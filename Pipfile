@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+wagtail = "*"
+django-environ = "*"
+
+[dev-packages]
+ruff = "*"
+pre-commit = "*"
+djlint = "*"
+
+[requires]
+python_version = "3.12"
