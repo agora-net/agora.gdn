@@ -5,6 +5,7 @@ from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+from home import views as home_views
 from search import views as search_views
 
 urlpatterns = [
@@ -12,6 +13,12 @@ urlpatterns = [
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
+    path("join-waiting-list/", home_views.join_waiting_list, name="join_waiting_list"),
+    path(
+        "join-waiting-list/success",
+        home_views.join_waiting_list_success,
+        name="join_waiting_list_success",
+    ),
 ]
 
 

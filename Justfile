@@ -21,6 +21,10 @@ manage *ARGS:
 runserver:
     @{{ manage }} runserver
 
+# Create Django migrations
+makemigrations:
+    @{{ manage }} makemigrations
+
 # Run Django migrations
 migrate:
     @{{ manage }} migrate

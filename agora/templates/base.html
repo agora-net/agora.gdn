@@ -1,6 +1,6 @@
 {% load static wagtailcore_tags wagtailuserbar %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
     <head>
         <meta charset="utf-8" />
         <title>
@@ -27,7 +27,7 @@
         <link rel="stylesheet" type="text/css" href="{% static 'css/agora.css' %}">
         {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
     </head>
-    <body class="{% block body_class %}{% endblock body_class %}">
+    <body class="{% block body_class %}h-full{% endblock body_class %}">
         {% wagtailuserbar %}
         {% block content %}
         {% endblock content %}

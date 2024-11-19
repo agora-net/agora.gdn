@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 wagtail = "*"
 django-environ = "*"
+django-extensions = "*"
+django-model-utils = "*"
+pillow = "*"
+nh3 = "*"
 
 [dev-packages]
 ruff = "*"
