@@ -21,9 +21,7 @@ class WaitingPage(Page):
     # Database fields
 
     tag = models.CharField(max_length=255, blank=True, help_text="Text for a tag above the title")
-    waiting_title = models.CharField(
-        max_length=255, blank=True, help_text="Title for the waiting page"
-    )
+    waiting_title = models.CharField(max_length=255, help_text="Title for the waiting page")
     description = models.TextField(blank=True, help_text="Description for the waiting page")
     show_signup = models.BooleanField(default=True, help_text="Show the signup form or not")
     background_color = models.CharField(
