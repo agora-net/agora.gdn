@@ -3,6 +3,9 @@ module.exports = {
 	content: ["../**/*.{html,js,css,svg}", "!../**/node_modules"],
 	theme: {
 		extend: {},
+		fontFamily: {
+			sans: ["Figtree", "sans-serif"],
+		},
 	},
 	plugins: [require("daisyui")],
 	daisyui: {
