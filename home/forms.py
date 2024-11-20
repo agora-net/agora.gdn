@@ -1,27 +1,16 @@
 from django import forms
 
-from .models import WaitingListSignup
 
-
-class WaitingListSignupForm(forms.ModelForm):
+class WaitingListSignupForm(forms.Form):
     referred_by_code = forms.CharField(
         required=False,
         widget=forms.HiddenInput(),
     )
-
-    class Meta:
-        model = WaitingListSignup
-        fields = ["email"]
-        widgets = {
-            "email": forms.EmailInput(
-                attrs={
-                    "placeholder": "jamie@example.com",
-                }
-            ),
-        }
-
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if WaitingListSignup.objects.filter(email=email).exists():
-            raise forms.ValidationError("You are already on the waiting list.")
-        return email
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(
+            attrs={
+                "placeholder": "jamie@example.com",
+            }
+        ),
+    )

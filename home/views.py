@@ -23,6 +23,21 @@ def join_waiting_list(request: HttpRequest):
 
         if form.is_valid():
             sanitized_email = nh3.clean(form.cleaned_data["email"])
+
+            # Has this user already registered?
+            try:
+                existing_signup = WaitingListSignup.objects.get(email=sanitized_email)
+                request.session["referral_code"] = existing_signup.referral_code
+
+                return page.specific.serve(
+                    request,
+                    additional_context={
+                        "referral_code": existing_signup.referral_code,
+                    },
+                )
+            except WaitingListSignup.DoesNotExist:
+                pass
+
             referral_code = nh3.clean(form.cleaned_data.get("referred_by_code", ""))
 
             try:
