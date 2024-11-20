@@ -1,7 +1,9 @@
 from cuid2 import Cuid
 from django.db import models
 from model_utils.models import TimeStampedModel
+from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
+from wagtail.fields import StreamField
 from wagtail.models import Page
 
 
@@ -39,9 +41,6 @@ class WaitingPage(Page):
     waiting_title = models.CharField(max_length=255, help_text="Title for the waiting page")
     description = models.TextField(blank=True, help_text="Description for the waiting page")
     show_signup = models.BooleanField(default=True, help_text="Show the signup form or not")
-    background_color = models.CharField(
-        max_length=255, blank=True, help_text="Background color for the waiting page"
-    )
     signup_image = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -49,6 +48,53 @@ class WaitingPage(Page):
         on_delete=models.SET_NULL,
         related_name="+",
         help_text="Sign Up image",
+    )
+    features = StreamField(
+        [
+            (
+                "feature_list",
+                blocks.ListBlock(
+                    blocks.StructBlock(
+                        [
+                            ("icon", blocks.CharBlock()),
+                            ("title", blocks.CharBlock()),
+                            ("description", blocks.TextBlock()),
+                        ]
+                    )
+                ),
+            )
+        ]
+    )
+
+    # Content for successful sign up to waiting list. Will have referral code injected
+    success_content = StreamField(
+        [
+            (
+                "title",
+                blocks.CharBlock(
+                    max_length=255,
+                    blank=True,
+                    help_text="Title upon successful sign up to waiting list",
+                ),
+            ),
+            ("body", blocks.RichTextBlock(blank=True, help_text="Body upon successful sign up")),
+            (
+                "referral_code",
+                blocks.BooleanBlock(default=True, help_text="Show referral code here"),
+            ),
+            (
+                "incentive_list",
+                blocks.ListBlock(
+                    blocks.StructBlock(
+                        [
+                            ("icon", blocks.CharBlock()),
+                            ("title", blocks.CharBlock()),
+                            ("description", blocks.TextBlock()),
+                        ]
+                    )
+                ),
+            ),
+        ]
     )
 
     # Editor panels configuration
@@ -58,8 +104,9 @@ class WaitingPage(Page):
         FieldPanel("waiting_title"),
         FieldPanel("description"),
         FieldPanel("show_signup"),
-        FieldPanel("background_color"),
         FieldPanel("signup_image"),
+        FieldPanel("features"),
+        FieldPanel("success_content"),
     ]
 
     # Overwrite some core methods

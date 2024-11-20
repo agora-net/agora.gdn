@@ -86,33 +86,33 @@
                             </div>
                         {% endif %}
                     </section>
-                {% endif %}
-                {% comment %} features:
-            - No spam and bots as we verify every user
-            - Small annual fee to see no advertising
-            - We profit share with our content creators (highlight top creators and up-and-coming)
-            - Content creators can sell exclusive content and merch (we take 20%)
-            - Tip your favorite content creators (we take 10%)
-            - No ads, no tracking, no selling your data
-            - Connect with other platforms (Threads via ActivityPub, Bluesky via AT Protocol)
-            - Use your verified identity across the web (via WebID)
-                {% endcomment %}
-                <div id="features" class="flex flex-col gap-2">
-                    <div class="carousel rounded-box w-full border-secondary border-2 lg:min-h-48">
-                        <div id="slide1" class="carousel-item relative w-full flex text-secondary">
-                            <div class="bg-secondary w-1/4 py-8 hidden md:flex items-center justify-center">
-                                <div class="h-12 w-12 lg:h-20 lg:w-20 bg-secondary-content rounded-s-lg"></div>
-                            </div>
-                            <div class="flex-grow py-8 pl-8 flex flex-col justify-center gap-4">
-                                <h2 class="text-2xl font-semibold">A cool feature</h2>
-                                <p>Some information about the cool feature</p>
+                    {% comment %} features:
+                - No spam and bots as we verify every user
+                - Small annual fee to see no advertising
+                - We profit share with our content creators (highlight top creators and up-and-coming)
+                - Content creators can sell exclusive content and merch (we take 20%)
+                - Tip your favorite content creators (we take 10%)
+                - No ads, no tracking, no selling your data
+                - Connect with other platforms (Threads via ActivityPub, Bluesky via AT Protocol)
+                - Use your verified identity across the web (via WebID)
+                    {% endcomment %}
+                    <div id="features" class="flex flex-col gap-2">
+                        <div class="carousel rounded-box w-full border-secondary border-2 lg:min-h-48">
+                            <div id="slide1" class="carousel-item relative w-full flex text-secondary">
+                                <div class="bg-secondary w-1/4 py-8 hidden md:flex items-center justify-center">
+                                    <div class="h-12 w-12 lg:h-20 lg:w-20 bg-secondary-content rounded-s-lg"></div>
+                                </div>
+                                <div class="flex-grow py-8 pl-8 flex flex-col justify-center gap-4">
+                                    <h2 class="text-2xl font-semibold">A cool feature</h2>
+                                    <p>Some information about the cool feature</p>
+                                </div>
                             </div>
                         </div>
+                        <div class="flex w-full justify-center gap-2 py-2">
+                            <a href="#slide1" class="btn btn-xs">1</a>
+                        </div>
                     </div>
-                    <div class="flex w-full justify-center gap-2 py-2">
-                        <a href="#slide1" class="btn btn-xs">1</a>
-                    </div>
-                </div>
+                {% endif %}
                 <div class="text-xs text-balance">
                     Some footer text and a <a class="link" href="#">link</a>. We should share some info on the <a class="link" href="#">company</a> and <a class="link" href="#">team</a>.
                 </div>
