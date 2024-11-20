@@ -13,7 +13,7 @@ urlpatterns = [
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
-    path("join-waiting-list/", home_views.join_waiting_list, name="join_waiting_list"),
+    path("join/", home_views.join_waiting_list, name="join_waiting_list"),
 ]
 
 

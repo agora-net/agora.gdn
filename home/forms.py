@@ -4,12 +4,20 @@ from .models import WaitingListSignup
 
 
 class WaitingListSignupForm(forms.ModelForm):
+    referred_by_code = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+
     class Meta:
         model = WaitingListSignup
-        fields = ["email", "referred_by"]
+        fields = ["email"]
         widgets = {
-            "email": forms.EmailInput(attrs={"placeholder": "jamie@example.com"}),
-            "referred_by": forms.HiddenInput(),
+            "email": forms.EmailInput(
+                attrs={
+                    "placeholder": "jamie@example.com",
+                }
+            ),
         }
 
     def clean_email(self):

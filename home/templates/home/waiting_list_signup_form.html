@@ -15,12 +15,13 @@
                 <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
                 <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
             </svg>
-            <input type="email" class="grow" placeholder="Email" />
+            {{ form.email }}
         </label>
-        <input type="text" name="referred_by" class="hidden">
+        {{ form.referred_by_code }}
         <button type="submit" class="group btn btn-primary flex">
             Join the waiting list
             {% include "icons/arrow-right-alt.svg" with class="transition-transform	translate-x-0 group-hover:translate-x-2 h-6" %}
         </button>
     </form>
+    {% if form.errors %}<div class="text-error mt-2">{{ form.errors }}</div>{% endif %}
 {% endblock content %}
