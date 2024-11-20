@@ -84,10 +84,16 @@
                                     </button>
                                 </form>
                                 {% if form.errors %}
-                                    <div class="form-errors text-error">
-                                        <ul>
+                                    <div role="alert" class="alert alert-error">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             class="h-6 w-6 shrink-0 stroke-current"
+                                             fill="none"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <ul class="flex flex-col gap-2">
                                             {% for field, errors in form.errors.items %}
-                                                <li>
+                                                <li class="flex gap-2">
                                                     {{ field }}:
                                                     <ul>
                                                         {% for error in errors %}<li>{{ error }}</li>{% endfor %}
