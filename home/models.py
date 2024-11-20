@@ -10,7 +10,12 @@ from wagtail.models import Page
 # -----------------------------------------
 class WaitingListSignup(TimeStampedModel):
     email = models.EmailField(unique=True, max_length=255)
-    referral_code = models.CharField(max_length=10, default=Cuid(length=10).generate, unique=True)
+    referral_code = models.CharField(
+        max_length=10,
+        default=Cuid(length=10).generate,
+        unique=True,
+        editable=False,
+    )
     referred_by = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
@@ -60,6 +65,7 @@ class WaitingPage(Page):
     # Overwrite some core methods
 
     def serve(self, request, *args, **kwargs):
+        """Handle the POST request to join the waiting list with our custom view"""
         if request.method == "POST" and not kwargs.get("additional_context"):
             from .views import join_waiting_list
 
