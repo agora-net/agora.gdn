@@ -7,7 +7,7 @@
     <div class="md:p-8 flex min-h-full">
         <div class="flex flex-1 flex-col justify-between lg:flex-none lg:w-1/2 p-4 md:p-8 lg:p-16 bg-[#FCFAE3] rounded-2xl md:rounded-r-none relative">
             {% comment %} Put a background image in the top half of the vertical content on smaller screens {% endcomment %}
-            {% image page.signup_image original class="absolute inset-0 size-full object-cover rounded-t-2xl md:hidden h-2/3" %}
+            {% image page.signup_image original class="absolute inset-0 size-full object-cover rounded-t-2xl md:hidden h-2/3" loading=lazy %}
             <div class="glass md:bg-none md:backdrop-blur-none shadow-none p-4 rounded-2xl flex flex-1 flex-col justify-between  [--glass-blur:20px] [--glass-opacity:40%]">
                 {% include "logo/agora.svg" %}
                 <h1 class="sr-only">Agora</h1>
@@ -156,7 +156,7 @@
             </div>
         </div>
         <div class="relative hidden w-0 flex-1 md:block">
-            {% image page.signup_image original class="absolute inset-0 size-full object-cover rounded-r-2xl" %}
+            {% image page.signup_image original class="absolute inset-0 size-full object-cover rounded-r-2xl" loading=lazy %}
         </div>
     </div>
 {% endblock content %}
