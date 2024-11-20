@@ -6,9 +6,10 @@ from .models import WaitingListSignup
 class WaitingListSignupForm(forms.ModelForm):
     class Meta:
         model = WaitingListSignup
-        fields = ["email"]
+        fields = ["email", "referred_by"]
         widgets = {
             "email": forms.EmailInput(attrs={"placeholder": "jamie@example.com"}),
+            "referred_by": forms.HiddenInput(),
         }
 
     def clean_email(self):

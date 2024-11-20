@@ -3,15 +3,6 @@
 {% block body_class %}
     h-full
 {% endblock body_class %}
-{% block extra_css %}
-    <style>
-  @property --background-color {
-    syntax: "<color>";
-    inherits: false;
-    initial-value: white;
-  }
-    </style>
-{% endblock extra_css %}
 {% block content %}
     <div class="md:p-8 flex min-h-full">
         <div class="flex flex-1 flex-col justify-between lg:flex-none lg:w-1/2 p-4 md:p-8 lg:p-16 bg-[#FCFAE3] rounded-2xl md:rounded-r-none relative">
@@ -52,7 +43,7 @@
                                     </svg>
                                     <input type="email" class="grow" placeholder="Email" />
                                 </label>
-                                <input type="text" name="referrer" class="hidden">
+                                <input type="text" name="referred_by" class="hidden">
                                 <button type="submit" class="group btn btn-primary flex">
                                     Join the waiting list
                                     {% include "icons/arrow-right-alt.svg" with class="transition-transform	translate-x-0 group-hover:translate-x-2 h-6" %}

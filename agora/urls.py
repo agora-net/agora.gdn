@@ -14,11 +14,6 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     path("join-waiting-list/", home_views.join_waiting_list, name="join_waiting_list"),
-    path(
-        "join-waiting-list/success",
-        home_views.join_waiting_list_success,
-        name="join_waiting_list_success",
-    ),
 ]
 
 

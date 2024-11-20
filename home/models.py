@@ -10,7 +10,7 @@ from wagtail.models import Page
 # -----------------------------------------
 class WaitingListSignup(TimeStampedModel):
     email = models.EmailField(unique=True, max_length=255)
-    referral_code = models.CharField(max_length=10, default=Cuid(length=10).generate)
+    referral_code = models.CharField(max_length=10, default=Cuid(length=10).generate, unique=True)
     referred_by = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
