@@ -1,9 +1,9 @@
 import nh3
 from django.http import HttpRequest
-from django.shortcuts import render
+from wagtail.models import Page
 
 from .forms import WaitingListSignupForm
-from .models import WaitingListSignup
+from .models import WaitingListSignup, WaitingPage
 
 REFERRAL_QUERY_PARAM = "ref"
 
@@ -14,6 +14,9 @@ def join_waiting_list(request: HttpRequest):
         initial_data["referred_by_code"] = request.GET[REFERRAL_QUERY_PARAM]
 
     form = WaitingListSignupForm(initial_data)
+
+    # Get the WaitingPage instance - assuming it's a child of home page
+    page = Page.objects.type(WaitingPage).first()
 
     if request.method == "POST":
         form.full_clean()
@@ -33,18 +36,11 @@ def join_waiting_list(request: HttpRequest):
             )
             obj.save()
 
-            return render(
+            return page.serve(
                 request,
-                "home/waiting_list_signup_success.html",
-                {
+                context={
                     "referral_code": obj.referral_code,
                 },
             )
 
-    return render(
-        request,
-        "home/waiting_list_signup_form.html",
-        {
-            "form": form,
-        },
-    )
+    return page.serve(request, context={"form": form})
