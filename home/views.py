@@ -36,6 +36,8 @@ def join_waiting_list(request: HttpRequest):
             )
             obj.save()
 
+            request.session["referral_code"] = obj.referral_code
+
             return page.specific.serve(
                 request,
                 additional_context={
