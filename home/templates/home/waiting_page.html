@@ -12,21 +12,34 @@
                 {% include "logo/agora.svg" %}
                 <h1 class="sr-only">Agora</h1>
                 {% if referral_code %}
-                    <section class="flex flex-col gap-4 lg:w-3/4">
+                    <section class="flex flex-col gap-4">
                         {% comment %} Show suggestion to share and refer users {% endcomment %}
                         {% for block in page.success_content %}
                             {% if block.block_type == "title" %}
                                 <h1 class="text-2xl lg:text-4xl font-semibold text-secondary">{{ block.value }}</h1>
                             {% endif %}
                             {% if block.block_type == "body" %}
-                                <p class="text-lg lg:text-2xl text-balance text-pretty text-secondary">{{ block.value }}</p>
+                                <div class="text-lg text-balance text-pretty text-secondary">{{ block.value | richtext }}</div>
                             {% endif %}
                             {% if block.block_type == "referral_code" %}
-                                {% if block.value %}<div class="flex flex-col gap-4">{{ referral_code }}</div>{% endif %}
+                                {% if block.value %}
+                                    <div class="flex flex-col gap-4 border rounded-md py-2 px-4 bg-white w-fit shadow-sm">
+                                        <a class="link text-secondary"
+                                           href="{% fullpageurl page %}{% querystring ref=referral_code %}">{% fullpageurl page %}{% querystring ref=referral_code %}</a>
+                                    </div>
+                                {% endif %}
                             {% endif %}
                             {% if block.block_type == "incentive_list" %}
-                                <div class="flex gap-4 flex-wrap">
-                                    {% for incentive in block.value %}<div class="flex flex-col p-4 border rounded-md border-accent"></div>{% endfor %}
+                                <div class="flex gap-4 flex-wrap ">
+                                    {% for incentive in block.value %}
+                                        <div class="flex flex-grow flex-col gap-2 p-4 border rounded-md border-secondary text-secondary">
+                                            <div class="flex gap-2 items-end w-full border-b pb-2">
+                                                {% include "icons/"|add:incentive.icon|add:".svg" with class="h-8 w-8" %}
+                                                <h2 class="font-semibold text-lg text-primary">{{ incentive.title }}</h2>
+                                            </div>
+                                            <p class="text-sm">{{ incentive.description }}</p>
+                                        </div>
+                                    {% endfor %}
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -130,8 +143,15 @@
                         </div>
                     </div>
                 {% endif %}
-                <div class="text-xs text-balance">
-                    Some footer text and a <a class="link" href="#">link</a>. We should share some info on the <a class="link" href="#">company</a> and <a class="link" href="#">team</a>.
+                <div class="flex flex-col gap-2">
+                    <div class="text-xs text-balance lg:w-1/2">
+                        © 2024, Agora is (currently) a project of <a class="link"
+    href="https://lu.chregister.ch/cr-portal/auszug/auszug.xhtml?uid=CHE-372.115.477#">Climacrux LLC</a> and a work in progress. More information will be available soon. If you have any questions, please <a class="link" href="mailto:hello@agora.gdn">email us</a>.
+                    </div>
+                    <div class="text-xs flex items-center gap-2">
+                        {% include "icons/flag/ch.svg" with class="w-4 h-4" %}
+                        Proudly built in Switzerland.
+                    </div>
                 </div>
             </div>
         </div>
