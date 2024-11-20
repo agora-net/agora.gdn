@@ -126,7 +126,7 @@ class WaitingPage(Page):
 
         context = super().get_context(request, *args, **kwargs)
         initial_data = {"referred_by_code": request.GET.get("ref")}
-        context["form"] = WaitingListSignupForm(data=initial_data)
+        context["form"] = WaitingListSignupForm(initial=initial_data)
         context["referral_code"] = request.session.get("referral_code")
 
         if additional_context:
