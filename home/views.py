@@ -36,11 +36,11 @@ def join_waiting_list(request: HttpRequest):
             )
             obj.save()
 
-            return page.serve(
+            return page.specific.serve(
                 request,
-                context={
+                additional_context={
                     "referral_code": obj.referral_code,
                 },
             )
 
-    return page.serve(request, context={"form": form})
+    return page.specific.serve(request, additional_context={"form": form})

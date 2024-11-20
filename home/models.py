@@ -1,6 +1,5 @@
 from cuid2 import Cuid
 from django.db import models
-from django.template.response import TemplateResponse
 from model_utils.models import TimeStampedModel
 from wagtail.admin.panels import FieldPanel
 from wagtail.models import Page
@@ -60,30 +59,23 @@ class WaitingPage(Page):
 
     # Overwrite some core methods
 
-    def route(self, request, path_components):
-        if request.method == "POST":
+    def serve(self, request, *args, **kwargs):
+        if request.method == "POST" and not kwargs.get("additional_context"):
             from .views import join_waiting_list
 
             return join_waiting_list(request)
-        return super().route(request, path_components)
-
-    def serve(self, request, *args, **kwargs):
-        context = self.get_context(request, *args, **kwargs)
-        # Allow passing additional context to serve method
-        context.update(kwargs.get("context", {}))
-
-        return TemplateResponse(
-            request,
-            self.get_template(request, *args, **kwargs),
-            context,
-        )
+        return super().serve(request, *args, **kwargs)
 
     # Add some additional context
 
-    def get_context(self, request):
+    def get_context(self, request, additional_context=None, *args, **kwargs):
         from .forms import WaitingListSignupForm
 
-        context = super().get_context(request)
+        context = super().get_context(request, *args, **kwargs)
         initial_data = {"referred_by_code": request.GET.get("ref")}
         context["form"] = WaitingListSignupForm(data=initial_data)
+
+        if additional_context:
+            context.update(additional_context)
+
         return context
