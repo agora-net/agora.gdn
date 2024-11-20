@@ -12,8 +12,25 @@
                 {% include "logo/agora.svg" %}
                 <h1 class="sr-only">Agora</h1>
                 {% if referral_code %}
-                    {% comment %} Show suggestion to share and refer users {% endcomment %}
-                    <div class="flex flex-col gap-4">{{ referral_code }}</div>
+                    <section class="flex flex-col gap-4 lg:w-3/4">
+                        {% comment %} Show suggestion to share and refer users {% endcomment %}
+                        {% for block in page.success_content %}
+                            {% if block.block_type == "title" %}
+                                <h1 class="text-2xl lg:text-4xl font-semibold text-secondary">{{ block.value }}</h1>
+                            {% endif %}
+                            {% if block.block_type == "body" %}
+                                <p class="text-lg lg:text-2xl text-balance text-pretty text-secondary">{{ block.value }}</p>
+                            {% endif %}
+                            {% if block.block_type == "referral_code" %}
+                                {% if block.value %}<div class="flex flex-col gap-4">{{ referral_code }}</div>{% endif %}
+                            {% endif %}
+                            {% if block.block_type == "incentive_list" %}
+                                <div class="flex gap-4 flex-wrap">
+                                    {% for incentive in block.value %}<div class="flex flex-col p-4 border rounded-md border-accent"></div>{% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </section>
                 {% else %}
                     <section class="flex flex-col gap-4 lg:w-3/4">
                         {% if page.tag %}
