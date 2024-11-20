@@ -10,6 +10,7 @@ django-extensions = "*"
 django-model-utils = "*"
 pillow = "*"
 nh3 = "*"
+cuid2 = "*"
 
 [dev-packages]
 ruff = "*"
