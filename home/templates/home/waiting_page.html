@@ -132,22 +132,33 @@
                 - Connect with other platforms (Threads via ActivityPub, Bluesky via AT Protocol)
                 - Use your verified identity across the web (via WebID)
                     {% endcomment %}
-                    <div id="features" class="flex flex-col gap-2">
-                        <div class="carousel rounded-box w-full border-secondary border-2 lg:min-h-48">
-                            <div id="slide1" class="carousel-item relative w-full flex text-secondary">
-                                <div class="bg-secondary w-1/4 py-8 hidden md:flex items-center justify-center">
-                                    <div class="h-12 w-12 lg:h-20 lg:w-20 bg-secondary-content rounded-s-lg"></div>
+                    {% for block in page.features %}
+                        {% if block.block_type == "feature_list" %}
+                            <div id="features" class="flex flex-col gap-2">
+                                <div class="carousel rounded-box w-full border-secondary border-2 lg:min-h-48">
+                                    {% for feature in block.value %}
+                                        <div id="slide{{ forloop.counter }}"
+                                             class="carousel-item relative w-full flex text-secondary">
+                                            <div class="bg-secondary w-1/4 py-8 hidden md:flex items-center justify-center">
+                                                <div class="h-12 w-12 lg:h-20 lg:w-20 text-secondary-content rounded-s-lg flex items-center justify-center">
+                                                    {% include "icons/"|add:feature.icon|add:".svg" with class="h-12 w-12" %}
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow py-8 pl-8 flex flex-col justify-center gap-4">
+                                                <h2 class="text-2xl font-semibold">{{ feature.title }}</h2>
+                                                <p>{{ feature.description }}</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
                                 </div>
-                                <div class="flex-grow py-8 pl-8 flex flex-col justify-center gap-4">
-                                    <h2 class="text-2xl font-semibold">A cool feature</h2>
-                                    <p>Some information about the cool feature</p>
+                                <div class="flex w-full justify-center gap-2 py-2">
+                                    {% for feature in block.value %}
+                                        <a href="#slide{{ forloop.counter }}" class="btn btn-xs">{{ forloop.counter }}</a>
+                                    {% endfor %}
                                 </div>
                             </div>
-                        </div>
-                        <div class="flex w-full justify-center gap-2 py-2">
-                            <a href="#slide1" class="btn btn-xs">1</a>
-                        </div>
-                    </div>
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
                 <div class="flex flex-col gap-4">
                     <div class="text-xs text-pretty lg:w-3/4">

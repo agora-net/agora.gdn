@@ -5,14 +5,18 @@
 		"elif",
 		"endcomment",
 		"endfor",
+		"forloop",
 		"fullpageurl",
 		"modelcluster",
 		"pageurl",
 		"signup",
+		"stylesheet",
 		"taggit",
 		"wagtailadmin",
+		"wagtailcore",
 		"wagtaildocs",
-		"WAGTAILSEARCH"
+		"WAGTAILSEARCH",
+		"wagtailuserbar"
 	],
 	"[python]": {
 		"editor.formatOnSave": true,
