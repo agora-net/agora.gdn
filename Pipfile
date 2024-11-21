@@ -11,6 +11,7 @@ django-model-utils = "*"
 pillow = "*"
 nh3 = "*"
 cuid2 = "*"
+whitenoise = {extras = ["brotli"], version = "*"}
 
 [dev-packages]
 ruff = "*"
