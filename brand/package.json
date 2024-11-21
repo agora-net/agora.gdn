@@ -4,6 +4,7 @@
 	"description": "",
 	"scripts": {
 		"build": "parcel build",
+		"build:cdn": "parcel build --public-url https://cdn.agora.gdn/",
 		"watch": "parcel watch"
 	},
 	"keywords": [],
@@ -24,8 +25,7 @@
 	"source": ["./assets/*", "./assets/*"],
 	"targets": {
 		"default": {
-			"distDir": "./static/brand",
-			"publicUrl": "https://cdn.agora.gdn/"
+			"distDir": "./static/brand"
 		}
 	}
 }

@@ -19,7 +19,7 @@ manage *ARGS:
 
 # Run the development server
 runserver:
-    @{{ manage }} runserver
+    @{{ manage }} runserver --nostatic
 
 # Create Django migrations
 makemigrations:
