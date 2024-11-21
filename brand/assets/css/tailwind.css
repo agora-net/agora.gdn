@@ -1,4 +1,4 @@
-@import url(https://fonts.bunny.net/css?family=figtree:400,400i,700,700i,900,900i);
+@import "@fontsource-variable/figtree";
 
 @tailwind base;
 @tailwind components;
