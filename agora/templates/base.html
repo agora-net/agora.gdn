@@ -53,12 +53,17 @@
               itemprop="description"
               content="{{ page.search_description|default:"A social media platform for grown ups" }}">
         {% comment %} Favicon {% endcomment %}
-        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon"
+              type="image/png"
+              href="{% static "favicon-96x96.png" %}"
+              sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="{% static "favicon.svg" %}" />
+        <link rel="shortcut icon" href="{% static "favicon.ico" %}" />
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="{% static "apple-touch-icon.png" %}" />
         <meta name="apple-mobile-web-app-title" content="Agora" />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="manifest" href="{% static "site.webmanifest" %}" />
         {% comment %} Extra {% endcomment %}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {# Force all links in the live preview panel to be opened in a new tab #}
