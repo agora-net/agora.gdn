@@ -24,7 +24,8 @@
 	"source": ["./assets/*", "./assets/*"],
 	"targets": {
 		"default": {
-			"distDir": "./static/brand"
+			"distDir": "./static/brand",
+			"publicUrl": "https://cdn.agora.gdn/"
 		}
 	}
 }
