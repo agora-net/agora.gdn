@@ -30,6 +30,10 @@ makemigrations:
 migrate:
     @{{ manage }} migrate
 
+# Collect static files
+collectstatic:
+    @{{ manage }} collectstatic --noinput
+
 # Run a NPM command in the brand directory
 npm *ARGS:
     @{{ NPM }} {{ ARGS }}
