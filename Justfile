@@ -7,6 +7,7 @@ default:
 # Variables
 PIPENV_RUN := "pipenv run"
 NPM := "cd brand && npm"
+NPX := "cd brand && npx"
 
 ###############################################
 ## Django management
@@ -48,6 +49,10 @@ install: install-python install-node
 # Compile and watch the static assets
 watch-static:
     @{{ NPM }} run watch
+
+# Expose the local Django server to the internet via localtunnel
+localtunnel:
+    @{{ NPX }} lt --port 8000
 
 # Run the linter and formatter
 format:
