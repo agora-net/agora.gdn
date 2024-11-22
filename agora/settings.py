@@ -101,7 +101,7 @@ WSGI_APPLICATION = "agora.wsgi.application"
 # Taken from: https://www.reddit.com/r/django/comments/x2h6cq/whats_your_logging_setup/
 
 
-LOG_LEVEL = env.str("LOG_LEVEL", default="ERROR")
+LOG_LEVEL = env.str("LOG_LEVEL", default="WARNING")
 LOGS_SAVE_TO_FILE = env.bool("LOGS_SAVE_TO_FILE", default=False)
 LOGS_DIR = BASE_DIR / "logs"
 LOGGING = {
@@ -190,7 +190,7 @@ LOGGING = {
             "handlers": [
                 "console",
             ],
-            "propagate": True,
+            "propagate": False,
         },
         "django.request": {
             "handlers": ["email_queue"],
