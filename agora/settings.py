@@ -96,6 +96,62 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "agora.wsgi.application"
 
+# Logging config
+# https://docs.djangoproject.com/en/5.1/topics/logging/
+# Taken from: https://www.reddit.com/r/django/comments/x2h6cq/whats_your_logging_setup/
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "superverbose": {
+            "format": (
+                "%(levelname)s %(asctime)s %(module)s:%(lineno)d "
+                "%(process)d %(thread)d %(message)s"
+            )
+        },
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s:%(lineno)d %(message)s"},
+        "simple": {"format": "%(levelname)s %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+        "formatter": "verbose",
+    },
+    "loggers": {
+        "django.utils.autoreload": {
+            "handlers": [],
+            "level": "ERROR",
+        },
+        "django": {
+            "level": env.str("DJANGO_LOG_LEVEL", "INFO"),
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        # "somelib": {
+        #     "level": "DEBUG",
+        #     "handlers": ["console"],
+        #     "propagate": False,
+        # },
+        # "somelib.package": {
+        #     "level": "ERROR",
+        #     "handlers": ["console"],
+        #     "propagate": False,
+        # },
+        "agora": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+    },
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
