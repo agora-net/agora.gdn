@@ -4,6 +4,10 @@
 default:
     @just --list --unsorted
 
+export PIPENV_DONT_LOAD_ENV := "1"
+export PIPENV_IGNORE_VIRTUALENVS := "1"
+export PIPENV_VENV_IN_PROJECT := "1"
+
 # Variables
 PIPENV_RUN := "pipenv run"
 NPM := "cd brand && npm"
