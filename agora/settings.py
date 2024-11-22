@@ -100,9 +100,18 @@ WSGI_APPLICATION = "agora.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/topics/logging/
 # Taken from: https://www.reddit.com/r/django/comments/x2h6cq/whats_your_logging_setup/
 
+
+LOG_LEVEL = env.str("LOG_LEVEL", default="ERROR")
+LOGS_SAVE_TO_FILE = env.bool("LOGS_SAVE_TO_FILE", default=False)
+LOGS_DIR = BASE_DIR / "logs"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+        "no_error_messages": {"()": "utils.log.NonErrorFilter"},
+        "require_save_to_file": {"()": "utils.log.RequireSaveToFileFilter"},
+    },
     "formatters": {
         "superverbose": {
             "format": (
@@ -112,46 +121,91 @@ LOGGING = {
         },
         "verbose": {"format": "%(levelname)s %(asctime)s %(module)s:%(lineno)d %(message)s"},
         "simple": {"format": "%(levelname)s %(message)s"},
+        "json": {
+            "()": "utils.log.JSONFormatter",
+            "fmt_keys": {
+                # key = value in the JSON log message output output
+                # value = logging variable that will be used
+                "level": "levelname",
+                "timestamp": "asctime",
+                "msg": "message",
+                "logger": "name",
+                "pid": "process",
+                "tid": "thread",
+                "exception": "exc_info",
+            },
+        },
     },
     "handlers": {
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
         "console": {
+            "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "debug_file": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "debug.log",
+            "formatter": "json",
+            "maxBytes": 1024 * 1024 * 5,  # 5MB
+            "backupCount": 3,
+            "encoding": "utf-8",
+            "filters": ["require_save_to_file", "no_error_messages"],
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "error.log",
+            "formatter": "json",
+            "maxBytes": 1024 * 1024 * 5,  # 5MB
+            "backupCount": 3,
+            "encoding": "utf-8",
+            "filters": ["require_save_to_file"],
+        },
+        "file_queue": {
+            "level": "DEBUG",
+            "class": "logging.handlers.QueueHandler",
+            "handlers": ["debug_file", "error_file"],
+            "respect_handler_level": True,
+        },
+        "email_queue": {
+            "level": "ERROR",
+            "class": "logging.handlers.QueueHandler",
+            "handlers": ["mail_admins"],
+            "respect_handler_level": True,
+        },
     },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-        "formatter": "verbose",
-    },
+    "root": {"level": LOG_LEVEL, "handlers": ["console", "file_queue"]},
     "loggers": {
         "django.utils.autoreload": {
             "handlers": [],
             "level": "ERROR",
         },
         "django": {
-            "level": env.str("DJANGO_LOG_LEVEL", "INFO"),
-            "handlers": ["console"],
-            "propagate": False,
+            "handlers": [
+                "console",
+            ],
+            "propagate": True,
         },
-        # "somelib": {
-        #     "level": "DEBUG",
-        #     "handlers": ["console"],
-        #     "propagate": False,
-        # },
-        # "somelib.package": {
-        #     "level": "ERROR",
-        #     "handlers": ["console"],
-        #     "propagate": False,
-        # },
-        "agora": {
-            "level": "DEBUG",
-            "handlers": ["console"],
-            "propagate": False,
+        "django.request": {
+            "handlers": ["email_queue"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+        "django.security.DisallowedHost": {
+            "level": "ERROR",
+            "handlers": ["console", "email_queue"],
+            "propagate": True,
         },
     },
 }
 
+LOGGING_CONFIG = "utils.log.load_logging_config_start_listener"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
