@@ -6,9 +6,9 @@ After=network.target
 [Service]
 User=agora
 Group=www-data
-WorkingDirectory=/home/agora/agora.gdn
-ExecStart=/home/agora/agora.gdn/.venv/bin/gunicorn \
-          --config /home/agora/agora.gdn/conf/gunicorn/gunicorn.conf.py \
+WorkingDirectory=/opt/agora.gdn
+ExecStart=/opt/agora.gdn/.venv/bin/gunicorn \
+          --config /opt/agora.gdn/conf/gunicorn/gunicorn.conf.py \
           agora.wsgi
 
 [Install]
