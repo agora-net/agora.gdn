@@ -71,10 +71,10 @@
         {# Global stylesheets #}
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'brand/tailwind.css' %}">
+              href="{% static 'brand/static/tailwind.css' %}">
         <link rel="stylesheet"
               type="text/css"
-              href="{% static 'brand/agora.css' %}">
+              href="{% static 'brand/static/agora.css' %}">
         {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
     </head>
     <body class="{% block body_class %}h-full{% endblock body_class %}">
@@ -82,7 +82,7 @@
         {% block content %}
         {% endblock content %}
         {# Global javascript #}
-        <script type="text/javascript" src="{% static 'brand/agora.js' %}"></script>
+        <script type="text/javascript" src="{% static 'brand/static/agora.js' %}"></script>
         {% block extra_js %}{# Override this in templates to add extra javascript #}{% endblock %}
     </body>
 </html>

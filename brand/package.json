@@ -23,10 +23,10 @@
 		"@fontsource-variable/figtree": "^5.1.1",
 		"localtunnel": "^2.0.2"
 	},
-	"source": ["./assets/*", "./assets/*"],
+	"source": ["./static_src/*"],
 	"targets": {
 		"default": {
-			"distDir": "./static/brand"
+			"distDir": "./static/brand/static"
 		}
 	},
 	"@parcel/transformer-css": {

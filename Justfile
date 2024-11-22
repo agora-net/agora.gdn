@@ -54,6 +54,10 @@ install: install-python install-node
 watch-static:
     @{{ NPM }} run watch
 
+# Compile the static assets
+build-static:
+    @{{ NPM }} run build
+
 # Expose the local Django server to the internet via localtunnel
 localtunnel:
     @{{ NPX }} lt --port 8000

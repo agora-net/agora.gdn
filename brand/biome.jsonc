@@ -12,7 +12,9 @@
 		"ignore": [
 			"**/htmx.min.js",
 			"static/brand/*",
-			"**/node_modules",
+			"agora.net/static/**",
+			"node_modules/**",
+			".parcel-cache/**",
 			".venv/**",
 			".mypy_cache/**"
 		]
