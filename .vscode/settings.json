@@ -41,5 +41,5 @@
 		},
 		"editor.defaultFormatter": "charliermarsh.ruff"
 	},
-	"cSpell.ignoreWords": ["DONT", "accesslog"]
+	"cSpell.ignoreWords": ["DONT", "accesslog", "zstd"]
 }
