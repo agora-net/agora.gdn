@@ -28,5 +28,9 @@
 		"default": {
 			"distDir": "./static/brand"
 		}
+	},
+	"@parcel/transformer-css": {
+		"//": "Include this as sometimes Parcel breaks building Tailwind",
+		"errorRecovery": true
 	}
 }
