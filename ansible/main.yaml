@@ -1,0 +1,98 @@
+---
+- name: Deploy Agora Application
+  hosts: app
+  become: yes
+  vars:
+    app_user: agora
+    app_group: www-data
+    app_dir: /opt/agora.gdn
+    repo_url: https://github.com/agora-net/agora.net.git
+
+  tasks:
+    - name: Create Agora user
+      user:
+        name: "{{ app_user }}"
+        shell: /bin/bash
+        system: yes
+
+    - name: Install system dependencies
+      package:
+        name:
+          - git
+          - python3
+          - python3-pip
+          - caddy
+          - just
+        state: present
+
+    - name: Install pipenv
+      pip:
+        name: pipenv
+        state: present
+
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0755"
+
+    - name: Clone application repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+      become_user: "{{ app_user }}"
+
+    - name: Install Python dependencies
+      command:
+        cmd: just install
+        chdir: "{{ app_dir }}"
+      become_user: "{{ app_user }}"
+
+    - name: Run database migrations
+      command:
+        cmd: just migrate
+        chdir: "{{ app_dir }}"
+      become_user: "{{ app_user }}"
+
+    - name: Collect static files
+      command:
+        cmd: just collectstatic
+        chdir: "{{ app_dir }}"
+      become_user: "{{ app_user }}"
+
+    - name: Install systemd service
+      template:
+        src: templates/agora.service.j2
+        dest: /etc/systemd/system/agora.service
+        mode: "0644"
+      notify: restart agora
+
+    - name: Install Caddyfile
+      template:
+        src: templates/Caddyfile.j2
+        dest: /etc/caddy/Caddyfile
+        mode: "0644"
+      notify: reload caddy
+
+    - name: Enable and start services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - agora
+        - caddy
+
+  handlers:
+    - name: restart agora
+      systemd:
+        name: agora
+        state: restarted
+        daemon_reload: yes
+
+    - name: reload caddy
+      systemd:
+        name: caddy
+        state: reloaded
