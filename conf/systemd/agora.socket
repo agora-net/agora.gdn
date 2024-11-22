@@ -1,0 +1,8 @@
+[Unit]
+Description=agora socket
+
+[Socket]
+ListenStream=/run/agora.sock
+
+[Install]
+WantedBy=sockets.target
