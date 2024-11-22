@@ -1,5 +1,7 @@
 {
 	"cSpell.words": [
+		"collectstatic",
+		"createsuperuser",
 		"Cuid",
 		"djlint",
 		"elif",
@@ -7,18 +9,29 @@
 		"endfor",
 		"forloop",
 		"fullpageurl",
+		"gunicorn",
+		"justfile",
 		"levelname",
+		"localtunnel",
+		"makemigrations",
 		"modelcluster",
+		"noinput",
+		"nostatic",
 		"pageurl",
+		"PIPENV",
+		"runserver",
 		"signup",
 		"stylesheet",
 		"superverbose",
 		"taggit",
+		"venv",
+		"VIRTUALENVS",
 		"wagtailadmin",
 		"wagtailcore",
 		"wagtaildocs",
 		"WAGTAILSEARCH",
-		"wagtailuserbar"
+		"wagtailuserbar",
+		"wsgi"
 	],
 	"[python]": {
 		"editor.formatOnSave": true,
@@ -27,5 +40,6 @@
 			"source.organizeImports": "explicit"
 		},
 		"editor.defaultFormatter": "charliermarsh.ruff"
-	}
+	},
+	"cSpell.ignoreWords": ["DONT", "accesslog"]
 }
