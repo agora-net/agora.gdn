@@ -1,5 +1,6 @@
 {
 	"cSpell.words": [
+		"Caddyfile",
 		"collectstatic",
 		"createsuperuser",
 		"Cuid",
@@ -31,6 +32,7 @@
 		"wagtaildocs",
 		"WAGTAILSEARCH",
 		"wagtailuserbar",
+		"Whitenoise",
 		"wsgi"
 	],
 	"[python]": {
@@ -41,5 +43,5 @@
 		},
 		"editor.defaultFormatter": "charliermarsh.ruff"
 	},
-	"cSpell.ignoreWords": ["DONT", "accesslog", "zstd"]
+	"cSpell.ignoreWords": ["DONT", "accesslog", "chdir", "zstd"]
 }
