@@ -3,13 +3,24 @@
   hosts: app
   become: yes
   vars:
+    # app information
+    app_name: agora
     app_user: agora
     app_group: www-data
-    app_dir: /opt/agora.gdn
-    repo_url: https://github.com/agora-net/agora.net.git
+    # where the app is on the internet
+    app_domain: agora.gdn
+    media_domain: agora-media.gdn
+    # where the app is on the server
+    app_dir: /opt/{{ app_name }}
+    # where the app code is
+    # todo(kisamoto): Create and encrypt the token
+    github_token: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      623132663536313536
+    repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
 
   tasks:
-    - name: Create Agora user
+    - name: Create app user
       user:
         name: "{{ app_user }}"
         shell: /bin/bash
@@ -56,24 +67,36 @@
         chdir: "{{ app_dir }}"
       become_user: "{{ app_user }}"
 
+    - name: Build frontend assets
+      command:
+        cmd: just build-static
+        chdir: "{{ app_dir }}"
+      become_user: "{{ app_user }}"
+
     - name: Collect static files
       command:
         cmd: just collectstatic
         chdir: "{{ app_dir }}"
       become_user: "{{ app_user }}"
 
-    - name: Install systemd service
+    - name: Install app systemd services
       template:
-        src: templates/agora.service.j2
-        dest: /etc/systemd/system/agora.service
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         mode: "0644"
-      notify: restart agora
+      with_items:
+        - src: templates/app.service.j2
+          dest: /etc/systemd/system/{{ app_name }}.service
+        - src: templates/app.socket.j2
+          dest: /etc/systemd/system/{{ app_name }}.socket
+      notify: restart app
 
     - name: Install Caddyfile
       template:
-        src: templates/Caddyfile.j2
+        src: templates/caddy/Caddyfile.j2
         dest: /etc/caddy/Caddyfile
         mode: "0644"
+        validate: caddy validate --config %s
       notify: reload caddy
 
     - name: Enable and start services
@@ -82,13 +105,13 @@
         state: started
         enabled: yes
       loop:
-        - agora
+        - "{{ app_name }}"
         - caddy
 
   handlers:
-    - name: restart agora
+    - name: restart app
       systemd:
-        name: agora
+        name: "{{ app_name }}"
         state: restarted
         daemon_reload: yes
 

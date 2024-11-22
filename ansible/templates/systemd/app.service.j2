@@ -1,0 +1,15 @@
+[Unit]
+Description={{ app_name }} daemon
+Requires={{ app_name }}.socket
+After=network.target
+
+[Service]
+User={{ app_user }}
+Group={{ app_group}}
+WorkingDirectory={{ app_dir }}
+ExecStart={{ app_dir }}/.venv/bin/gunicorn \
+          --config {{ app_dir }}/conf/gunicorn/gunicorn.conf.py \
+          {{ app_name }}.wsgi
+
+[Install]
+WantedBy=multi-user.target

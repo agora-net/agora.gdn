@@ -1,16 +1,16 @@
 @media path /media/*
-@agora path *
+@{{ app_name }} path *
 
-agora-media.gdn {
+{{ media_domain }} {
 	file_server @media {
 		hide .git
 		precompressed zstd br gzip
 	}
 }
 
-agora.gdn {
-	reverse_proxy @agora {
+{{ app_domain }} {
+	reverse_proxy @{{ app_name }} {
 		# Reverse proxy everything. Whitenoise will serve static files.
-		to /run/agora.sock
+		to /run/{{ app_name }}.sock
 	}
 }
