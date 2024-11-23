@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "parcel build",
 		"build:cdn": "parcel build --public-url https://cdn.agora.gdn/",
-		"watch": "parcel watch"
+		"watch": "chokidar '../**/*.html ../**/*.css ../**/*.svg' --ignore './node_modules ../static ./.parcel-cache ../.venv ../.ruff_cache' --verbose --command 'parcel build'"
 	},
 	"keywords": [],
 	"author": "",
@@ -21,6 +21,7 @@
 	},
 	"dependencies": {
 		"@fontsource-variable/figtree": "^5.1.1",
+		"chokidar-cli": "^3.0.0",
 		"localtunnel": "^2.0.2"
 	},
 	"source": ["./static_src/*"],
