@@ -30,10 +30,10 @@
                                 {% endif %}
                             {% endif %}
                             {% if block.block_type == "incentive_list" %}
-                                <div class="flex gap-y-4 flex-wrap ">
+                                <div class="flex gap-y-4 flex-wrap divide-x">
                                     {% for incentive in block.value %}
-                                        <div class="flex flex-grow flex-col gap-2 p-4 border rounded-md border-secondary text-secondary">
-                                            <div class="flex gap-2 items-end w-full border-b pb-2">
+                                        <div class="flex flex-grow flex-col gap-2 p-4 rounded-md text-secondary">
+                                            <div class="flex gap-2 items-end w-full pb-2">
                                                 {% include "icons/"|add:incentive.icon|add:".svg" with class="h-8 w-8" %}
                                                 <h2 class="font-semibold text-lg text-primary">{{ incentive.title }}</h2>
                                             </div>
