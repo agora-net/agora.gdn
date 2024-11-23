@@ -1,3 +1,7 @@
+vault
+.vault
+vault*
+.vault*
 .env
 .env.local
 *.sqlite3
