@@ -18,6 +18,7 @@ gunicorn = "*"
 ruff = "*"
 pre-commit = "*"
 djlint = "*"
+ansible = "*"
 
 [requires]
 python_version = "3.12"
