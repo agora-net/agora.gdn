@@ -42,6 +42,10 @@ collectstatic:
 npm *ARGS:
     @{{ NPM }} {{ ARGS }}
 
+# Run a Pipenv command
+pipenv *ARGS:
+    @pipenv {{ ARGS }}
+
 # Install node dependencies
 install-node:
     @{{ NPM }} install -d
