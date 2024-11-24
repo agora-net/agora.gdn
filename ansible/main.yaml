@@ -2,6 +2,9 @@
 - name: Create ansible user and give it sudo access
   hosts: all
   remote_user: root
+  tags:
+    - setup
+    - ansible
 
   vars:
     ansible_username: ansible
@@ -34,7 +37,10 @@
   hosts: all
   user: ansible
   become: yes
-  tags: ssh
+  tags:
+    - setup
+    - ssh
+    - hardening
 
   roles:
     # This will disable the root user and password authentication
@@ -44,6 +50,16 @@
   hosts: all
   remote_user: ansible
   become: yes
+  tags:
+    - os
+    - setup
+    - hardening
+
+  pre_tasks:
+    - name: Update the packages cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
 
   roles:
     - name: devsec.hardening.os_hardening
@@ -55,11 +71,6 @@
     os_ignore_users: ["ansible"]
 
   tasks:
-    - name: Update the box
-      ansible.builtin.apt:
-        update_cache: yes
-        cache_valid_time: 3600
-
     - name: Upgrade all installed packages
       ansible.builtin.apt:
         upgrade: dist
@@ -82,6 +93,8 @@
   hosts: app_servers
   remote_user: ansible
   become: yes
+  tags:
+    - app
   vars:
     # app information
     app_name: agora
@@ -137,6 +150,8 @@
       ansible.builtin.pip:
         name: pipenv
         state: present
+        extra_args: --user
+        break_system_packages: yes
 
     - name: Create application directory
       ansible.builtin.file:
@@ -209,6 +224,8 @@
   hosts: app_servers
   remote_user: ansible
   become: yes
+  tags:
+    - web
 
   vars:
     # app information
@@ -257,6 +274,8 @@
   hosts: app_servers
   remote_user: ansible
   become: yes
+  tags:
+    - backup
 
   vars:
     # app information
