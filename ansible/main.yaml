@@ -107,11 +107,24 @@
     app_repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
 
   tasks:
+    - name: Create app groups
+      ansible.builtin.group:
+        name: "{{ item }}"
+        system: yes
+        state: present
+      with_items:
+        - "{{ app_user }}"
+        - "{{ app_group }}"
+
     - name: Create app user
       ansible.builtin.user:
         name: "{{ app_user }}"
-        shell: /bin/bash
+        create_home: no
         system: yes
+        state: present
+        group: "{{ app_user }}"
+        groups: "{{ app_group }}"
+        password_lock: yes
 
     - name: Install system dependencies
       ansible.builtin.package:
