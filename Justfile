@@ -7,6 +7,8 @@ default:
 export PIPENV_DONT_LOAD_ENV := "1"
 export PIPENV_IGNORE_VIRTUALENVS := "1"
 export PIPENV_VENV_IN_PROJECT := "1"
+# Ansible configuration file location
+export ANSIBLE_CONFIG := "ansible/ansible.cfg"
 
 # Variables
 PIPENV_RUN := "pipenv run"
@@ -86,3 +88,18 @@ format:
 # Create a Django superuser
 createsuperuser *FLAGS:
     @{{ manage }} createsuperuser {{ FLAGS }}
+
+###############################################
+## Infrastructure management
+###############################################
+# Run ansible commands
+ansible *ARGS:
+    @{{ PIPENV_RUN }} ansible {{ ARGS }}
+
+# Run the ansible-playbook command
+ansible-playbook *ARGS:
+    @{{ PIPENV_RUN }} ansible-playbook {{ ARGS }}
+
+# Run the ansible/main.yaml playbook
+ansible-playbook-main *ARGS:
+    @{{ PIPENV_RUN }} ansible-playbook ansible/main.yaml {{ ARGS }}
