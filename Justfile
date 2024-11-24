@@ -52,10 +52,17 @@ install-node:
 
 # Install python dependencies
 install-python:
-    @pipenv install --dev
-    {{ PIPENV_RUN }} pre-commit install
+    @pipenv install
+
+# Install ansible dependencies
+install-ansible:
+    @{{ PIPENV_RUN }} ansible-galaxy install -r ansible/requirements.yaml
 
 # Install all dependencies
+install-dev: install-python install-node install-ansible
+    @pipenv install --dev
+    @{{ PIPENV_RUN }} pre-commit install
+
 install: install-python install-node
 
 # Compile and watch the static assets
