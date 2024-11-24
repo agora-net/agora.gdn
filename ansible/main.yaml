@@ -10,7 +10,7 @@
 
   tasks:
     - name: Create ansible user
-      user:
+      ansible.builtin.user:
         name: "{{ ansible_user }}"
         shell: /bin/bash
         system: yes
@@ -24,7 +24,7 @@
         validation: required
 
     - name: Install public SSH keys for GitHub user kisamoto for ansible user
-      authorized_key:
+      ansible.builtin.authorized_key:
         user: "{{ ansible_user }}"
         state: present
         key: "{{ item }}"
@@ -58,23 +58,23 @@
 
   tasks:
     - name: Update the box
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
         cache_valid_time: 3600
 
     - name: Upgrade all installed packages
-      apt:
+      ansible.builtin.apt:
         upgrade: dist
         force_apt_get: yes
         autoremove: yes
 
     - name: Enable automatic security updates
-      apt:
+      ansible.builtin.apt:
         name: unattended-upgrades
         state: present
 
     - name: Configure automatic updates
-      copy:
+      ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/20auto-upgrades
         content: |
           APT::Periodic::Update-Package-Lists "1";
@@ -108,13 +108,13 @@
 
   tasks:
     - name: Create app user
-      user:
+      ansible.builtin.user:
         name: "{{ app_user }}"
         shell: /bin/bash
         system: yes
 
     - name: Install system dependencies
-      package:
+      ansible.builtin.package:
         name:
           - git
           - python3
@@ -123,50 +123,45 @@
         state: present
 
     - name: Install pipenv
-      pip:
+      ansible.builtin.pip:
         name: pipenv
         state: present
 
     - name: Create application directory
-      file:
+      ansible.builtin.file:
         path: "{{ app_dir }}"
         state: directory
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: "0755"
 
-    - name: Clone application repository
-      git:
+    - name: Pull application code
+      ansible.builtin.git:
         repo: "{{ app_repo_url }}"
         dest: "{{ app_dir }}"
       become_user: "{{ app_user }}"
+      notify: reload app
 
-    - name: Install Python dependencies
-      command:
+    - name: Install all dependencies
+      ansible.builtin.command:
         cmd: just install
         chdir: "{{ app_dir }}"
       become_user: "{{ app_user }}"
 
-    - name: Run database migrations
-      command:
-        cmd: just migrate
-        chdir: "{{ app_dir }}"
-      become_user: "{{ app_user }}"
-
     - name: Build frontend assets
-      command:
+      ansible.builtin.command:
         cmd: just build-static
         chdir: "{{ app_dir }}"
       become_user: "{{ app_user }}"
 
     - name: Collect static files
-      command:
+      ansible.builtin.command:
         cmd: just collectstatic
         chdir: "{{ app_dir }}"
       become_user: "{{ app_user }}"
 
     - name: Install app systemd services
-      template:
+      ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
         mode: "0644"
@@ -176,21 +171,27 @@
           dest: /etc/systemd/system/{{ app_name }}.service
         - src: templates/app.socket.j2
           dest: /etc/systemd/system/{{ app_name }}.socket
-      notify: restart app
 
     - name: Enable and start services
-      systemd:
+      ansible.builtin.systemd_service:
         name: "{{ item }}"
         state: started
         enabled: yes
       loop:
         - "{{ app_name }}"
 
+    - name: Run database migrations
+      ansible.builtin.command:
+        cmd: just migrate
+        chdir: "{{ app_dir }}"
+      become_user: "{{ app_user }}"
+      notify: reload app
+
   handlers:
-    - name: restart app
-      systemd:
+    - name: reload app
+      ansible.builtin.systemd_service:
         name: "{{ app_name }}"
-        state: restarted
+        state: reloaded
         daemon_reload: yes
 
 - name: Setup Caddy webserver for application
@@ -207,12 +208,12 @@
 
   tasks:
     - name: Install Caddy
-      package:
+      ansible.builtin.package:
         name: caddy
         state: present
 
     - name: Create Caddy configuration directory
-      file:
+      ansible.builtin.file:
         path: /etc/caddy
         state: directory
         owner: root
@@ -220,7 +221,7 @@
         mode: "0755"
 
     - name: Install Caddyfile
-      template:
+      ansible.builtin.template:
         src: templates/caddy/Caddyfile.j2
         dest: /etc/caddy/Caddyfile
         mode: "0644"
@@ -228,7 +229,7 @@
       notify: reload caddy
 
     - name: Enable and start services
-      systemd:
+      ansible.builtin.systemd_service:
         name: "{{ item }}"
         state: started
         enabled: yes
@@ -237,7 +238,7 @@
 
   handlers:
     - name: reload caddy
-      systemd:
+      ansible.builtin.systemd_service:
         name: caddy
         state: reloaded
 
@@ -262,7 +263,7 @@
 
   tasks:
     - name: Install Borg and Borgmatic
-      package:
+      ansible.builtin.package:
         name: "{{ item }}"
         state: present
       with_items:
@@ -270,7 +271,7 @@
         - borgmatic
 
     - name: Create Borgmatic configuration directory
-      file:
+      ansible.builtin.file:
         path: /etc/borgmatic
         state: directory
         owner: root
@@ -278,7 +279,7 @@
         mode: "0755"
 
     - name: Create Borgmatic configuration file
-      template:
+      ansible.builtin.template:
         src: templates/borgmatic/config.yaml.j2
         dest: /etc/borgmatic/config.yaml
         owner: root
@@ -287,7 +288,7 @@
         validate: borgmatic config validate --config %s
 
     - name: Create Borgmatic systemd services
-      template:
+      ansible.builtin.template:
         src: templates/borgmatic/{{ item }}.j2
         dest: /etc/systemd/system/{{ item }}
         owner: root
@@ -299,11 +300,10 @@
         - borgmatic.service
 
     - name: Initialize remote Borg repository
-      command: borg init --encryption=repokey {{ borg_repo }}
-      when: borg_repo is defined
+      ansible.builtin.command: borg init --encryption=repokey-blake2 {{ borg_repo }}
 
     - name: Enable and start Borgmatic services
-      systemd:
+      ansible.builtin.systemd_service:
         name: "{{ item }}"
         state: started
         enabled: yes
