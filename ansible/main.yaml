@@ -1,31 +1,31 @@
 ---
 - name: Create ansible user and give it sudo access
   hosts: all
-  user: root
+  remote_user: root
 
   vars:
-    ansible_user: ansible
+    ansible_username: ansible
     ansible_ssh_keys:
-      - https://github.com/kisamoto.keys'
+      - https://github.com/kisamoto.keys
 
   tasks:
     - name: Create ansible user
       ansible.builtin.user:
-        name: "{{ ansible_user }}"
+        name: "{{ ansible_username }}"
         shell: /bin/bash
         system: yes
 
     - name: Give ansible user sudo access
       community.general.sudoers:
-        name: "{{ ansible_user }}-sudo"
-        user: "{{ ansible_user }}"
+        name: "{{ ansible_username }}-sudo"
+        user: "{{ ansible_username }}"
         state: present
         commands: ALL
         validation: required
 
     - name: Install public SSH keys for GitHub user kisamoto for ansible user
       ansible.builtin.authorized_key:
-        user: "{{ ansible_user }}"
+        user: "{{ ansible_username }}"
         state: present
         key: "{{ item }}"
       with_items: "{{ ansible_ssh_keys }}"
@@ -34,17 +34,15 @@
   hosts: all
   user: ansible
   become: yes
+  tags: ssh
 
   roles:
     # This will disable the root user and password authentication
     - devsec.hardening.ssh_hardening
 
-  vars:
-    ssh_use_pam: no
-
 - name: Prepare and harden box
   hosts: all
-  user: ansible
+  remote_user: ansible
   become: yes
 
   roles:
@@ -82,7 +80,7 @@
 
 - name: Deploy Agora Application
   hosts: app_servers
-  user: ansible
+  remote_user: ansible
   become: yes
   vars:
     # app information
@@ -209,7 +207,7 @@
 
 - name: Setup Caddy webserver for application
   hosts: app_servers
-  user: ansible
+  remote_user: ansible
   become: yes
 
   vars:
@@ -257,7 +255,7 @@
 
 - name: Add Backups for application
   hosts: app_servers
-  user: ansible
+  remote_user: ansible
   become: yes
 
   vars:
