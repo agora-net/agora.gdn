@@ -1,23 +1,110 @@
 ---
+- name: Create ansible user and give it sudo access
+  hosts: all
+  user: root
+
+  vars:
+    ansible_user: ansible
+    ansible_ssh_keys:
+      - https://github.com/kisamoto.keys'
+
+  tasks:
+    - name: Create ansible user
+      user:
+        name: "{{ ansible_user }}"
+        shell: /bin/bash
+        system: yes
+
+    - name: Give ansible user sudo access
+      community.general.sudoers:
+        name: "{{ ansible_user }}-sudo"
+        user: "{{ ansible_user }}"
+        state: present
+        commands: ALL
+        validation: required
+
+    - name: Install public SSH keys for GitHub user kisamoto for ansible user
+      authorized_key:
+        user: "{{ ansible_user }}"
+        state: present
+        key: "{{ item }}"
+      with_items: "{{ ansible_ssh_keys }}"
+
+- name: Harden SSH configuration
+  hosts: all
+  user: ansible
+  become: yes
+
+  roles:
+    # This will disable the root user and password authentication
+    - devsec.hardening.ssh_hardening
+
+  vars:
+    ssh_use_pam: no
+
+- name: Prepare and harden box
+  hosts: all
+  user: ansible
+  become: yes
+
+  roles:
+    - name: devsec.hardening.os_hardening
+
+  vars:
+    os_auditd_admin_space_left_action: rotate
+    os_auditd_disk_full_action: rotate
+    os_auditd_max_log_file_action: rotate
+    os_ignore_users: ["ansible"]
+
+  tasks:
+    - name: Update the box
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all installed packages
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+        autoremove: yes
+
+    - name: Enable automatic security updates
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Configure automatic updates
+      copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+
 - name: Deploy Agora Application
-  hosts: app
+  hosts: app_servers
+  user: ansible
   become: yes
   vars:
     # app information
     app_name: agora
     app_user: agora
     app_group: www-data
-    # where the app is on the internet
-    app_domain: agora.gdn
-    media_domain: agora-media.gdn
     # where the app is on the server
     app_dir: /opt/{{ app_name }}
     # where the app code is
     # todo(kisamoto): Create and encrypt the token
     github_token: !vault |
       $ANSIBLE_VAULT;1.1;AES256
-      623132663536313536
-    repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
+      65333537316530616539343835343034613533316463623238633730373333336561353538616266
+      6139653362306330653432646464633333393765343631320a346361656466646561646435376566
+      34383833353033613133633464303031613133656630623030616663653333386235363532633461
+      6266633738393163370a663866366637373139323263366135623936633664663033396432333362
+      33653561633766343539326539336236643834336664636233626135353539656666346137663163
+      62626261353339646630386463376363616531373139373035636263653162343861623562623135
+      38363135613637353335303464613136316638646666326238633631356132636535386538326262
+      62646662653635373136363633343666326665643361363966343266323934376633356639353031
+      3239
+    app_repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
 
   tasks:
     - name: Create app user
@@ -32,7 +119,6 @@
           - git
           - python3
           - python3-pip
-          - caddy
           - just
         state: present
 
@@ -51,7 +137,7 @@
 
     - name: Clone application repository
       git:
-        repo: "{{ repo_url }}"
+        repo: "{{ app_repo_url }}"
         dest: "{{ app_dir }}"
       become_user: "{{ app_user }}"
 
@@ -84,12 +170,54 @@
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
         mode: "0644"
+        validate: systemd_analyze verify %s
       with_items:
         - src: templates/app.service.j2
           dest: /etc/systemd/system/{{ app_name }}.service
         - src: templates/app.socket.j2
           dest: /etc/systemd/system/{{ app_name }}.socket
       notify: restart app
+
+    - name: Enable and start services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - "{{ app_name }}"
+
+  handlers:
+    - name: restart app
+      systemd:
+        name: "{{ app_name }}"
+        state: restarted
+        daemon_reload: yes
+
+- name: Setup Caddy webserver for application
+  hosts: app_servers
+  user: ansible
+  become: yes
+
+  vars:
+    # app information
+    app_name: agora
+    # where the app is on the internet
+    app_domain: agora.gdn
+    media_domain: agora-media.gdn
+
+  tasks:
+    - name: Install Caddy
+      package:
+        name: caddy
+        state: present
+
+    - name: Create Caddy configuration directory
+      file:
+        path: /etc/caddy
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
 
     - name: Install Caddyfile
       template:
@@ -104,18 +232,81 @@
         name: "{{ item }}"
         state: started
         enabled: yes
-      loop:
-        - "{{ app_name }}"
+      with_items:
         - caddy
 
   handlers:
-    - name: restart app
-      systemd:
-        name: "{{ app_name }}"
-        state: restarted
-        daemon_reload: yes
-
     - name: reload caddy
       systemd:
         name: caddy
         state: reloaded
+
+- name: Add Backups for application
+  hosts: app_servers
+  user: ansible
+  become: yes
+
+  vars:
+    # app information
+    app_name: agora
+    # TODO(kisamoto): Add the Borg repo
+    borg_repo:
+    borg_passphrase: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      65333461306537383863336563666339313435313164356538313564343136616264646537323464
+      3234623934663636663431323231663063353439353633660a336534363666656162316466633833
+      32373537653466643731303866346564616138656136633133323430353337663164343465636664
+      6165383364633539320a343135393039626532323465666332646165613664363764346238393366
+      37666138373136346536356666643834363565323131626666303632636634383330626166356661
+      6165343235633961663635613766333861653333396134343231
+
+  tasks:
+    - name: Install Borg and Borgmatic
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - borgbackup
+        - borgmatic
+
+    - name: Create Borgmatic configuration directory
+      file:
+        path: /etc/borgmatic
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Create Borgmatic configuration file
+      template:
+        src: templates/borgmatic/config.yaml.j2
+        dest: /etc/borgmatic/config.yaml
+        owner: root
+        group: root
+        mode: "0644"
+        validate: borgmatic config validate --config %s
+
+    - name: Create Borgmatic systemd services
+      template:
+        src: templates/borgmatic/{{ item }}.j2
+        dest: /etc/systemd/system/{{ item }}
+        owner: root
+        group: root
+        mode: "0644"
+        validate: systemd_analyze verify %s
+      with_items:
+        - borgmatic.timer
+        - borgmatic.service
+
+    - name: Initialize remote Borg repository
+      command: borg init --encryption=repokey {{ borg_repo }}
+      when: borg_repo is defined
+
+    - name: Enable and start Borgmatic services
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items:
+        - borgmatic.timer
+        - borgmatic.service
