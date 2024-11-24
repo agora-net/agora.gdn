@@ -59,9 +59,10 @@ install-ansible:
     @{{ PIPENV_RUN }} ansible-galaxy install -r ansible/requirements.yaml
 
 # Install all dependencies
-install-dev: install-python install-node install-ansible
+install-dev: install-python install-node
     @pipenv install --dev
     @{{ PIPENV_RUN }} pre-commit install
+    @just install-ansible
 
 install: install-python install-node
 
