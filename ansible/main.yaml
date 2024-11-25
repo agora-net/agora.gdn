@@ -2,6 +2,7 @@
 - name: Create ansible user and give it sudo access
   hosts: all
   remote_user: root
+  become: yes
   tags:
     - setup
     - ansible
@@ -18,13 +19,15 @@
         shell: /bin/bash
         system: yes
 
-    - name: Give ansible user sudo access
+    - name: Give ansible user no password sudo access for all users
       community.general.sudoers:
         name: "{{ ansible_username }}-sudo"
         user: "{{ ansible_username }}"
         state: present
         commands: ALL
+        nopassword: yes
         validation: required
+        runas: ALL
 
     - name: Install public SSH keys for GitHub user kisamoto for ansible user
       ansible.builtin.authorized_key:
@@ -92,7 +95,6 @@
 - name: Deploy Agora Application
   hosts: app_servers
   remote_user: ansible
-  become: yes
   tags:
     - app
   vars:
@@ -106,15 +108,15 @@
     # todo(kisamoto): Create and encrypt the token
     github_token: !vault |
       $ANSIBLE_VAULT;1.1;AES256
-      65333537316530616539343835343034613533316463623238633730373333336561353538616266
-      6139653362306330653432646464633333393765343631320a346361656466646561646435376566
-      34383833353033613133633464303031613133656630623030616663653333386235363532633461
-      6266633738393163370a663866366637373139323263366135623936633664663033396432333362
-      33653561633766343539326539336236643834336664636233626135353539656666346137663163
-      62626261353339646630386463376363616531373139373035636263653162343861623562623135
-      38363135613637353335303464613136316638646666326238633631356132636535386538326262
-      62646662653635373136363633343666326665643361363966343266323934376633356639353031
-      3239
+      34323039636330663565613138363163633438616637366165366232353363316138366463306363
+      6165623631383739613663623637386162306233333433350a353032396433396266363464616635
+      63663139633930643764636137313366646436383231633839363662626564316231653238336637
+      3132386163393437640a353739353634626261393338343039383334303435666632383137373631
+      34323965366564373439303330636462343834316166666437373838656130373138343636393630
+      37303937643632646266633633633739653632643131363235323036356164323438386137363439
+      61636262646532303363656537616231373736343562383961383630643462663565323736613139
+      38366565306632353130306663663433623661623837623339366436646631616166326432363936
+      3837
     app_repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
 
   tasks:
@@ -126,6 +128,7 @@
       with_items:
         - "{{ app_user }}"
         - "{{ app_group }}"
+      become: yes
 
     - name: Create app user
       ansible.builtin.user:
@@ -136,6 +139,7 @@
         group: "{{ app_user }}"
         groups: "{{ app_group }}"
         password_lock: yes
+      become: yes
 
     - name: Install system dependencies
       ansible.builtin.package:
@@ -145,6 +149,7 @@
           - python3-pip
           - just
         state: present
+      become: yes
 
     - name: Install pipenv
       ansible.builtin.pip:
@@ -152,6 +157,7 @@
         state: present
         extra_args: --user
         break_system_packages: yes
+      become: yes
 
     - name: Create application directory
       ansible.builtin.file:
@@ -160,11 +166,13 @@
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: "0755"
+      become: yes
 
     - name: Pull application code
       ansible.builtin.git:
         repo: "{{ app_repo_url }}"
         dest: "{{ app_dir }}"
+      become: yes
       become_user: "{{ app_user }}"
       notify: reload app
 
@@ -172,18 +180,21 @@
       ansible.builtin.command:
         cmd: just install
         chdir: "{{ app_dir }}"
+      become: yes
       become_user: "{{ app_user }}"
 
     - name: Build frontend assets
       ansible.builtin.command:
         cmd: just build-static
         chdir: "{{ app_dir }}"
+      become: yes
       become_user: "{{ app_user }}"
 
     - name: Collect static files
       ansible.builtin.command:
         cmd: just collectstatic
         chdir: "{{ app_dir }}"
+      become: yes
       become_user: "{{ app_user }}"
 
     - name: Install app systemd services
@@ -197,6 +208,7 @@
           dest: /etc/systemd/system/{{ app_name }}.service
         - src: templates/app.socket.j2
           dest: /etc/systemd/system/{{ app_name }}.socket
+      become: yes
 
     - name: Enable and start services
       ansible.builtin.systemd_service:
@@ -205,11 +217,13 @@
         enabled: yes
       loop:
         - "{{ app_name }}"
+      become: yes
 
     - name: Run database migrations
       ansible.builtin.command:
         cmd: just migrate
         chdir: "{{ app_dir }}"
+      become: yes
       become_user: "{{ app_user }}"
       notify: reload app
 
@@ -219,6 +233,7 @@
         name: "{{ app_name }}"
         state: reloaded
         daemon_reload: yes
+      become: yes
 
 - name: Setup Caddy webserver for application
   hosts: app_servers
