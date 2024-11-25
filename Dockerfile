@@ -79,7 +79,7 @@ RUN just collectstatic
 #   PRACTICE. The database should be migrated manually or using the release
 #   phase facilities of your hosting platform. This is used only so the
 #   Wagtail instance can be started with a simple "docker run" command.
-CMD set -xe; just migrate --noinput; gunicorn --config conf/gunicorn/gunicorn.conf.py agora.wsgi:application
+CMD set -xe; gunicorn --config conf/gunicorn/gunicorn.conf.py agora.wsgi:application
 # Expose the Gunicorn socket for lightweight communication with a web server.
 # The socket is defined in the Gunicorn configuration file.
 VOLUME /run/gunicorn/
