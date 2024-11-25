@@ -11,6 +11,7 @@ export PIPENV_VENV_IN_PROJECT := "1"
 export ANSIBLE_CONFIG := "ansible/ansible.cfg"
 
 # Variables
+APP_NAME := "agora"
 PIPENV_RUN := "pipenv run"
 NPM := "cd brand && npm"
 NPX := "cd brand && npx"
@@ -33,12 +34,12 @@ makemigrations:
     @{{ manage }} makemigrations
 
 # Run Django migrations
-migrate:
-    @{{ manage }} migrate
+migrate *FLAGS:
+    @{{ manage }} migrate {{ FLAGS }}
 
 # Collect static files
 collectstatic:
-    @{{ manage }} collectstatic --noinput
+    @{{ manage }} collectstatic --noinput --clear
 
 # Run a NPM command in the brand directory
 npm *ARGS:
@@ -53,8 +54,8 @@ install-node:
     @{{ NPM }} install -d
 
 # Install python dependencies
-install-python:
-    @pipenv install
+install-python *FLAGS:
+    @pipenv install {{ FLAGS }}
 
 # Install ansible dependencies
 install-ansible:
@@ -103,3 +104,28 @@ ansible-playbook *ARGS:
 # Run the ansible/main.yaml playbook
 ansible-playbook-main *ARGS:
     @{{ PIPENV_RUN }} ansible-playbook ansible/main.yaml {{ ARGS }}
+
+
+###############################################
+## Docker commands
+###############################################
+# Build the Docker image
+docker-build:
+    @docker build -t {{ APP_NAME }} .
+
+# Remove the Docker container
+docker-rm:
+    @docker rm -f {{ APP_NAME }} || true
+
+# Run the Docker container
+docker-run: docker-rm
+    # Note: This still needs a web server to proxy to it
+    @docker run \
+        --name {{ APP_NAME }} \
+        -it \
+        --rm \
+        --volume $(pwd)/media:/app/media:rw \
+        --volume $(pwd)/.env:/app/.env:ro \
+        --publish 8000:8000 \
+        {{ APP_NAME }}:latest
+        
