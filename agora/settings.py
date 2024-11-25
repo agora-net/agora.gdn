@@ -29,7 +29,7 @@ env = environ.Env()
 
 DEBUG = env.bool("DEBUG", default=False)
 
-SECRET_KEY = env.str("SECRET_KEY")
+SECRET_KEY = env.str("SECRET_KEY", default="!!!SET DJANGO_SECRET_KEY!!!")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
