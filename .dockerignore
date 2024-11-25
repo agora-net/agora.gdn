@@ -4,6 +4,9 @@
 /media/
 /static/
 *.sqlite3
+*.db
+/ansible/
+/gunicorn/
 
 # Python and others
 __pycache__
@@ -20,6 +23,8 @@ node_modules/
 .vscode
 coverage
 .python-version
+.ruff_cache
+.venv
 
 # Distribution / packaging
 .Python
@@ -39,3 +44,14 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Javascript things
+.parcel-cache
+*/node_modules/
+brand/static
+
+# Extra
+.vault*
+*.log
+*.env
+*.env.local
