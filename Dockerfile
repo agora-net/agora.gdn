@@ -5,10 +5,16 @@
 FROM node:lts-slim AS static-builder
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
-COPY brand/package.json .
-RUN npm install && npm cache clean --force
-COPY brand/ .
-RUN npm run build
+ENV GENERATE_SOURCEMAP=false \
+    NODE_OPTIONS=--max-old-space-size=4096 \
+    PATH=$PATH:/home/node/.npm-global/bin
+RUN npm install --prefix /home/node/.npm-global -g rust-just \
+    && ln -s /home/node/.npm-global/bin/rust-just /home/node/.npm-global/bin/just 
+COPY Justfile .
+COPY brand/package*.json ./brand/
+RUN just install-node && npm cache clean --force
+COPY . .
+RUN just build-static
 
 ###############################################
 ## Python alias
@@ -59,6 +65,8 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     && mkdir -p /run/gunicorn
 # Copy the virtual environment from the build stage to the current stage.
 COPY --from=python-build-stage ${APP_HOME}/.venv ${APP_HOME}/.venv
+# Copy the static assets from the static builder stage to the current stage.
+COPY --from=static-builder /app/brand/static /app/brand/
 ENV PATH=/app/.venv/bin:$PATH
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
 # uses SQLite, the folder needs to be owned by the user that

@@ -13,8 +13,8 @@ export ANSIBLE_CONFIG := "ansible/ansible.cfg"
 # Variables
 APP_NAME := "agora"
 PIPENV_RUN := "pipenv run"
-NPM := "cd brand && npm"
-NPX := "cd brand && npx"
+NPM := "npm --prefix brand"
+NPX := "npx --prefix brand"
 
 ###############################################
 ## Django management
@@ -126,6 +126,9 @@ docker-run: docker-rm
         --rm \
         --volume $(pwd)/media:/app/media:rw \
         --volume $(pwd)/.env:/app/.env:ro \
+        --volume {{ APP_NAME }}_gunicorn:/run/gunicorn:rw \
+        --volume ./db.sqlite3:/app/db.sqlite3:rw \
         --publish 8000:8000 \
         {{ APP_NAME }}:latest
         
+docker-migrate:
