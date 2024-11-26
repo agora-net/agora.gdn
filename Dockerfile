@@ -66,7 +66,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
 # Copy the virtual environment from the build stage to the current stage.
 COPY --from=python-build-stage ${APP_HOME}/.venv ${APP_HOME}/.venv
 # Copy the static assets from the static builder stage to the current stage.
-COPY --from=static-builder /app/brand/static /app/brand/
+COPY --from=static-builder /app/brand/static /app/brand/static
 ENV PATH=/app/.venv/bin:$PATH
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
 # uses SQLite, the folder needs to be owned by the user that
