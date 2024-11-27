@@ -109,11 +109,15 @@ ansible-playbook-main *ARGS:
 ###############################################
 ## Docker commands
 ###############################################
-DOCKER_IMAGE := "kisamoto/tmp.agora.net"
+DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
 
 # Build the Docker image
 docker-build:
     @docker buildx build --platform linux/amd64,linux/arm64 -t {{ DOCKER_IMAGE }} .
+
+# Push the Docker image to the registry
+docker-push:
+    @docker push {{ DOCKER_IMAGE }}
 
 # Remove the Docker container
 docker-rm:
