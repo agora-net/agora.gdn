@@ -109,13 +109,15 @@ ansible-playbook-main *ARGS:
 ###############################################
 ## Docker commands
 ###############################################
+DOCKER_IMAGE := "kisamoto/tmp.agora.net"
+
 # Build the Docker image
 docker-build:
-    @docker build -t {{ APP_NAME }} .
+    @docker buildx build --platform linux/amd64,linux/arm64 -t {{ DOCKER_IMAGE }} .
 
 # Remove the Docker container
 docker-rm:
-    @docker rm -f {{ APP_NAME }} || true
+    @docker rm -f {{ DOCKER_IMAGE }} || true
 
 # Run the Docker container
 docker-run: docker-rm
@@ -129,6 +131,6 @@ docker-run: docker-rm
         --volume {{ APP_NAME }}_gunicorn:/run/gunicorn:rw \
         --volume ./db.sqlite3:/app/db.sqlite3:rw \
         --publish 8000:8000 \
-        {{ APP_NAME }}:latest
+        {{ DOCKER_IMAGE }}:latest
         
 docker-migrate:
