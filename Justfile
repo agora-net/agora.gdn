@@ -15,6 +15,7 @@ APP_NAME := "agora"
 PIPENV_RUN := "pipenv run"
 NPM := "npm --prefix brand"
 NPX := "npx --prefix brand"
+DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
 
 ###############################################
 ## Django management
@@ -109,7 +110,6 @@ ansible-playbook-main *ARGS:
 ###############################################
 ## Docker commands
 ###############################################
-DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
 
 # Build the Docker image
 docker-build:
