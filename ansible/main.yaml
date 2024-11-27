@@ -65,13 +65,16 @@
         cache_valid_time: 3600
 
   roles:
-    - name: devsec.hardening.os_hardening
+    - geerlingguy.swap
+    - devsec.hardening.os_hardening
 
   vars:
     os_auditd_admin_space_left_action: rotate
     os_auditd_disk_full_action: rotate
     os_auditd_max_log_file_action: rotate
     os_ignore_users: ["ansible"]
+    # Create a swap space to prevent the server from running out of memory
+    swap_file_size_mb: "4096"
 
   tasks:
     - name: Upgrade all installed packages
@@ -92,12 +95,36 @@
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Unattended-Upgrade "1";
 
+- name: Install dokku
+  hosts: app_servers
+  remote_user: ansible
+  become: yes
+  tags:
+    - dokku
+    - setup
+  vars:
+    # Dokku setup
+    dokku_packages_state: latest
+    dokku_users:
+      - name: "ewan"
+        username: "ewan"
+        ssh_key: "{{lookup('file', '~/.ssh/id_ed25519.pub')}}"
+    dokku_plugins:
+      - name: maintenance
+        url: https://github.com/dokku/dokku-maintenance.git
+      - name: letsencrypt
+        url: https://github.com/dokku/dokku-letsencrypt.git
+
+  roles:
+    - dokku_bot.ansible_dokku
+
 - name: Deploy Agora Application
   hosts: app_servers
   remote_user: ansible
   become: yes
   tags:
     - app
+    - deploy
   vars:
     # app information
     app_name: agora
@@ -138,23 +165,6 @@
     app_image: agora/agora.net
     app_image_tag: latest
     app_use_docker_image: false
-    # Create a swap space to prevent the server from running out of memory
-    swap_file_size_mb: "4096"
-    # Dokku setup
-    dokku_packages_state: latest
-    dokku_users:
-      - name: "ewan"
-        username: "ewan"
-        ssh_key: "{{lookup('file', '~/.ssh/id_ed25519.pub')}}"
-    dokku_plugins:
-      - name: maintenance
-        url: https://github.com/dokku/dokku-maintenance.git
-      - name: letsencrypt
-        url: https://github.com/dokku/dokku-letsencrypt.git
-
-  roles:
-    - dokku_bot.ansible_dokku
-    - geerlingguy.swap
 
   tasks:
     - name: Create a docker volume for the SQLite database
