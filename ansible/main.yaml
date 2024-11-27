@@ -95,6 +95,7 @@
 - name: Deploy Agora Application
   hosts: app_servers
   remote_user: ansible
+  become: yes
   tags:
     - app
   vars:
@@ -102,10 +103,24 @@
     app_name: agora
     app_user: agora
     app_group: www-data
+    app_domains:
+      - agora.gdn
+      - agorausermedia.com # Used for user uploaded media
+    app_static_host: https://cdn.agora.gdn/
     # where the app is on the server
     app_dir: /opt/{{ app_name }}
+    # additional app configuration
+    app_django_secret_key: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      30316332666532343838333837643936333432623763333531303834303161306437656134343335
+      6138623233613462353563636131313235303330633337360a323932373838616264656462303161
+      62316537653335643532653263346638363165396263313531303464626366666165303331316561
+      3034313737393863640a303535386466623735356164646532373638626261613263386231316239
+      34663434373462376432656230333465623566373030646265363561633165636166373032346463
+      37323365316536396337616237326631343365656262633633363261303762653761356163316165
+      64316666383262363232643131646562353132623936313539376130613864323638366137313137
+      62373366366236336362
     # where the app code is
-    # todo(kisamoto): Create and encrypt the token
     github_token: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       34323039636330663565613138363163633438616637366165366232353363316138366463306363
@@ -118,8 +133,81 @@
       38366565306632353130306663663433623661623837623339366436646631616166326432363936
       3837
     app_repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
+    app_repo_version: main
+    app_build_from_source: true
+    app_image: agora/agora.net
+    app_image_tag: latest
+    app_use_docker_image: false
+    # Create a swap space to prevent the server from running out of memory
+    swap_file_size_mb: "4096"
+    # Dokku setup
+    dokku_packages_state: latest
+    dokku_users:
+      - name: "ewan"
+        username: "ewan"
+        ssh_key: "{{lookup('file', '~/.ssh/id_ed25519.pub')}}"
+    dokku_plugins:
+      - name: maintenance
+        url: https://github.com/dokku/dokku-maintenance.git
+      - name: letsencrypt
+        url: https://github.com/dokku/dokku-letsencrypt.git
 
-  tasks: []
+  roles:
+    - dokku_bot.ansible_dokku
+    - geerlingguy.swap
+
+  tasks:
+    - name: Create a docker volume for the SQLite database
+      community.docker.docker_volume:
+        volume_name: "{{ app_name }}_db"
+    - name: create app
+      dokku_app:
+        # change this name in your template!
+        app: "{{ app_name }}"
+    - name: Mount docker volume for SQLite database into dokku app
+      dokku_storage:
+        app: "{{ app_name }}"
+        mounts:
+          - "{{ app_name }}_db:/app/db"
+    - name: Set app configuration
+      dokku_config:
+        app: "{{ app_name }}"
+        config:
+          DEBUG: "False"
+          SECRET_KEY: "{{ app_django_secret_key }}"
+          ALLOWED_HOSTS: "{{ app_domains | join(',') }}"
+          STATIC_HOST: "{{ app_static_host }}"
+          LOG_LEVEL: "WARNING"
+          DB_URL: "sqlite:////app/db/db.sqlite3"
+    - name: pull and build app from source code
+      dokku_clone:
+        app: "{{ app_name }}"
+        repository: "{{ app_repo_url }}"
+        version: "{{ app_repo_version }}"
+        build: "{{ app_build_from_source }}"
+      when: "app_build_from_source"
+    - name: set app docker image
+      dokku_image:
+        app: "{{ app_name }}"
+        image: "{{ app_image }}:{{ app_image_tag }}"
+        create_host_dir: true
+      notify: restart app
+      when: app_use_docker_image
+    - name: add domain
+      dokku_domains:
+        app: "{{ app_name }}"
+        domains: "{{ app_domains }}"
+    - name: add letsencrypt
+      dokku_letsencrypt:
+        app: "{{ app_name }}"
+    - name: Enable the default proxy
+      dokku_proxy:
+        app: "{{ app_name }}"
+
+  handlers:
+    - name: restart app
+      ansible.builtin.command:
+        cmd: dokku ps:restart --quiet {{ app_name }}
 
 - name: Add Backups for application
   hosts: app_servers
