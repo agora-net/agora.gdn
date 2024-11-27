@@ -212,7 +212,7 @@
           ALLOWED_HOSTS: "{{ app_domains | join(',') }}"
           STATIC_HOST: "{{ app_static_host }}"
           LOG_LEVEL: "WARNING"
-          DB_URL: "sqlite:////app/db/db.sqlite3"
+          DB_DEFAULT_URL: "sqlite:////app/db/db.sqlite3"
           PORT: "5000" # dokku forwards to 5000 by default
       no_log: yes
     - name: pull and build app from source code

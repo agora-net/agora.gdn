@@ -211,10 +211,23 @@ LOGGING_CONFIG = "utils.log.load_logging_config_start_listener"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    }
+    "default": env.db_url("DB_DEFAULT_URL"),
+}
+
+# For databases, if using SQLITE, add the following options
+# https://gcollazo.com/optimal-sqlite-settings-for-django/
+SQLITE_OPTIONS = {
+    "init_command": (
+        "PRAGMA foreign_keys=ON;"
+        "PRAGMA journal_mode = WAL;"
+        "PRAGMA synchronous = NORMAL;"
+        "PRAGMA busy_timeout = 500;"  # 500ms
+        "PRAGMA temp_store = MEMORY;"
+        f"PRAGMA mmap_size = {128 * 1024 * 1024};"  # 128MB
+        f"PRAGMA journal_size_limit = {64 * 1024 * 1024};"  # 64MB
+        f"PRAGMA cache_size = -{8 * 1024 * 1024};"  # 8MB of 4096 bytes pages
+    ),
+    "transaction_mode": "IMMEDIATE",
 }
 
 
@@ -318,3 +331,9 @@ WAGTAILDOCS_EXTENSIONS = [
     "xlsx",
     "zip",
 ]
+
+for db in DATABASES.values():
+    if "sqlite3" in db["ENGINE"]:
+        options = SQLITE_OPTIONS.copy()
+        options.update(db.get("OPTIONS", {}))
+        db["OPTIONS"] = options
