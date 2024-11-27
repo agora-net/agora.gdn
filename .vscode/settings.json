@@ -1,23 +1,30 @@
 {
 	"cSpell.words": [
+		"auditd",
+		"autoremove",
 		"borgmatic",
 		"Caddyfile",
 		"collectstatic",
 		"createsuperuser",
 		"Cuid",
+		"devsec",
 		"djlint",
+		"Dokku",
 		"elif",
 		"endcomment",
 		"endfor",
 		"forloop",
 		"fullpageurl",
+		"geerlingguy",
 		"gunicorn",
 		"justfile",
+		"letsencrypt",
 		"levelname",
 		"localtunnel",
 		"makemigrations",
 		"modelcluster",
 		"noinput",
+		"nopassword",
 		"nostatic",
 		"pageurl",
 		"PIPENV",
@@ -44,5 +51,12 @@
 		},
 		"editor.defaultFormatter": "charliermarsh.ruff"
 	},
-	"cSpell.ignoreWords": ["DONT", "accesslog", "chdir", "zstd"]
+	"cSpell.ignoreWords": [
+		"DONT",
+		"accesslog",
+		"agorausermedia",
+		"chdir",
+		"runas",
+		"zstd"
+	]
 }
