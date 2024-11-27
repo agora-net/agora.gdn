@@ -105,6 +105,7 @@
   vars:
     # Dokku setup
     dokku_packages_state: latest
+    dokku_vhost_enable: false # don't use vhost (*.example.com) domain
     dokku_users:
       - name: "ewan"
         username: "ewan"
@@ -132,7 +133,9 @@
     app_group: www-data
     app_domains:
       - agora.gdn
-      - agorausermedia.com # Used for user uploaded media
+      - www.agora.gdn
+      # todo(kisamoto): add agorausermedia.com dns entries
+      # - agorausermedia.com # Used for user uploaded media
     app_static_host: https://cdn.agora.gdn/
     # where the app is on the server
     app_dir: /opt/{{ app_name }}
@@ -161,10 +164,23 @@
       3837
     app_repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
     app_repo_version: main
-    app_build_from_source: true
-    app_image: agora/agora.net
+    app_build_from_source: false
+    app_image_registry: docker.io
+    app_image: "{{ app_image_registry}}/kisamoto/tmp.agora.net"
+    app_image_registry_username: kisamoto
+    # docker.io access token
+    app_image_registry_password: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      61656439303330623434393332363734333361383063613234363436313865383865393438646465
+      6661333533643938333936643364656437636431393238630a326461646565633633333635363866
+      62356666643739326531666165646362393666346130323233353835323266353734633364306434
+      3039633765663439660a386239613734353239666134666432663935306462623862343933323662
+      37346337663534313332656538653265383233303138393230303237626263393134343733663236
+      3761353066623633373838333634343336386637303566396631
     app_image_tag: latest
-    app_use_docker_image: false
+    app_use_docker_image: true
+    # management information
+    lets_encrypt_email: ewan@agora.gdn
 
   tasks:
     - name: Create a docker volume for the SQLite database
@@ -190,24 +206,35 @@
           LOG_LEVEL: "WARNING"
           DB_URL: "sqlite:////app/db/db.sqlite3"
     - name: pull and build app from source code
+      when: "app_build_from_source"
       dokku_clone:
         app: "{{ app_name }}"
         repository: "{{ app_repo_url }}"
         version: "{{ app_repo_version }}"
         build: "{{ app_build_from_source }}"
-      when: "app_build_from_source"
-    - name: set app docker image
-      dokku_image:
-        app: "{{ app_name }}"
-        image: "{{ app_image }}:{{ app_image_tag }}"
-        create_host_dir: true
-      notify: restart app
+    - name: setup app with docker image
       when: app_use_docker_image
+      block:
+        - name: authenticate with docker registry
+          dokku_registry:
+            app: "{{ app_name }}"
+            image: "{{ app_image }}"
+            username: "{{ app_image_registry_username }}"
+            password: "{{ app_image_registry_password }}"
+            server: "{{ app_image_registry }}"
+        - name: pull docker image for app
+          dokku_image:
+            app: "{{ app_name }}"
+            image: "{{ app_image }}:{{ app_image_tag }}"
+          notify: restart app
     - name: add domain
       dokku_domains:
         app: "{{ app_name }}"
         domains: "{{ app_domains }}"
-    - name: add letsencrypt
+    - name: set letsencrypt email for app
+      command:
+        cmd: dokku letsencrypt:set {{ app_name }} email {{ lets_encrypt_email }}
+    - name: enable letsencrypt for app
       dokku_letsencrypt:
         app: "{{ app_name }}"
     - name: Enable the default proxy
