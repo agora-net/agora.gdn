@@ -181,6 +181,14 @@
     app_use_docker_image: true
     # management information
     lets_encrypt_email: ewan@agora.gdn
+    app_cloudflare_api_token: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      38346139306238623238373536313333363439336236316634343134306265656663303735363363
+      6135666164653836323935653731386431323164653131310a636563613762373463663264333431
+      37613136653532663137623038613534333063343962323464643839623039643234633362306138
+      3235376165643237380a396336313137653261376239623562343863613338663934636331386663
+      63303661623530393032393737613638393930656135636166653639346565346234303534346662
+      6562366462366666623338343063336461633666333762643833
 
   tasks:
     - name: Create a docker volume for the SQLite database
@@ -205,6 +213,8 @@
           STATIC_HOST: "{{ app_static_host }}"
           LOG_LEVEL: "WARNING"
           DB_URL: "sqlite:////app/db/db.sqlite3"
+          PORT: "5000" # dokku forwards to 5000 by default
+      no_log: yes
     - name: pull and build app from source code
       when: "app_build_from_source"
       dokku_clone:
@@ -222,6 +232,7 @@
             username: "{{ app_image_registry_username }}"
             password: "{{ app_image_registry_password }}"
             server: "{{ app_image_registry }}"
+          no_log: yes
         - name: pull docker image for app
           dokku_image:
             app: "{{ app_name }}"
@@ -231,15 +242,29 @@
       dokku_domains:
         app: "{{ app_name }}"
         domains: "{{ app_domains }}"
-    - name: set letsencrypt email for app
-      command:
-        cmd: dokku letsencrypt:set {{ app_name }} email {{ lets_encrypt_email }}
+    - name: set config for letsencrypt dns provider
+      ansible.builtin.command:
+        cmd: dokku letsencrypt:set {{ app_name }} {{ item.property }} {{ item.value }}
+      with_items:
+        - property: dns-provider
+          value: cloudflare
+        - property: dns-provider-CF_DNS_API_TOKEN
+          value: "{{ app_cloudflare_api_token }}"
+        - property: email
+          value: "{{ lets_encrypt_email }}"
+      no_log: yes
     - name: enable letsencrypt for app
       dokku_letsencrypt:
         app: "{{ app_name }}"
     - name: Enable the default proxy
       dokku_proxy:
         app: "{{ app_name }}"
+    # run in a separate container but a shared volume so should be persisted
+    - name: run migrations
+      ansible.builtin.command:
+        cmd: dokku run {{ app_name }} just migrate
+      notify:
+        - restart app
 
   handlers:
     - name: restart app
