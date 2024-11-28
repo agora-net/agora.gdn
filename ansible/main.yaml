@@ -191,9 +191,12 @@
       6562366462366666623338343063336461633666333762643833
 
   tasks:
-    - name: Create a docker volume for the SQLite database
+    - name: Create a docker volume for the SQLite database and media files
       community.docker.docker_volume:
-        volume_name: "{{ app_name }}_db"
+        volume_name: "{{ item }}"
+      with_items:
+        - "{{ app_name }}_db"
+        - "{{ app_name }}_media"
     - name: create app
       dokku_app:
         # change this name in your template!
@@ -203,6 +206,11 @@
         app: "{{ app_name }}"
         mounts:
           - "{{ app_name }}_db:/data/db"
+    - name: Mount docker volume for media files into dokku app
+      dokku_storage:
+        app: "{{ app_name }}"
+        mounts:
+          - "{{ app_name }}_media:/data/media"
     - name: Set app configuration
       dokku_config:
         app: "{{ app_name }}"
