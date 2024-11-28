@@ -221,6 +221,7 @@
           STATIC_HOST: "{{ app_static_host }}"
           LOG_LEVEL: "WARNING"
           DB_DEFAULT_URL: "sqlite:////data/db/db.sqlite3"
+          MEDIA_ROOT: "/data/media"
           PORT: "5000" # dokku forwards to 5000 by default
       no_log: yes
     - name: pull and build app from source code

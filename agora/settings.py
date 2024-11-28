@@ -280,7 +280,7 @@ STATIC_ROOT = BASE_DIR / "static"
 STATIC_HOST = env.str("STATIC_HOST", "")
 STATIC_URL = STATIC_HOST + "/static/"
 
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = env.str("MEDIA_ROOT", BASE_DIR / "media")
 MEDIA_URL = "/media/"
 
 # Default storage settings, with the staticfiles storage updated.
