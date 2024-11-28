@@ -74,7 +74,7 @@ ENV PATH=/app/.venv/bin:$PATH
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
 # uses SQLite, the folder needs to be owned by the user that
 # will be writing to the database file.
-RUN chown wagtail:wagtail ${APP_HOME} /run/gunicorn /data
+RUN chown -R wagtail:wagtail ${APP_HOME} /run/gunicorn /data
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
 # Use user "wagtail" to run the build commands below and the server itself.
@@ -93,4 +93,4 @@ RUN just collectstatic
 CMD set -xe; gunicorn --config conf/gunicorn/gunicorn.conf.py agora.wsgi:application
 # Expose the Gunicorn socket for lightweight communication with a web server.
 # The socket is defined in the Gunicorn configuration file.
-VOLUME /run/gunicorn/
+VOLUME ["/run/gunicorn/", "/data/media", "/data/db"]
