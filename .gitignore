@@ -5,6 +5,7 @@ vault*
 .env
 .env.local
 *.sqlite3
+/static/
 
 .ruff_cache
 

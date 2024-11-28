@@ -211,7 +211,7 @@ LOGGING_CONFIG = "utils.log.load_logging_config_start_listener"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": env.db_url("DB_DEFAULT_URL"),
+    "default": env.db_url("DB_DEFAULT_URL", "sqlite:///db.sqlite3"),
 }
 
 # For databases, if using SQLITE, add the following options
