@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Image before Deploying to Dokku
 
 on:
   push:
@@ -38,3 +38,10 @@ jobs:
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Push and deploy to dokku
+        uses: dokku/github-action@v1.6.1
+        with:
+          git_remote_url: "ssh://dokku@agora.gdn:22/agora"
+          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+          deploy_docker_image: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.ref_name }}
