@@ -57,7 +57,10 @@
 		"agorausermedia",
 		"alvistack",
 		"chdir",
+		"mholt",
+		"ratelimit",
 		"runas",
+		"setcap",
 		"zstd"
 	]
 }
