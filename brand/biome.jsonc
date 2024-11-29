@@ -16,7 +16,9 @@
 			"node_modules/**",
 			".parcel-cache/**",
 			".venv/**",
-			".mypy_cache/**"
+			".mypy_cache/**",
+			"ansible/roles/**",
+			"static/**"
 		]
 	},
 	"formatter": {
