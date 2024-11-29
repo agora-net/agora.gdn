@@ -1,12 +1,12 @@
 ---
 roles:
-  - dokku_bot.ansible_dokku
   - geerlingguy.swap
+  - caddy_ansible.caddy_ansible
 collections:
   - name: devsec.hardening
     version: 10.1.0
     source: https://galaxy.ansible.com
   - name: community.general
     version: 9.5.1
-  - name: community.docker
-    version: 4.1.0
+  - name: containers.podman
+    version: 1.16.2

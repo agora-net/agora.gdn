@@ -95,6 +95,53 @@
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Unattended-Upgrade "1";
 
+- name: Ensure webserver installed and watching directory
+  hosts: app_servers
+  remote_user: ansible
+  become: yes
+  tags:
+    - app
+    - webserver
+
+  vars:
+    app_cloudflare_api_token: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      38346139306238623238373536313333363439336236316634343134306265656663303735363363
+      6135666164653836323935653731386431323164653131310a636563613762373463663264333431
+      37613136653532663137623038613534333063343962323464643839623039643234633362306138
+      3235376165643237380a396336313137653261376239623562343863613338663934636331386663
+      63303661623530393032393737613638393930656135636166653639346565346234303534346662
+      6562366462366666623338343063336461633666333762643833
+    # management information
+    lets_encrypt_email: ewan@agora.gdn
+
+  roles:
+    - role: caddy_ansible.caddy_ansible
+      caddy_config: |
+        tls {{ lets_encrypt_email }} {
+          dns cloudflare {env.CF_API_TOKEN}
+          resolvers 1.1.1.1
+        }
+
+        import sites-enabled/*
+      caddy_update: true
+      caddy_packages:
+        - dns.providers.cloudflare
+      caddy_setcap: true
+      caddy_systemd_capabilities_enabled: true
+      caddy_systemd_capabilities: "CAP_NET_BIND_SERVICE"
+      caddy_environment_variables:
+        CF_API_TOKEN: "{{ app_cloudflare_api_token }}"
+
+  tasks:
+    - name: Create sites-enabled directory
+      ansible.builtin.file:
+        source: /etc/caddy/sites-enabled
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: "0755"
+
 - name: Deploy Agora Application
   hosts: app_servers
   remote_user: ansible
@@ -155,18 +202,40 @@
       3761353066623633373838333634343336386637303566396631
     app_image_tag: latest
     app_use_docker_image: true
-    # management information
-    lets_encrypt_email: ewan@agora.gdn
-    app_cloudflare_api_token: !vault |
-      $ANSIBLE_VAULT;1.1;AES256
-      38346139306238623238373536313333363439336236316634343134306265656663303735363363
-      6135666164653836323935653731386431323164653131310a636563613762373463663264333431
-      37613136653532663137623038613534333063343962323464643839623039643234633362306138
-      3235376165643237380a396336313137653261376239623562343863613338663934636331386663
-      63303661623530393032393737613638393930656135636166653639346565346234303534346662
-      6562366462366666623338343063336461633666333762643833
 
-  tasks: []
+  tasks:
+    - name: Add podman volumes for sqlite database and media files
+      containers.podman.podman_volume:
+        name: "{{ app_name }}_{{ item }}"
+      with_items:
+        - db
+        - media
+
+    - name: Log in to docker hub for podman
+      containers.podman.podman_login:
+        username: "{{ app_image_registry_username }}"
+        password: "{{ app_image_registry_password }}"
+        registry: "{{ app_image_registry }}"
+
+    - name: Pull app docker image for use with podman
+      containers.podman.podman_image:
+        name: "{{ app_image }}"
+        tag: "{{ app_image_tag }}"
+
+    - name: Create podman pod for application and web server
+      containers.podman.podman_pod:
+
+    - name: Add application to pod
+      containers.podman.podman_container:
+
+    - name: Copy caddy config to directory being watched
+      ansible.builtin.template:
+        src: templates/caddy/Caddyfile.j2
+        dest: /etc/caddy/sites-enabled/{{ app_name }}
+        owner: www-data
+        group: www-data
+        mode: "0644"
+        validate: caddy validate --config %s
 
 - name: Add Backups for application
   hosts: app_servers
