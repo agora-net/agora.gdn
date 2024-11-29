@@ -65,8 +65,9 @@
         cache_valid_time: 3600
 
   roles:
-    - geerlingguy.swap
-    - devsec.hardening.os_hardening
+    - geerlingguy.swap # add some swap space
+    - devsec.hardening.os_hardening # lock down the OS
+    - alvistack.podman # install podman
 
   vars:
     os_auditd_admin_space_left_action: rotate

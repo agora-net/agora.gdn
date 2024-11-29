@@ -2,6 +2,7 @@
 roles:
   - geerlingguy.swap
   - caddy_ansible.caddy_ansible
+  - alvistack.podman
 collections:
   - name: devsec.hardening
     version: 10.1.0
