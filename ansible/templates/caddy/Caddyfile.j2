@@ -2,6 +2,8 @@
 @{{ app_name }} path *
 
 {{ media_domain }} {
+    import cf_dns_https
+
 	file_server @media {
 		hide .git
 		precompressed zstd br gzip
@@ -9,6 +11,8 @@
 }
 
 {{ app_domain }} {
+    import cf_dns_https
+    
 	reverse_proxy @{{ app_name }} {
 		# Reverse proxy everything. Whitenoise will serve static files.
 		to /run/{{ app_name }}.sock
