@@ -32,6 +32,7 @@ DEBUG = env.bool("DEBUG", default=False)
 SECRET_KEY = env.str("SECRET_KEY", default="!!!SET DJANGO_SECRET_KEY!!!")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=False)
 
 # Application definition
 
