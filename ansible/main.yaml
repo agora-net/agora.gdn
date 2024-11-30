@@ -246,6 +246,14 @@
       ansible.builtin.set_fact:
         app_media_dir: "{{ media_mount['volumes'][0]['Mountpoint'] }}"
 
+    - name: Make sure media directory is owned and accessible by root group for caddy
+      ansible.builtin.file:
+        path: "{{ app_media_dir }}"
+        state: directory
+        group: "root"
+        recurse: yes
+        mode: "u=rwx,g=rwx,o=r"
+
     - name: Log in to docker hub for podman
       containers.podman.podman_login:
         username: "{{ app_image_registry_username }}"
