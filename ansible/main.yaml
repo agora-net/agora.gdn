@@ -264,6 +264,8 @@
       containers.podman.podman_image:
         name: "{{ app_image }}"
         tag: "{{ app_image_tag }}"
+        force: "{{ app_image_tag == 'latest' }}"
+      register: image_pull
 
     - name: Create podman secrets
       containers.podman.podman_secret:
@@ -283,6 +285,8 @@
           - root
         # todo(kisamoto): Setup health checks
         image: "{{ app_image }}:{{ app_image_tag }}"
+        # recreate: "{{ image_pull.changed }}"
+        recreate: yes
         volumes:
           - "{{ app_name }}_db:/data/db"
           - "{{ app_name }}_media:/data/media"
