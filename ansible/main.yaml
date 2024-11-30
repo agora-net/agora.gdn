@@ -237,6 +237,15 @@
         - db
         - media
 
+    - name: Find where the media volume is mounted on the host
+      containers.podman.podman_volume_info:
+        name: "{{ app_name }}_media"
+      register: media_mount
+
+    - name: Register media mount point for Caddy
+      ansible.builtin.set_fact:
+        app_media_dir: "{{ media_mount['volumes'][0]['Mountpoint'] }}"
+
     - name: Log in to docker hub for podman
       containers.podman.podman_login:
         username: "{{ app_image_registry_username }}"
@@ -272,8 +281,10 @@
           - "{{ runtime_dir }}:/run/gunicorn"
         env:
           DEBUG: "False"
+          MEDIA_ROOT: "/data/media"
+          MEDIA_HOST: "{{ app_media_domain }}"
           DB_DEFAULT_URL: "sqlite:////data/db/db.sqlite3"
-          ALLOWED_HOSTS: "{{ (app_domains + [app_media_domain]) | join(',') }}"
+          ALLOWED_HOSTS: "{{ (app_domains) | join(',') }}"
           STATIC_HOST: "{{ app_static_host }}"
           LOG_LEVEL: WARNING
           EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
