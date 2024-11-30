@@ -209,6 +209,19 @@
     app_use_docker_image: true
 
   tasks:
+    - name: Set variable for runtime directory
+      ansible.builtin.set_fact:
+        runtime_dir: "{{ ansible_facts.ansible_env.XDG_RUNTIME_DIR | default('/tmp') }}/{{ app_name }}"
+
+    - name: Create bind mount for gunicorn socket
+      ansible.builtin.file:
+        path: "{{ runtime_dir }}"
+        state: directory
+        owner: "www-data"
+        group: "root"
+        recurse: yes
+        mode: "u=rwx,g=rwx,o=r"
+
     - name: Add podman volumes for sqlite database and media files
       containers.podman.podman_volume:
         name: "{{ app_name }}_{{ item }}"
@@ -227,11 +240,21 @@
         name: "{{ app_image }}"
         tag: "{{ app_image_tag }}"
 
-    - name: Create podman pod for application and web server
-      containers.podman.podman_pod:
-
-    - name: Add application to pod
+    - name: Create podman container for application
       containers.podman.podman_container:
+        name: "{{ app_name }}"
+        generate_systemd:
+          path: /etc/systemd/system
+        group_add:
+          - "{{ app_group }}"
+          - www-data
+        # todo(kisamoto): Setup health checks
+        image: "{{ app_image }}:{{ app_image_tag }}"
+        volumes:
+          - "{{ app_name }}_db:/data/db"
+          - "{{ app_name }}_media:/data/media"
+          - "{{ runtime_dir }}:/run/gunicorn"
+      notify: reload caddy
 
     - name: Copy caddy config to directory being watched
       ansible.builtin.template:
@@ -241,6 +264,13 @@
         group: www-data
         mode: "0644"
         validate: caddy validate --config %s
+      notify: reload caddy
+
+  handlers:
+    - name: reload caddy
+      ansible.builtin.systemd:
+        name: caddy
+        state: reloaded
 
 - name: Add Backups for application
   hosts: app_servers
