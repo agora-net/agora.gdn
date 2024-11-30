@@ -23,6 +23,6 @@
     
 	reverse_proxy @{{ app_name }} {
 		# Reverse proxy everything. Whitenoise will serve static files.
-		to /run/{{ app_name }}.sock
+		to unix/{{ runtime_dir }}/gunicorn.sock
 	}
 }

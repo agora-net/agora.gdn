@@ -139,6 +139,20 @@
         group: www-data
         mode: "0755"
 
+    - name: Update Caddy service to run as root group
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/system/caddy.service
+        regexp: "^Group="
+        line: "Group=root"
+        state: present
+      notify:
+        - systemctl daemon-reload
+
+  handlers:
+    - name: systemctl daemon-reload
+      ansible.builtin.systemd_service:
+        daemon_reload: yes
+
 - name: Deploy Agora Application
   hosts: app_servers
   remote_user: ansible
@@ -204,15 +218,18 @@
     app_use_docker_image: true
 
   tasks:
+    - name: Set the group ID as a string
+      ansible.builtin.set_fact:
+        effective_group_id: "{{ ansible_facts['effective_group_id'] | string }}"
+
     - name: Set variable for runtime directory
       ansible.builtin.set_fact:
-        runtime_dir: "{{ ansible_facts.ansible_env.XDG_RUNTIME_DIR | default('/tmp') }}/{{ app_name }}"
+        runtime_dir: "{{ ansible_facts['env']['XDG_RUNTIME_DIR'] | default('/run/user/' + effective_group_id) }}/{{ app_name }}"
 
     - name: Create bind mount for gunicorn socket
       ansible.builtin.file:
         path: "{{ runtime_dir }}"
         state: directory
-        owner: "www-data"
         group: "root"
         recurse: yes
         mode: "u=rwx,g=rwx,o=r"
@@ -242,7 +259,7 @@
           path: /etc/systemd/system
         group_add:
           - "{{ app_group }}"
-          # - www-data
+          - root
         # todo(kisamoto): Setup health checks
         image: "{{ app_image }}:{{ app_image_tag }}"
         volumes:
