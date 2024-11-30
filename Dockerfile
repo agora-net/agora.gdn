@@ -74,9 +74,12 @@ ENV PATH=/app/.venv/bin:$PATH
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
 # uses SQLite, the folder needs to be owned by the user that
 # will be writing to the database file.
-RUN chown -R wagtail:wagtail ${APP_HOME} /run/gunicorn /data
+RUN chown -R wagtail:0 ${APP_HOME} /run/gunicorn /data
 # Copy the source code of the project into the container.
-COPY --chown=wagtail:wagtail . .
+COPY --chown=wagtail:0 . .
+# Make sure the root group has all the same permissions as the user
+RUN chgrp -R 0 ${APP_HOME} /run/gunicorn /data && \
+    chmod -R g=u ${APP_HOME} /run/gunicorn /data
 # Use user "wagtail" to run the build commands below and the server itself.
 USER wagtail
 # Collect static files.
