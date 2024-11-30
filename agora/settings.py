@@ -282,7 +282,8 @@ STATIC_HOST = env.str("STATIC_HOST", "")
 STATIC_URL = STATIC_HOST + "/static/"
 
 MEDIA_ROOT = env.str("MEDIA_ROOT", BASE_DIR / "media")
-MEDIA_URL = "/media/"
+MEDIA_HOST = env.str("MEDIA_HOST", "")
+MEDIA_URL = MEDIA_HOST + "/media/"
 
 # Default storage settings, with the staticfiles storage updated.
 # See https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-STORAGES
