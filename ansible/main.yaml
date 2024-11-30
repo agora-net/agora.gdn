@@ -165,17 +165,17 @@
     app_name: agora
     app_user: agora
     app_group: www-data
-    media_domain: media.agora.gdn
+    app_media_domain: media.agora.gdn
+    app_static_domain: cdn.agora.gdn
     app_domains:
       - agora.gdn
       - www.agora.gdn
+      - "{{ app_static_domain }}"
       # todo(kisamoto): add agorausermedia.com dns entries
       # - agorausermedia.com # Used for user uploaded media
-    app_static_host: https://cdn.agora.gdn/
+    app_static_host: https://{{ app_static_domain }}/
     # management information
     lets_encrypt_email: ewan@agora.gdn
-    # where the app is on the server
-    app_dir: /opt/{{ app_name }}
     # additional app configuration
     app_django_secret_key: !vault |
       $ANSIBLE_VAULT;1.1;AES256
@@ -199,9 +199,6 @@
       61636262646532303363656537616231373736343562383961383630643462663565323736613139
       38366565306632353130306663663433623661623837623339366436646631616166326432363936
       3837
-    app_repo_url: https://{{ github_token }}@github.com/agora-net/agora.net.git
-    app_repo_version: main
-    app_build_from_source: false
     app_image_registry: docker.io
     app_image: "{{ app_image_registry}}/kisamoto/tmp.agora.net"
     app_image_registry_username: kisamoto
@@ -215,7 +212,6 @@
       37346337663534313332656538653265383233303138393230303237626263393134343733663236
       3761353066623633373838333634343336386637303566396631
     app_image_tag: latest
-    app_use_docker_image: true
 
   tasks:
     - name: Set the group ID as a string
@@ -252,6 +248,14 @@
         name: "{{ app_image }}"
         tag: "{{ app_image_tag }}"
 
+    - name: Create podman secrets
+      containers.podman.podman_secret:
+        name: "{{ item.name }}"
+        data: "{{ item.data }}"
+      with_items:
+        - name: DJANGO_SECRET_KEY
+          data: "{{ app_django_secret_key }}"
+
     - name: Create podman container for application
       containers.podman.podman_container:
         name: "{{ app_name }}"
@@ -266,6 +270,15 @@
           - "{{ app_name }}_db:/data/db"
           - "{{ app_name }}_media:/data/media"
           - "{{ runtime_dir }}:/run/gunicorn"
+        env:
+          DEBUG: "False"
+          DB_DEFAULT_URL: "sqlite:////data/db/db.sqlite3"
+          ALLOWED_HOSTS: "{{ (app_domains + [app_media_domain]) | join(',') }}"
+          STATIC_HOST: "{{ app_static_host }}"
+          LOG_LEVEL: WARNING
+          EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
+        secrets:
+          - DJANGO_SECRET_KEY,type=env,target=SECRET_KEY
       notify: reload caddy
 
     - name: Copy caddy config to directory being watched

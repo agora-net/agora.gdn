@@ -5,7 +5,7 @@
     }
   }
 
-{{ media_domain }} {
+{{ app_media_domain }} {
     import cf_dns_https
 
     @media path /media/*
@@ -16,13 +16,13 @@
 	}
 }
 
+# Reverse proxy everything. Whitenoise will serve static files.
 {{ app_domains | join(' ') }} {
     import cf_dns_https
 
     @{{ app_name }} path *
     
 	reverse_proxy @{{ app_name }} {
-		# Reverse proxy everything. Whitenoise will serve static files.
 		to unix/{{ runtime_dir }}/gunicorn.sock
 	}
 }
