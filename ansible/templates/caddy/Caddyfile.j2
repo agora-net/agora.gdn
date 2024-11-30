@@ -6,25 +6,26 @@
 }
 
 (media_file_server) {
-    file_server /media/* {
-		hide .git
-		precompressed zstd br gzip
-        root {{ app_media_dir }}
-	}
+    root * {{ app_media_dir }}
+
+    handle_path /media/* {
+        file_server {
+            hide .git
+            precompressed zstd br gzip
+        }
+    }
 }
 
 {{ app_media_domain }} {
     import cf_dns_https
-
     import media_file_server
 }
 
 # Reverse proxy everything. Whitenoise will serve static files.
 {{ app_domains | join(' ') }} {
-    import cf_dns_https
-
     @{{ app_name }} path *
 
+    import cf_dns_https
     import media_file_server
     
 	reverse_proxy @{{ app_name }} {

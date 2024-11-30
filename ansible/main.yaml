@@ -139,6 +139,13 @@
         group: www-data
         mode: "0755"
 
+    - name: Add caddy user to root group
+      ansible.builtin.user:
+        name: caddy
+        groups:
+          - root
+        append: yes
+
     - name: Update Caddy service to run as root group
       ansible.builtin.lineinfile:
         path: /etc/systemd/system/caddy.service
@@ -146,12 +153,14 @@
         line: "Group=root"
         state: present
       notify:
-        - systemctl daemon-reload
+        - systemctl daemon-reload and caddy restart
 
   handlers:
-    - name: systemctl daemon-reload
+    - name: systemctl daemon-reload and caddy restart
       ansible.builtin.systemd_service:
         daemon_reload: yes
+        name: caddy
+        state: restarted
 
 - name: Deploy Agora Application
   hosts: app_servers
@@ -174,6 +183,7 @@
       # todo(kisamoto): add agorausermedia.com dns entries
       # - agorausermedia.com # Used for user uploaded media
     app_static_host: https://{{ app_static_domain }}/
+    app_media_host: https://{{ app_media_domain }}/
     # management information
     lets_encrypt_email: ewan@agora.gdn
     # additional app configuration
@@ -254,6 +264,16 @@
         recurse: yes
         mode: "u=rwx,g=rwx,o=r"
 
+    - name: Copy caddy config to directory being watched
+      ansible.builtin.template:
+        src: templates/caddy/Caddyfile.j2
+        dest: /etc/caddy/sites-enabled/{{ app_name }}
+        owner: www-data
+        group: root
+        mode: "0644"
+        validate: caddy validate --adapter caddyfile --config %s
+      notify: reload caddy
+
     - name: Log in to docker hub for podman
       containers.podman.podman_login:
         username: "{{ app_image_registry_username }}"
@@ -293,7 +313,7 @@
         env:
           DEBUG: "False"
           MEDIA_ROOT: "/data/media"
-          MEDIA_HOST: "{{ app_media_domain }}"
+          MEDIA_HOST: "{{ app_media_host }}"
           DB_DEFAULT_URL: "sqlite:////data/db/db.sqlite3"
           ALLOWED_HOSTS: "{{ (app_domains) | join(',') }}"
           STATIC_HOST: "{{ app_static_host }}"
@@ -301,16 +321,6 @@
           EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
         secrets:
           - DJANGO_SECRET_KEY,type=env,target=SECRET_KEY
-      notify: reload caddy
-
-    - name: Copy caddy config to directory being watched
-      ansible.builtin.template:
-        src: templates/caddy/Caddyfile.j2
-        dest: /etc/caddy/sites-enabled/{{ app_name }}
-        owner: www-data
-        group: www-data
-        mode: "0644"
-        validate: caddy validate --adapter caddyfile --config %s
       notify: reload caddy
 
   handlers:
