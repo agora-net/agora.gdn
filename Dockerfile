@@ -81,7 +81,7 @@ COPY --chown=wagtail:0 . .
 RUN chgrp -R 0 ${APP_HOME} /run/gunicorn /data && \
     chmod -R g=u ${APP_HOME} /run/gunicorn /data
 # Use user "wagtail" to run the build commands below and the server itself.
-USER wagtail
+USER wagtail:root
 # Collect static files.
 RUN just collectstatic
 # Runtime command that executes when "docker run" is called, it does the
