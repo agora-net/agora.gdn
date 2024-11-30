@@ -1,8 +1,14 @@
-@media path /media/*
-@{{ app_name }} path *
+(cf_dns_https) {
+    tls {{ lets_encrypt_email }} {
+        dns cloudflare {env.CF_API_TOKEN}
+        resolvers 1.1.1.1
+    }
+  }
 
 {{ media_domain }} {
     import cf_dns_https
+
+    @media path /media/*
 
 	file_server @media {
 		hide .git
@@ -10,8 +16,10 @@
 	}
 }
 
-{{ app_domain }} {
+{{ app_domains | join(' ') }} {
     import cf_dns_https
+
+    @{{ app_name }} path *
     
 	reverse_proxy @{{ app_name }} {
 		# Reverse proxy everything. Whitenoise will serve static files.

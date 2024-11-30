@@ -113,20 +113,12 @@
       3235376165643237380a396336313137653261376239623562343863613338663934636331386663
       63303661623530393032393737613638393930656135636166653639346565346234303534346662
       6562366462366666623338343063336461633666333762643833
-    # management information
-    lets_encrypt_email: ewan@agora.gdn
 
   roles:
     - role: caddy_ansible.caddy_ansible
       caddy_config: |
-        (cf_dns_https) {
-          tls {{ lets_encrypt_email }} {
-              dns cloudflare {env.CF_API_TOKEN}
-              resolvers 1.1.1.1
-          }
-        }
-
         import sites-enabled/*
+
       caddy_config_update: true
       caddy_update: true
       caddy_packages:
@@ -141,7 +133,7 @@
   tasks:
     - name: Create sites-enabled directory
       ansible.builtin.file:
-        source: /etc/caddy/sites-enabled
+        path: /etc/caddy/sites-enabled
         state: directory
         owner: www-data
         group: www-data
@@ -159,12 +151,15 @@
     app_name: agora
     app_user: agora
     app_group: www-data
+    media_domain: media.agora.gdn
     app_domains:
       - agora.gdn
       - www.agora.gdn
       # todo(kisamoto): add agorausermedia.com dns entries
       # - agorausermedia.com # Used for user uploaded media
     app_static_host: https://cdn.agora.gdn/
+    # management information
+    lets_encrypt_email: ewan@agora.gdn
     # where the app is on the server
     app_dir: /opt/{{ app_name }}
     # additional app configuration
@@ -247,7 +242,7 @@
           path: /etc/systemd/system
         group_add:
           - "{{ app_group }}"
-          - www-data
+          # - www-data
         # todo(kisamoto): Setup health checks
         image: "{{ app_image }}:{{ app_image_tag }}"
         volumes:
@@ -263,7 +258,7 @@
         owner: www-data
         group: www-data
         mode: "0644"
-        validate: caddy validate --config %s
+        validate: caddy validate --adapter caddyfile --config %s
       notify: reload caddy
 
   handlers:
