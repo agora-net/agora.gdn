@@ -285,8 +285,7 @@
           - root
         # todo(kisamoto): Setup health checks
         image: "{{ app_image }}:{{ app_image_tag }}"
-        # recreate: "{{ image_pull.changed }}"
-        recreate: yes
+        recreate: "{{ image_pull.changed }}"
         volumes:
           - "{{ app_name }}_db:/data/db"
           - "{{ app_name }}_media:/data/media"
