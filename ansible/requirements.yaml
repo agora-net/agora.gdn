@@ -3,7 +3,7 @@ roles:
   - geerlingguy.swap
   - caddy_ansible.caddy_ansible
   - alvistack.podman
-  - m3nu.ansible_role_borgbackup
+  - borgbase.ansible_role_borgbackup
 collections:
   - name: devsec.hardening
     version: 10.1.0
