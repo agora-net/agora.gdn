@@ -187,6 +187,7 @@
     # management information
     lets_encrypt_email: ewan@agora.gdn
     # additional app configuration
+    app_media_dir: /var/lib/{{ app_name }}/media
     app_django_secret_key: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       30316332666532343838333837643936333432623763333531303834303161306437656134343335
@@ -198,17 +199,6 @@
       64316666383262363232643131646562353132623936313539376130613864323638366137313137
       62373366366236336362
     # where the app code is
-    github_token: !vault |
-      $ANSIBLE_VAULT;1.1;AES256
-      34323039636330663565613138363163633438616637366165366232353363316138366463306363
-      6165623631383739613663623637386162306233333433350a353032396433396266363464616635
-      63663139633930643764636137313366646436383231633839363662626564316231653238336637
-      3132386163393437640a353739353634626261393338343039383334303435666632383137373631
-      34323965366564373439303330636462343834316166666437373838656130373138343636393630
-      37303937643632646266633633633739653632643131363235323036356164323438386137363439
-      61636262646532303363656537616231373736343562383961383630643462663565323736613139
-      38366565306632353130306663663433623661623837623339366436646631616166326432363936
-      3837
     app_image_registry: docker.io
     app_image: "{{ app_image_registry}}/kisamoto/tmp.agora.net"
     app_image_registry_username: kisamoto
@@ -240,26 +230,15 @@
         recurse: yes
         mode: "u=rwx,g=rwx,o=r"
 
-    - name: Add podman volumes for sqlite database and media files
+    - name: Add podman volumes for sqlite database
       containers.podman.podman_volume:
-        name: "{{ app_name }}_{{ item }}"
-      with_items:
-        - db
-        - media
-
-    - name: Find where the media volume is mounted on the host
-      containers.podman.podman_volume_info:
-        name: "{{ app_name }}_media"
-      register: media_mount
-
-    - name: Register media mount point for Caddy
-      ansible.builtin.set_fact:
-        app_media_dir: "{{ media_mount['volumes'][0]['Mountpoint'] }}"
+        name: "{{ app_name }}_db"
 
     - name: Make sure media directory is owned and accessible by root group for caddy
       ansible.builtin.file:
         path: "{{ app_media_dir }}"
         state: directory
+        owner: caddy
         group: "root"
         recurse: yes
         mode: "u=rwx,g=rwx,o=r"
@@ -273,6 +252,13 @@
         mode: "0644"
         validate: caddy validate --adapter caddyfile --config %s
       notify: reload caddy
+
+    - name: Add podman volumes for media directory at media directory location
+      containers.podman.podman_volume:
+        name: "{{ app_name }}_media"
+        options:
+          - device={{ app_media_dir }}
+          - o=bind
 
     - name: Log in to docker hub for podman
       containers.podman.podman_login:
