@@ -303,8 +303,9 @@
           DB_DEFAULT_URL: "sqlite:////data/db/db.sqlite3"
           ALLOWED_HOSTS: "{{ (app_domains) | join(',') }}"
           STATIC_HOST: "{{ app_static_host }}"
-          LOG_LEVEL: WARNING
+          LOG_LEVEL: INFO
           EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
+          USE_X_FORWARDED_HOST: "True"
         secrets:
           - DJANGO_SECRET_KEY,type=env,target=SECRET_KEY
       notify: reload caddy
@@ -375,6 +376,12 @@
           - borgmatic
         state: absent
 
+    - name: Install os dependencies
+      ansible.builtin.package:
+        name:
+          - sqlite3
+        state: present
+
     - name: Accept host key for Borgbase
       ansible.builtin.known_hosts:
         name: "{{ borgbase_repo_id }}.repo.borgbase.com"
@@ -417,28 +424,28 @@
         group: root
         mode: "0600"
 
-    # - name: Copy additional borgmatic config for app
-    #   ansible.builtin.template:
-    #     src: templates/borgmatic/config.yaml.j2
-    #     dest: "{{ borgmatic_config_dir }}/{{ app_name }}.yaml"
-    #     owner: root
-    #     group: root
-    #     mode: "0600"
-
   roles:
     - role: borgbase.ansible_role_borgbackup
-      borg_encryption_passphrase: "{{ borg_passphrase }}"
-      borg_repository: "{{ borg_repo }}"
+      borg_encryption_passphrase: ""
+      borg_repository: []
       borgmatic_timer: systemd
       borg_user: root
       borg_group: root
       borg_ssh_key_file_path: "{{ borg_ssh_key_path }}"
       borg_ssh_command: ssh -i {{ borg_ssh_key_path }}
-      borg_source_directories:
-        - "{{ media_volume_mount }}"
+      borg_source_directories: []
       borg_retention_policy:
         keep_hourly: 3
         keep_daily: 7
         keep_weekly: 4
         keep_monthly: 6
         keep_yearly: 1
+
+  tasks:
+    - name: Overwrite generated borgmatic config with our own
+      ansible.builtin.template:
+        src: templates/borgmatic/config.yaml.j2
+        dest: "/etc/borgmatic/config.yaml"
+        owner: root
+        group: root
+        mode: "0600"

@@ -1,18 +1,75 @@
+---
+# {{ ansible_managed }}
+
+# Stay in same file system (do not cross mount points).
+one_file_system: True
+# Store atime into archive.
+atime: True
+# Store ctime into archive.
+ctime: True
+# Exclude directories that contain a CACHEDIR.TAG file. See
+# http://www.brynosaurus.com/cachedir/spec.html for details.
+exclude_caches: true
+# Exclude directories that contain a file with the given filename.
+exclude_if_present: .nobackup
+
 source_directories:
 - {{ media_volume_mount }}
-repositories:
-  - path: {{ borg_repo }}
-    label: borgbase-remote-{{ app_name }}
-ssh_command: ssh -i {{ borg_ssh_key_path }}
-source_directories_must_exist: true
-keep_daily: 7
-keep_weekly: 4
-keep_monthly: 6
-keep_yearly: 1
-checks:
-    - repository
-    - archives
 sqlite_databases:
     - name: {{ app_name }}
       path: {{ db_volume_mount }}/db.sqlite3
 encryption_passphrase: {{ borg_passphrase }}
+repositories:
+  - path: {{ borg_repo }}
+    label: borgbase-remote-{{ app_name }}
+ssh_command: ssh -i {{ borg_ssh_key_path }}
+
+# Type of compression to use when creating archives. See
+# https://borgbackup.readthedocs.org/en/stable/usage.html#borg-create for details.
+# Defaults to no compression.
+compression: auto,zstd
+# Umask to be used for borg create.
+umask: 0077
+# Maximum seconds to wait for acquiring a repository/cache lock.
+lock_wait: 5
+# Name of the archive. Borg placeholders can be used. See the output of
+# "borg help placeholders" for details. Default is
+# "{hostname}-{now:%Y-%m-%dT%H:%M:%S.%f}". If you specify this option, you must
+# also specify a prefix in the retention section to avoid accidental pruning of
+# archives with a different archive name format. And you should also specify a
+# prefix in the consistency section as well.
+archive_name_format: '{hostname}-{now:%Y-%m-%d-%H%M%S}'
+# Bypass Borg error about a repository that has been moved.
+relocated_repo_access_is_ok: False
+source_directories_must_exist: true
+
+# Number of archives to keep.
+keep_hourly: 3
+keep_daily: 7
+keep_weekly: 4
+keep_monthly: 6
+keep_yearly: 1
+# List of one or more consistency checks to run: "repository",
+# "archives", "data", and/or "extract". Defaults to
+# "repository" and "archives". Set to "disabled" to disable
+# all consistency checks. "repository" checks the consistency
+# of the repository, "archives" checks all of the archives,
+# "data" verifies the integrity of the data within the
+# archives, and "extract" does an extraction dry-run of the
+# most recent archive. Note that "data" implies "archives".
+checks:
+    - {'name': 'repository', 'frequency': '4 weeks'}
+    - {'name': 'archives', 'frequency': '6 weeks'}
+# Restrict the number of checked archives to the last n. Applies only to the "archives" check.
+check_last: 3
+# Shell commands or scripts to execute before and after a backup or if an error has occurred.
+# IMPORTANT: All provided commands and scripts are executed with user permissions of borgmatic.
+# Do not forget to set secure permissions on this file as well as on any script listed (chmod 0700) to
+# prevent potential shell injection or privilege escalation.
+hooks:
+    on_error:
+        - echo "`date` - Error while creating a backup."
+    before_backup:
+        - echo "`date` - Starting backup."
+    after_backup:
+        - echo "`date` - Finished backup."
