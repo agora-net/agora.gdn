@@ -11,3 +11,5 @@ collections:
     version: 9.5.1
   - name: containers.podman
     version: 1.16.2
+  - name: adhawkins.borgbase
+    version: 1.0.3

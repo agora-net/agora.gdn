@@ -1,8 +1,9 @@
 source_directories:
-- /opt/{{ app_name }}/media
+- {{ media_volume_mount }}
 repositories:
-- path: {{ borg_repo }}
+  - path: {{ borg_repo }}
     label: borgbase-remote-{{ app_name }}
+ssh_command: ssh -i {{ borg_ssh_key_path }}
 source_directories_must_exist: true
 keep_daily: 7
 keep_weekly: 4
@@ -13,5 +14,5 @@ checks:
     - archives
 sqlite_databases:
     - name: {{ app_name }}
-      path: /opt/{{ app_name }}/db.sqlite3
+      path: {{ db_volume_mount }}/db.sqlite3
 encryption_passphrase: {{ borg_passphrase }}
