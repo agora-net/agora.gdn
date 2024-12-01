@@ -325,8 +325,8 @@
   vars:
     # app information
     app_name: agora
-    # TODO(kisamoto): Add the Borg repo
-    borg_repo: ssh://t12bjj3x@t12bjj3x.repo.borgbase.com/./repo
+    borgbase_repo_id: t12bjj3x
+    borg_repo: ssh://{{ borgbase_repo_id }}@{{ borgbase_repo_id }}.repo.borgbase.com/./repo
     borg_passphrase: !vault |
       $ANSIBLE_VAULT;1.1;AES256
       65333461306537383863336563666339313435313164356538313564343136616264646537323464
@@ -364,14 +364,22 @@
       31666662356462343963396535336637386664313234663335326637663863373838
     borg_ssh_key_directory: /root/.ssh
     borg_ssh_key_path: "{{ borg_ssh_key_directory }}/borg_{{ app_name }}_key"
+    borgmatic_config_dir: /etc/borgmatic.d
 
   pre_tasks:
-    - name: Update the packages cache
-      ansible.builtin.apt:
-        update_cache: yes
-        cache_valid_time: 3600
+    - name: Uninstall Borg and Borgmatic with apt
+      ansible.builtin.package:
+        name:
+          - python3-msgpack
+          - borgbackup
+          - borgmatic
+        state: absent
 
-  tasks:
+    - name: Accept host key for Borgbase
+      ansible.builtin.known_hosts:
+        name: "{{ borgbase_repo_id }}.repo.borgbase.com"
+        key: "{{ borgbase_repo_id }}.repo.borgbase.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMS3185JdDy7ffnr0nLWqVy8FaAQeVh1QYUSiNpW5ESq"
+
     - name: Get podman volume info for app sqlite database
       containers.podman.podman_volume_info:
         name: "{{ app_name }}_db"
@@ -390,13 +398,16 @@
       ansible.builtin.set_fact:
         media_volume_mount: "{{ media_volume_info.volumes[0]['Mountpoint'] }}"
 
-    - name: Create SSH directory for Borg
+    - name: Create necessary directories
       ansible.builtin.file:
-        path: "{{ borg_ssh_key_directory }}"
+        path: "{{ item }}"
         state: directory
         owner: root
         group: root
         mode: "0700"
+      with_items:
+        - "{{ borgmatic_config_dir }}"
+        - "{{ borg_ssh_key_directory }}"
 
     - name: Copy Borg SSH key to server
       ansible.builtin.copy:
@@ -406,90 +417,28 @@
         group: root
         mode: "0600"
 
-    - name: Uninstall Borg and Borgmatic with apt
-      ansible.builtin.package:
-        name:
-          - python3-msgpack
-          - borgbackup
-          - borgmatic
-        state: absent
+    # - name: Copy additional borgmatic config for app
+    #   ansible.builtin.template:
+    #     src: templates/borgmatic/config.yaml.j2
+    #     dest: "{{ borgmatic_config_dir }}/{{ app_name }}.yaml"
+    #     owner: root
+    #     group: root
+    #     mode: "0600"
 
-    - name: Install Borg by downloading standalone binary
-      block:
-        - name: Download Borg standalone binary
-          ansible.builtin.get_url:
-            url: https://github.com/borgbackup/borg/releases/download/1.4.0/borg-linux-glibc236
-            dest: /usr/local/bin/borg
-            group: root
-            owner: root
-            mode: "0755"
-
-        - name: Download Borg standalone binary signature
-          ansible.builtin.get_url:
-            url: https://github.com/borgbackup/borg/releases/download/1.4.0/borg-linux-glibc236.asc
-            dest: /usr/local/bin/borg.asc
-            group: root
-            owner: root
-
-        - name: Import Borg standalone binary signature
-          ansible.builtin.command:
-            cmd: gpg --recv-keys 9F88FB52FAF7B393
-
-        - name: Validate Borg standalone binary signature
-          ansible.builtin.command:
-            cmd: gpg --verify /usr/local/bin/borg.asc /usr/local/bin/borg
-
-    - name: Install pipx
-      ansible.builtin.apt:
-        name: pipx
-        state: present
-
-    - name: Ensure pipx path
-      ansible.builtin.command:
-        cmd: pipx ensurepath
-
-    - name: Install Borgmatic with pipx
-      ansible.builtin.command:
-        cmd: pipx install borgmatic
-
-    - name: Create Borgmatic configuration directory
-      ansible.builtin.file:
-        path: /etc/borgmatic
-        state: directory
-        owner: root
-        group: root
-        mode: "0755"
-
-    - name: Create Borgmatic configuration file
-      ansible.builtin.template:
-        src: templates/borgmatic/config.yaml.j2
-        dest: /etc/borgmatic/config.yaml
-        owner: root
-        group: root
-        mode: "0644"
-        validate: borgmatic config validate --config %s
-
-    - name: Create Borgmatic systemd services
-      ansible.builtin.template:
-        src: templates/borgmatic/{{ item }}.j2
-        dest: /etc/systemd/system/{{ item }}
-        owner: root
-        group: root
-        mode: "0644"
-        validate: systemd-analyze verify %s
-      with_items:
-        - borgmatic.timer
-        - borgmatic.service
-
-    - name: Initialize remote Borg repository
-      ansible.builtin.command:
-        cmd: borg init --encryption=repokey-blake2 {{ borg_repo }}
-
-    - name: Enable and start Borgmatic services
-      ansible.builtin.systemd_service:
-        name: "{{ item }}"
-        state: started
-        enabled: yes
-      with_items:
-        - borgmatic.timer
-        - borgmatic.service
+  roles:
+    - role: borgbase.ansible_role_borgbackup
+      borg_encryption_passphrase: "{{ borg_passphrase }}"
+      borg_repository: "{{ borg_repo }}"
+      borgmatic_timer: systemd
+      borg_user: root
+      borg_group: root
+      borg_ssh_key_file_path: "{{ borg_ssh_key_path }}"
+      borg_ssh_command: ssh -i {{ borg_ssh_key_path }}
+      borg_source_directories:
+        - "{{ media_volume_mount }}"
+      borg_retention_policy:
+        keep_hourly: 3
+        keep_daily: 7
+        keep_weekly: 4
+        keep_monthly: 6
+        keep_yearly: 1
