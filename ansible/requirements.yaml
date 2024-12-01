@@ -3,6 +3,7 @@ roles:
   - geerlingguy.swap
   - caddy_ansible.caddy_ansible
   - alvistack.podman
+  - m3nu.ansible_role_borgbackup
 collections:
   - name: devsec.hardening
     version: 10.1.0
@@ -11,5 +12,3 @@ collections:
     version: 9.5.1
   - name: containers.podman
     version: 1.16.2
-  - name: adhawkins.borgbase
-    version: 1.0.3
