@@ -34,7 +34,7 @@
         {% comment %} Twitter card information {% endcomment %}
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title"
-              content="{{ page.seo_title|default:page.title }}">
+              content="{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}">
         <meta name="twitter:description"
               content="{{ page.search_description|default:"A social media platform for grown ups" }}">
         <meta name="twitter:image" content="{% static "social/waiting-list.png" %}">
@@ -47,7 +47,8 @@
               content="nopin"
               description="Sorry, you can't save from my website!">
         {% comment %} WeChat {% endcomment %}
-        <meta itemprop="name" content="{{ page.seo_title|default:page.title }}">
+        <meta itemprop="name"
+              content="{% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}">
         <meta itemprop="image" content="{% static "social/waiting-list.png" %}">
         <meta name="description"
               itemprop="description"
