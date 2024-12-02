@@ -73,3 +73,10 @@ hooks:
         - echo "`date` - Starting backup."
     after_backup:
         - echo "`date` - Finished backup."
+    # Slightly hacky workaround.
+    # Backups can end up with wal & shm files that are owned by root and not writable by the group.
+    # This is a workaround to ensure that the group can write to the files so containers aren't stuck
+    # in a read only state.
+    after_everything:
+        - chmod -R g=u {{ db_volume_mount }}
+
