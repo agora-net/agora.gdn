@@ -1,8 +1,7 @@
-from datetime import date
-
 from cuid2 import Cuid
 from django.db import models
 from model_utils.models import TimeStampedModel
+from taggit.managers import TaggableManager
 from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
@@ -138,9 +137,14 @@ class WaitingPage(Page):
 
 
 class BlogPage(Page):
-    # Inspiration: https://www.qualcomm.com/news/releases/2024/12/qualcomm-appoints-yasumasa-nakayama-as-vice-president-and-presid
+    """A blog page, written to attract and engage readers
 
-    tag = models.CharField(max_length=255, blank=True, help_text="Text for a tag above the title")
+    Inspiration: https://www.qualcomm.com/news/releases/2024/12/qualcomm-appoints-yasumasa-nakayama-as-vice-president-and-presid
+    """
+
+    category = models.CharField(
+        max_length=255, blank=True, help_text="Text for a category above the title"
+    )
     location = models.CharField(max_length=255, blank=True, help_text="Location of the release")
     content = StreamField(
         [
@@ -148,17 +152,27 @@ class BlogPage(Page):
         ]
     )
 
+    tags = TaggableManager()
+
+    content_panels = Page.content_panels + [
+        FieldPanel("category"),
+        FieldPanel("location"),
+        FieldPanel("content"),
+        FieldPanel("tags"),
+    ]
+
+    parent_page_types = ["home.BlogIndexPage"]
+    page_description = "A blog page, written to attract and engage readers"
+
 
 class BlogIndexPage(Page):
-    def blogs(self):
-        # Get the list of live event pages that are descendants of this page
-        blogs = BlogPage.objects.live().descendant_of(self)
+    """Lists all the blog pages"""
 
-        # Filter events list to get ones that are either
-        # running now or start in the future
-        blogs = blogs.filter(date_from__gte=date.today())
+    subpage_types = ["home.BlogPage"]
 
-        # Order by date
-        blogs = blogs.order_by("date_from")
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
 
-        return blogs
+        # Add extra variables and return the updated context
+        context["blog_entries"] = BlogPage.objects.child_of(self).live()
+        return context

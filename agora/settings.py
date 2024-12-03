@@ -215,6 +215,8 @@ DATABASES = {
     "default": env.db_url("DB_DEFAULT_URL", "sqlite:///db.sqlite3"),
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 # For databases, if using SQLITE, add the following options
 # https://gcollazo.com/optimal-sqlite-settings-for-django/
 SQLITE_OPTIONS = {
@@ -299,6 +301,10 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# Taggit settings
+# https://django-taggit.readthedocs.io/en/latest/getting_started.html#settings
+TAGGIT_CASE_INSENSITIVE = True
 
 
 # Wagtail settings
