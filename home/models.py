@@ -1,3 +1,5 @@
+from datetime import date
+
 from cuid2 import Cuid
 from django.db import models
 from model_utils.models import TimeStampedModel
@@ -133,3 +135,30 @@ class WaitingPage(Page):
             context.update(additional_context)
 
         return context
+
+
+class BlogPage(Page):
+    # Inspiration: https://www.qualcomm.com/news/releases/2024/12/qualcomm-appoints-yasumasa-nakayama-as-vice-president-and-presid
+
+    tag = models.CharField(max_length=255, blank=True, help_text="Text for a tag above the title")
+    location = models.CharField(max_length=255, blank=True, help_text="Location of the release")
+    content = StreamField(
+        [
+            ("body", blocks.RichTextBlock(blank=True, help_text="Blog body")),
+        ]
+    )
+
+
+class BlogIndexPage(Page):
+    def blogs(self):
+        # Get the list of live event pages that are descendants of this page
+        blogs = BlogPage.objects.live().descendant_of(self)
+
+        # Filter events list to get ones that are either
+        # running now or start in the future
+        blogs = blogs.filter(date_from__gte=date.today())
+
+        # Order by date
+        blogs = blogs.order_by("date_from")
+
+        return blogs
