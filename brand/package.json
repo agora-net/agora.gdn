@@ -3,26 +3,26 @@
 	"version": "1.0.0",
 	"description": "",
 	"scripts": {
-		"build": "parcel build",
+		"build": "parcel build --no-cache",
 		"build:cdn": "parcel build --public-url https://cdn.agora.gdn/",
-		"watch": "chokidar '../**/*.html ../**/*.css ../**/*.svg' --ignore './node_modules ../static ./.parcel-cache ../.venv ../.ruff_cache' --verbose --command 'parcel build'"
+		"watch": "chokidar '../**/*.html ../**/*.css ../**/*.svg' --ignore '../brand/node_modules' --ignore '../ansible/*' --ignore '../static/*' --ignore './.parcel-cache' --ignore '../.venv' --ignore '../.ruff_cache' --verbose --initial --command 'parcel build'"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"@fontsource-variable/figtree": "^5.1.1",
-		"chokidar-cli": "^3.0.0",
-		"localtunnel": "^2.0.2",
 		"@biomejs/biome": "1.9.4",
+		"@fontsource-variable/figtree": "^5.1.1",
 		"@parcel/transformer-sass": "^2.13.0",
+		"@tailwindcss/typography": "^0.5.15",
+		"chokidar-cli": "^3.0.0",
 		"daisyui": "^4.12.14",
+		"localtunnel": "^2.0.2",
 		"parcel": "^2.13.0",
 		"postcss": "^8.4.49",
 		"postcss-import": "^16.1.0",
 		"tailwindcss": "^3.4.15"
 	},
-	"dependencies": {},
 	"source": ["./static_src/*"],
 	"targets": {
 		"default": {

@@ -3,14 +3,14 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
-	content: ["../**/*.{html,js,css,svg}", "!../**/node_modules"],
+	content: ["../**/*.{html,js,css,svg}", "!./node_modules"],
 	theme: {
 		extend: {},
 		fontFamily: {
 			sans: ['"Figtree Variable"', ...defaultTheme.fontFamily.sans],
 		},
 	},
-	plugins: [require("daisyui")],
+	plugins: [require("daisyui"), require("@tailwindcss/typography")],
 	daisyui: {
 		themes: [
 			{
