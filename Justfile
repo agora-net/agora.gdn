@@ -72,7 +72,7 @@ install: install-python install-node
 
 # Compile and watch the static assets
 watch-static:
-    @{{ NPM }} run watch
+    @{{ PIPENV_RUN }} watchfiles --target-type command --ignore-paths 'brand/node_modules,ansible,brand/static,brand/.parcel-cache' '{{ NPM }} run build -- --no-cache' agora assets brand home
 
 # Compile the static assets
 build-static:

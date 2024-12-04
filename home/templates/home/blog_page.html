@@ -2,7 +2,8 @@
 {% load wagtailcore_tags %}
 {% block metadata %}
     <span>{{ page.first_published_at | date }}</span>
-    <span>{{ page.location }}</span>
+    {% if page.location %}<span>{{ page.location }}</span>{% endif %}
+    <span>{{ page.read_time }}</span>
 {% endblock metadata %}
 {% block sidebar %}
     <a href="{% slugurl "blog" %}" class="flex gap-2">
@@ -10,7 +11,7 @@
     All posts</a>
 {% endblock sidebar %}
 {% block blog_content %}
-    <div class="prose">
+    <div class="prose text-secondary">
         {% for block in page.content %}
             {% if block.block_type == 'body' %}{{ block.value | richtext }}{% endif %}
         {% endfor %}

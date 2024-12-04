@@ -143,8 +143,30 @@ class BlogPage(Page):
     Inspiration: https://www.qualcomm.com/news/releases/2024/12/qualcomm-appoints-yasumasa-nakayama-as-vice-president-and-presid
     """
 
+    CATEGORY_CHOICES = {
+        "news": "News",
+        "press_release": "Press Release",
+        "blog": "Blog",
+        "article": "Article",
+        "case_study": "Case Study",
+        "white_paper": "White Paper",
+        "webinar": "Webinar",
+        "podcast": "Podcast",
+        "video": "Video",
+        "infographic": "Infographic",
+        "report": "Report",
+        "research": "Research",
+        "interview": "Interview",
+        "event": "Event",
+        "award": "Award",
+        "job_posting": "Job Posting",
+    }
+
     category = models.CharField(
-        max_length=255, blank=True, help_text="Text for a category above the title"
+        choices=CATEGORY_CHOICES,
+        max_length=255,
+        blank=True,
+        help_text="Text for a category above the title",
     )
     location = models.CharField(max_length=255, blank=True, help_text="Location of the release")
     content = StreamField(
