@@ -13,6 +13,7 @@ nh3 = "*"
 cuid2 = "*"
 whitenoise = {extras = ["brotli"], version = "*"}
 gunicorn = "*"
+readtime = "*"
 
 [dev-packages]
 ruff = "*"

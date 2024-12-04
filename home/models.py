@@ -1,3 +1,4 @@
+import readtime
 from cuid2 import Cuid
 from django.db import models
 from model_utils.models import TimeStampedModel
@@ -163,6 +164,15 @@ class BlogPage(Page):
 
     parent_page_types = ["home.BlogIndexPage"]
     page_description = "A blog page, written to attract and engage readers"
+
+    def read_time(self):
+        """Calculates how long (roughly) it will take to read the blog post"""
+        words_per_minute = 235
+        content = ""
+        for block in self.content:
+            content += block.get_prep_value()["value"]
+
+        return readtime.of_text(content, words_per_minute)
 
 
 class BlogIndexPage(Page):

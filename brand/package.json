@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "",
 	"scripts": {
-		"build": "parcel build --no-cache",
+		"build": "parcel build",
 		"build:cdn": "parcel build --public-url https://cdn.agora.gdn/",
 		"watch": "chokidar '../**/*.html ../**/*.css ../**/*.svg' --ignore '../brand/node_modules' --ignore '../ansible/*' --ignore '../static/*' --ignore './.parcel-cache' --ignore '../.venv' --ignore '../.ruff_cache' --verbose --initial --command 'parcel build'"
 	},

@@ -1,4 +1,24 @@
-{% extends "base.html" %}
-{% block content %}
-    <h1>blog index</h1>
-{% endblock content %}
+{% extends "home/blog_base.html" %}
+{% load wagtailcore_tags %}
+{% block blog_content %}
+    <div class="flex flex-col gap-8">
+        {% for blog in blog_entries %}
+            <a href="{% pageurl blog %}"
+               class="flex flex-col gap-2 text-secondary p-2 rounded-2xl md:p-4 lg:p-6 bg-base-100">
+                <div class="flex gap-1 flex-col">
+                    <h2 class="text-2xl font-medium text-secondary">{{ blog.title }}</h2>
+                    <p>
+                        {% for block in blog.content %}
+                            {% if block.block_type == 'body' %}{{ block.value | truncatewords:20 }}{% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+                <div class="flex justify-between w-full text-secondary/50">
+                    <span>{{ blog.first_published_at | date }}</span>
+                    <span>{{ blog.location }}</span>
+                    <span>{{ blog.read_time }}</span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock blog_content %}

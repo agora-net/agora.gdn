@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+{% block content %}
+    <div class="md:p-8 flex min-h-full">
+        <div class="container mx-auto flex flex-col gap-4 md:gap-8 lg:gap-16 rounded-2xl p-4 md:p-8 lg:p-16 bg-[#FCFAE3]">
+            <div class="flex w-full items-center justify-between">
+                <a href="{% slugurl 'homepage' %}">
+                    {% include "logo/agora.svg" %}
+                    <h1 class="sr-only">Agora</h1>
+                </a>
+                {% if page.category %}
+                    <div class="rounded-md border border-primary text-primary px-4 py-1 w-fit flex gap-4 md:hidden">
+                        {% include "icons/newspaper.svg" %}
+                        {{ page.category }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="w-full grid md:grid-cols-12">
+                <div class="hidden md:flex items-center col-span-3">
+                    {% block sidebar %}
+                    {% endblock sidebar %}
+                </div>
+                <div class="md:col-start-4 col-span-9">
+                    {% if page.category %}
+                        <div class="rounded-md border border-primary text-primary px-4 py-1 w-fit gap-4 hidden md:flex">
+                            {% include "icons/newspaper.svg" %}
+                            {{ page.category }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="md:col-start-4 col-span-9 py-4 lg:py-8">
+                    <h1 class="text-4xl lg:text-6xl text-secondary">{{ page.title }}</h1>
+                </div>
+                <div class="md:col-start-4 col-span-9">
+                    <hr class="w-full">
+                </div>
+                <div class="md:col-start-4 col-span-9 py-4 lg:py-8 flex gap-8">
+                    {% block metadata %}
+                    {% endblock metadata %}
+                </div>
+                <div class="md:col-start-4 col-span-9 py-8 lg:py-16 text-secondary">
+                    {% block blog_content %}
+                    {% endblock blog_content %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
