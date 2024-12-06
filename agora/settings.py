@@ -219,20 +219,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # For databases, if using SQLITE, add the following options
 # https://gcollazo.com/optimal-sqlite-settings-for-django/
+# https://briandouglas.ie/sqlite-defaults/
 SQLITE_OPTIONS = {
     "init_command": (
-        "PRAGMA foreign_keys=ON;"
+        "PRAGMA foreign_keys = ON;"
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
         "PRAGMA busy_timeout = 500;"  # 500ms
         "PRAGMA temp_store = MEMORY;"
+        "PRAGMA auto_vacuum = INCREMENTAL;"
+        f"PRAGMA page_size = {8 * 1024};"  # 8KB
         f"PRAGMA mmap_size = {128 * 1024 * 1024};"  # 128MB
         f"PRAGMA journal_size_limit = {64 * 1024 * 1024};"  # 64MB
-        f"PRAGMA cache_size = -{8 * 1024 * 1024};"  # 8MB of 4096 bytes pages
+        f"PRAGMA cache_size = -{20 * 1024 * 1024};"  # 20MB of 4096 bytes pages
     ),
     "transaction_mode": "IMMEDIATE",
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -252,7 +254,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -265,7 +266,6 @@ USE_I18N = True
 USE_TZ = True
 
 EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -305,7 +305,6 @@ STORAGES = {
 # Taggit settings
 # https://django-taggit.readthedocs.io/en/latest/getting_started.html#settings
 TAGGIT_CASE_INSENSITIVE = True
-
 
 # Wagtail settings
 
