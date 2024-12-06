@@ -15,6 +15,7 @@ whitenoise = {extras = ["brotli"], version = "*"}
 gunicorn = "*"
 readtime = "*"
 watchfiles = "*"
+django = "*"
 
 [dev-packages]
 ruff = "*"
