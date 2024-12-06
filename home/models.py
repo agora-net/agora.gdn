@@ -2,7 +2,9 @@ import readtime
 from cuid2 import Cuid
 from django.db import models
 from model_utils.models import TimeStampedModel
-from taggit.managers import TaggableManager
+from modelcluster.contrib.taggit import ClusterTaggableManager
+from modelcluster.fields import ParentalKey
+from taggit.models import TaggedItemBase
 from wagtail import blocks
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
@@ -137,6 +139,16 @@ class WaitingPage(Page):
         return context
 
 
+class BlogPageTag(TaggedItemBase):
+    """https://docs.wagtail.org/en/stable/reference/pages/model_recipes.html#tagging"""
+
+    content_object = ParentalKey(
+        "home.BlogPage",
+        on_delete=models.CASCADE,
+        related_name="tagged_items",
+    )
+
+
 class BlogPage(Page):
     """A blog page, written to attract and engage readers
 
@@ -175,7 +187,7 @@ class BlogPage(Page):
         ]
     )
 
-    tags = TaggableManager()
+    tags = ClusterTaggableManager(through=BlogPageTag, blank=True)
 
     content_panels = Page.content_panels + [
         FieldPanel("category"),
