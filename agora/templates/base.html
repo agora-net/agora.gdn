@@ -77,6 +77,8 @@
               type="text/css"
               href="{% static 'brand/static/agora.css' %}">
         {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
+        {% comment %} Plausible analytics {% endcomment %}
+        <script defer data-domain="agora.gdn" src="https://plausible.io/js/script.js"></script>
     </head>
     <body class="{% block body_class %}h-full{% endblock body_class %}">
         {% wagtailuserbar %}
