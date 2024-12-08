@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
-    "brand",  # Custom stylings in the brand app
+    "brand",  # Custom styling in the brand app
 ]
 
 MIDDLEWARE = [
@@ -125,7 +125,7 @@ LOGGING = {
         "json": {
             "()": "utils.log.JSONFormatter",
             "fmt_keys": {
-                # key = value in the JSON log message output output
+                # key = value in the JSON log message output
                 # value = logging variable that will be used
                 "level": "levelname",
                 "timestamp": "asctime",
