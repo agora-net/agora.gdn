@@ -68,5 +68,16 @@
 		"runas",
 		"setcap",
 		"zstd"
+	],
+	"github.copilot.chat.commitMessageGeneration.instructions": [
+		{
+			"text": "use imperative verb form"
+		},
+		{
+			"text": "avoid using the term 'refactor'"
+		},
+		{
+			"text": "use the present tense"
+		}
 	]
 }
