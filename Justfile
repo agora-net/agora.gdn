@@ -4,15 +4,12 @@
 default:
     @just --list --unsorted
 
-export PIPENV_DONT_LOAD_ENV := "1"
-export PIPENV_IGNORE_VIRTUALENVS := "1"
-export PIPENV_VENV_IN_PROJECT := "1"
 # Ansible configuration file location
 export ANSIBLE_CONFIG := "ansible/ansible.cfg"
 
 # Variables
 APP_NAME := "agora"
-PIPENV_RUN := "pipenv run"
+UV_RUN := "uv"
 NPM := "npm --prefix brand"
 NPX := "npx --prefix brand"
 DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
@@ -20,7 +17,7 @@ DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
 ###############################################
 ## Django management
 ###############################################
-manage := PIPENV_RUN + " python manage.py"
+manage := UV_RUN + " run manage.py"
 
 # Shortcut to run Django management commands
 manage *ARGS:
@@ -46,9 +43,9 @@ collectstatic:
 npm *ARGS:
     @{{ NPM }} {{ ARGS }}
 
-# Run a Pipenv command
-pipenv *ARGS:
-    @pipenv {{ ARGS }}
+# Run a uv command
+uv *ARGS:
+    @uv {{ ARGS }}
 
 # Install node dependencies
 install-node:
@@ -56,23 +53,23 @@ install-node:
 
 # Install python dependencies
 install-python *FLAGS:
-    @pipenv install {{ FLAGS }}
+    @uv pip install {{ FLAGS }} -r requirements.txt
 
 # Install ansible dependencies
 install-ansible:
-    @{{ PIPENV_RUN }} ansible-galaxy install -r ansible/requirements.yaml
+    @{{ UV_RUN }} ansible-galaxy install -r ansible/requirements.yaml
 
 # Install all dependencies
 install-dev: install-python install-node
-    @pipenv install --dev
-    @{{ PIPENV_RUN }} pre-commit install
+    @uv install -r requirements.txt
+    @{{ UV_RUN }} pre-commit install
     @just install-ansible
 
 install: install-python install-node
 
 # Compile and watch the static assets
 watch-static:
-    @{{ PIPENV_RUN }} watchfiles --target-type command --ignore-paths 'brand/node_modules,ansible,brand/static,brand/.parcel-cache' '{{ NPM }} run build -- --no-cache' agora assets brand home
+    @{{ UV_RUN }} watchfiles --target-type command --ignore-paths 'brand/node_modules,ansible,brand/static,brand/.parcel-cache' '{{ NPM }} run build -- --no-cache' agora assets brand home
 
 # Compile the static assets
 build-static:
@@ -84,8 +81,8 @@ localtunnel:
 
 # Run the linter and formatter
 format:
-    @{{ PIPENV_RUN }} ruff check --fix
-    @{{ PIPENV_RUN }} ruff format
+    @{{ UV_RUN }} ruff check --fix
+    @{{ UV_RUN }} ruff format
 
 # Create a Django superuser
 createsuperuser *FLAGS:
@@ -96,15 +93,15 @@ createsuperuser *FLAGS:
 ###############################################
 # Run ansible commands
 ansible *ARGS:
-    @{{ PIPENV_RUN }} ansible {{ ARGS }}
+    @{{ UV_RUN }} ansible {{ ARGS }}
 
 # Run the ansible-playbook command
 ansible-playbook *ARGS:
-    @{{ PIPENV_RUN }} ansible-playbook {{ ARGS }}
+    @{{ UV_RUN }} ansible-playbook {{ ARGS }}
 
 # Run the ansible/main.yaml playbook
 ansible-playbook-main *ARGS:
-    @{{ PIPENV_RUN }} ansible-playbook ansible/main.yaml {{ ARGS }}
+    @{{ UV_RUN }} ansible-playbook ansible/main.yaml {{ ARGS }}
 
 
 ###############################################

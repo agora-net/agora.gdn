@@ -1,7 +1,35 @@
+[project]
+name = "agora.gdn"
+version = "0.1.0"
+dependencies = [
+    "wagtail",
+    "django-environ",
+    "django-extensions",
+    "django-model-utils",
+    "pillow",
+    "nh3",
+    "cuid2",
+    "whitenoise[brotli]",
+    "gunicorn",
+    "readtime",
+    "watchfiles",
+    "django",
+    "django-countries",
+]
+requires-python = ">=3.12"
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 extend-exclude = ["*/migrations/*"]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "pre-commit",
+    "djlint",
+    "ansible",
+]
 
 [tool.ruff.format]
 docstring-code-format = true
