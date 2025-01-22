@@ -37,6 +37,11 @@ USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=False)
 # Application definition
 
 INSTALLED_APPS = [
+    # The required `allauth` apps
+    "allauth",
+    "allauth.account",
+    # Additional MFA
+    "allauth.mfa",
     "home",
     "search",
     "wagtail.contrib.forms",
@@ -62,6 +67,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_countries",
     "brand",  # Custom styling in the brand app
+    "user",  # Custom user model
 ]
 
 MIDDLEWARE = [
