@@ -9,7 +9,7 @@ export ANSIBLE_CONFIG := "ansible/ansible.cfg"
 
 # Variables
 APP_NAME := "agora"
-UV_RUN := "uv"
+UV_RUN := "uv run"
 NPM := "npm --prefix brand"
 NPX := "npx --prefix brand"
 DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
@@ -17,7 +17,7 @@ DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
 ###############################################
 ## Django management
 ###############################################
-manage := UV_RUN + " run manage.py"
+manage := UV_RUN + " manage.py"
 
 # Shortcut to run Django management commands
 manage *ARGS:
@@ -53,7 +53,7 @@ install-node:
 
 # Install python dependencies
 install-python *FLAGS:
-    @uv pip install {{ FLAGS }} -r requirements.txt
+    @uv sync {{ FLAGS }}
 
 # Install ansible dependencies
 install-ansible:
@@ -61,7 +61,7 @@ install-ansible:
 
 # Install all dependencies
 install-dev: install-python install-node
-    @uv install -r requirements.txt
+    @uv sync --dev
     @{{ UV_RUN }} pre-commit install
     @just install-ansible
 
