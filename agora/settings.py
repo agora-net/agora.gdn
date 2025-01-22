@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "django_countries",
     "brand",  # Custom styling in the brand app
 ]
 
@@ -253,6 +254,12 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+PASSWORD_HASHERS = [
+    "utils.hashers.SecureArgon2PasswordHasher",
+]
+
+AUTH_USER_MODEL = "user.AgoraUser"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

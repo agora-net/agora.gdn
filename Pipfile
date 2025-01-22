@@ -16,6 +16,7 @@ gunicorn = "*"
 readtime = "*"
 watchfiles = "*"
 django = "*"
+django-countries = "*"
 
 [dev-packages]
 ruff = "*"
