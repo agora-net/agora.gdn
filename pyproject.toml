@@ -13,7 +13,7 @@ dependencies = [
     "gunicorn",
     "readtime",
     "watchfiles",
-    "django",
+    "django[argon2]",
     "django-countries",
     "django-allauth[mfa]>=65.3.1",
 ]
