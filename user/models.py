@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
 
+from . import managers
+
 
 class AgoraUser(AbstractUser):
     email = models.EmailField(_("email address"), unique=True)
@@ -20,6 +22,8 @@ class AgoraUser(AbstractUser):
 
     REQUIRED_FIELDS = []
     USERNAME_FIELD = "email"
+
+    objects = managers.AgoraUserManager()
 
     def get_full_name(self):
         """
@@ -105,6 +109,15 @@ class Subscription(models.Model):
 
     def __str__(self):
         return self.stripe_subscription_id
+
+
+class PaymentMethod(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    stripe_payment_method_id = models.CharField(max_length=255)
+    issuing_country = CountryField(blank=False)
+
+    def __str__(self):
+        return self.stripe_payment_method_id
 
 
 # Identity Verification info
