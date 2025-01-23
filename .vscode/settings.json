@@ -37,6 +37,7 @@
 		"stylesheet",
 		"superverbose",
 		"taggit",
+		"totp",
 		"venv",
 		"VIRTUALENVS",
 		"wagtailadmin",
@@ -44,6 +45,7 @@
 		"wagtaildocs",
 		"WAGTAILSEARCH",
 		"wagtailuserbar",
+		"webauthn",
 		"Whitenoise",
 		"wsgi"
 	],
