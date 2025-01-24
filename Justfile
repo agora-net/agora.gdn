@@ -25,7 +25,8 @@ manage *ARGS:
 
 # Run the development server
 runserver:
-    @{{ manage }} runserver --nostatic
+    @mkcert -cert-file ./certs/localhost.crt -key-file ./certs/localhost.key localhost 127.0.0.1
+    @{{ manage }} runserver_plus --nostatic --cert ./certs/localhost.crt --key-file ./certs/localhost.key
 
 # Create Django migrations
 makemigrations:
