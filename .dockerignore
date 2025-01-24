@@ -7,6 +7,7 @@
 *.db
 /ansible/
 /gunicorn/
+/certs/
 
 # Python and others
 __pycache__

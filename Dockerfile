@@ -33,11 +33,11 @@ WORKDIR ${APP_HOME}
 RUN apt-get update && apt-get install --no-install-recommends -y \
     # dependencies for building Python packages
     build-essential
-RUN pip install pipenv rust-just
-# Copy the Pipfile.lock to the container.
-COPY Justfile Pipfile Pipfile.lock ./
+RUN pip install rust-just && curl -LsSf https://astral.sh/uv/install.sh | sh
+# Copy the uv dependency and lock files
+COPY Justfile pyproject.toml uv.lock ./
 # Use Just for consistency with the rest of the project.
-RUN just install-python --deploy --ignore-pipfile
+RUN just install-python --no-group dev
 
 ###############################################
 ## Python runner
@@ -59,8 +59,9 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
     # Clean up to reduce the size of the image.
     && rm -rf /var/lib/apt/lists/* \
-    # Install pipenv and Just.
-    && pip install pipenv rust-just \
+    # Install uv and Just.
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && pip install rust-just \
     # Create the file structure for gunicorn
     && mkdir -p /run/gunicorn \
     # Create the directories for the media and database files.
