@@ -302,7 +302,6 @@ MFA_PASSKEY_LOGIN_ENABLED = True
 MFA_PASSKEY_SIGNUP_ENABLED = True
 MFA_TOTP_ISSUER = "Agora"
 MFA_SUPPORTED_TYPES = ["recovery_codes", "totp", "webauthn"]
-MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = DEBUG
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
