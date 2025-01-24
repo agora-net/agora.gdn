@@ -64,6 +64,7 @@
 		"agorausermedia",
 		"alvistack",
 		"chdir",
+		"getpid",
 		"mholt",
 		"msgpack",
 		"pipx",
