@@ -5,10 +5,12 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
 
+from utils.models import SnowflakeIdPrimaryKeyMixin
+
 from . import managers
 
 
-class AgoraUser(AbstractUser):
+class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     email = models.EmailField(_("email address"), unique=True)
 
     # Names can be blank upon account creation but will be populated after ID verification
