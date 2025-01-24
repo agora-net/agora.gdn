@@ -17,7 +17,9 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     first_name = models.CharField(_("first name"), max_length=150, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
     # Handle can be blank upon account creation but will be populated after ID verification
-    handle = models.CharField(_("handle"), max_length=150, blank=True, unique=True, db_index=True)
+    handle = models.CharField(
+        _("handle"), max_length=150, blank=True, null=True, unique=True, db_index=True
+    )
     # Nickname is optional
     nickname = models.CharField(_("nickname"), max_length=150, blank=True)
 
