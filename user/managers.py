@@ -1,8 +1,14 @@
+from typing import Any
+
 from django.contrib.auth.models import BaseUserManager
 
+from . import models as user_models
 
-class AgoraUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+
+class AgoraUserManager(BaseUserManager["user_models.AgoraUser"]):
+    def create_user(
+        self, email: str, password: str | None = None, **extra_fields: Any
+    ) -> "user_models.AgoraUser":
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
@@ -11,7 +17,9 @@ class AgoraUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(
+        self, email: str, password: str | None = None, **extra_fields: Any
+    ) -> "user_models.AgoraUser":
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
