@@ -1,5 +1,5 @@
 from allauth.mfa.utils import is_mfa_enabled
-from django_stubs_ext.db.models import QuerySet
+from django.db.models.query import QuerySet
 
 from . import models
 

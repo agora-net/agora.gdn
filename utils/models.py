@@ -6,7 +6,7 @@ from snowflake import SnowflakeGenerator
 SNOWFLAKE_GENERATOR = SnowflakeGenerator(instance=(os.getpid() % 1024))
 
 
-def snowflake_generator():
+def snowflake_generator() -> int:
     return next(SNOWFLAKE_GENERATOR)
 
 

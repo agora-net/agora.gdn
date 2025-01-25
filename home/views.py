@@ -1,5 +1,6 @@
 import nh3
 from django.http import HttpRequest
+from django.template.response import TemplateResponse
 from wagtail.models import Page
 
 from .forms import WaitingListSignupForm
@@ -8,7 +9,7 @@ from .models import WaitingListSignup, WaitingPage
 REFERRAL_QUERY_PARAM = "ref"
 
 
-def join_waiting_list(request: HttpRequest):
+def join_waiting_list(request: HttpRequest) -> TemplateResponse:
     initial_data = request.POST.copy()
     if "ref" in request.GET:
         initial_data["referred_by_code"] = request.GET[REFERRAL_QUERY_PARAM]

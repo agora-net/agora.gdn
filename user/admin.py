@@ -30,7 +30,7 @@ class UserCreationForm(forms.ModelForm):
             raise ValidationError("Passwords don't match")
         return password2
 
-    def save(self, commit=True) -> user_models.AgoraUser:
+    def save(self, commit: bool = True) -> user_models.AgoraUser:
         # Save the provided password in hashed format
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])

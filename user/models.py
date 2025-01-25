@@ -1,5 +1,7 @@
+from typing import Any, ClassVar
+
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
@@ -7,7 +9,26 @@ from model_utils.models import TimeStampedModel
 
 from utils.models import SnowflakeIdPrimaryKeyMixin
 
-from . import managers
+
+class AgoraUserManager(BaseUserManager["AgoraUser"]):
+    def create_user(
+        self, email: str, password: str | None = None, **extra_fields: Any
+    ) -> "AgoraUser":
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(
+        self, email: str, password: str | None = None, **extra_fields: Any
+    ) -> "AgoraUser":
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        return self.create_user(email, password, **extra_fields)
 
 
 class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
@@ -29,9 +50,11 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     REQUIRED_FIELDS = []
     USERNAME_FIELD = "email"
 
-    objects = managers.AgoraUserManager()
+    # Open bug so ignoring this type:
+    # https://github.com/typeddjango/django-stubs/issues/174
+    objects: ClassVar[AgoraUserManager] = AgoraUserManager()  # type: ignore[assignment]
 
-    def get_full_name(self):
+    def get_full_name(self) -> str:
         """
         Return the first_name plus the last_name, with a space and optional nickname in between.
         """
@@ -41,7 +64,7 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
         full_name = f"{self.first_name.strip()} {nickname} {self.last_name.strip()}"
         return full_name.strip()
 
-    def clean(self):
+    def clean(self) -> None:
         return super().clean()
 
 
@@ -77,7 +100,7 @@ class UserEmail(UserContactScope.AbstractContactClaim, VerifiableMixin):
 
     email = models.EmailField(_("email address"), blank=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.email
 
 
@@ -87,7 +110,7 @@ class UserPhoneNumber(UserContactScope.AbstractContactClaim, VerifiableMixin):
     phone_number = models.CharField(_("phone number"), blank=True, max_length=255)
     country = CountryField(blank=False, help_text="What country is this phone number from?")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.phone_number
 
 
@@ -96,7 +119,7 @@ class UserDomain(UserContactScope.AbstractContactClaim, VerifiableMixin):
 
     domain = models.CharField(_("domain"), blank=True, max_length=255)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.domain
 
 
@@ -105,7 +128,7 @@ class Customer(TimeStampedModel):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=255)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.stripe_customer_id
 
 
@@ -113,7 +136,7 @@ class Subscription(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     stripe_subscription_id = models.CharField(max_length=255)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.stripe_subscription_id
 
 
@@ -122,7 +145,7 @@ class PaymentMethod(models.Model):
     stripe_payment_method_id = models.CharField(max_length=255)
     issuing_country = CountryField(blank=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.stripe_payment_method_id
 
 
@@ -134,5 +157,5 @@ class IdentityVerification(TimeStampedModel):
     stripe_identity_verification_session_id = models.CharField(max_length=255)
     identity_issuing_country = CountryField(blank=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.stripe_identity_verification_session_id
