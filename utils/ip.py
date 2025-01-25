@@ -1,4 +1,7 @@
-def get_client_ip(request) -> str:
+from django.http import HttpRequest
+
+
+def get_client_ip(request: HttpRequest) -> str:
     """Takes a request object and returns the client's IP address.
 
     https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
