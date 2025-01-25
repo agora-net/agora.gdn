@@ -8,6 +8,10 @@
 
 For local development it's best to use HTTPS to register Multi-factor authentication (MFA). To do this `mkcert` needs to be installed.
 
+### Typechecking
+
+This project uses `mypy` for typechecking wherever possible. To perform a typecheck run `just typecheck`.
+
 ## Overview
 
 ### Onboarding

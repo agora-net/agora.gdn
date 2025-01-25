@@ -25,6 +25,7 @@
 		"localtunnel",
 		"makemigrations",
 		"modelcluster",
+		"mypy",
 		"noinput",
 		"nopassword",
 		"nostatic",
