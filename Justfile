@@ -48,6 +48,10 @@ npm *ARGS:
 clean-migrations:
     @find . -path "*/migrations/*.py" -not -name "__init__.py" -not -path "./.venv/*" -type f -delete
 
+# Use mypy to check types
+typecheck:
+    @{{ UV_RUN }} mypy .
+
 # Run a uv command
 uv *ARGS:
     @uv {{ ARGS }}
