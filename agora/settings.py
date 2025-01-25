@@ -81,6 +81,9 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    # By default, users have to be fully onboarded to do anything.
+    # Whitelist views with `onboarding_required = False` to bypass this middleware.
+    "user.middleware.FullyOnboardedUserRequiredMiddleware",
 ]
 
 ROOT_URLCONF = "agora.urls"
