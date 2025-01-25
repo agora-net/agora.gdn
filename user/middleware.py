@@ -1,4 +1,9 @@
-from django.contrib.auth.middleware import LoginRequiredMiddleware
+from collections.abc import Callable
+from typing import Any
+
+# django-stubs doesn't seem to have the LoginRequiredMiddleware type yet
+from django.contrib.auth.middleware import LoginRequiredMiddleware  # type: ignore[attr-defined]
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
 from . import selectors
@@ -11,7 +16,13 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
     onboarding step if they are not.
     """
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(
+        self,
+        request: HttpRequest,
+        view_func: Callable,
+        view_args: tuple[Any, ...],
+        view_kwargs: dict[str, Any],
+    ) -> None | HttpResponse:
         if not getattr(view_func, "onboarding_required", True):
             return None
 
@@ -30,5 +41,5 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
         return None
 
     # If a user fails the onboarding checks don't bother recording where they were trying to go
-    def get_redirect_field_name(self):
+    def get_redirect_field_name(self) -> None:
         return None
