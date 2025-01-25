@@ -97,6 +97,10 @@ format:
 createsuperuser *FLAGS:
     @{{ manage }} createsuperuser {{ FLAGS }}
 
+# Run the Django tests
+test *FLAGS:
+    @{{ manage }} test {{ FLAGS }}
+
 ###############################################
 ## Infrastructure management
 ###############################################
