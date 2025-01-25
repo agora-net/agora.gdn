@@ -1,18 +1,28 @@
 import datetime as dt
 import json
 import logging
-from typing import override
+import logging.config
+import logging.handlers
+from typing import Any, override
 
 from django.conf import settings
 
 
-def load_logging_config_start_listener(config):
+def load_logging_config_start_listener(config: dict[str, Any]) -> None:
     logging.config.dictConfig(config)
     file_queue_handler = logging.getHandlerByName("file_queue")
-    if file_queue_handler is not None:
+    if (
+        file_queue_handler is not None
+        and isinstance(file_queue_handler, logging.handlers.QueueHandler)
+        and file_queue_handler.listener is not None
+    ):
         file_queue_handler.listener.start()
     email_queue_handler = logging.getHandlerByName("email_queue")
-    if email_queue_handler is not None:
+    if (
+        email_queue_handler is not None
+        and isinstance(email_queue_handler, logging.handlers.QueueHandler)
+        and email_queue_handler.listener is not None
+    ):
         email_queue_handler.listener.start()
 
 
@@ -80,7 +90,7 @@ class JSONFormatter(logging.Formatter):
         message = self._prepare_log_dict(record)
         return json.dumps(message, default=str)
 
-    def _prepare_log_dict(self, record: logging.LogRecord):
+    def _prepare_log_dict(self, record: logging.LogRecord) -> dict[str, str | Any]:
         always_fields = {
             "message": record.getMessage(),
             "timestamp": dt.datetime.fromtimestamp(record.created, tz=dt.UTC).isoformat(),
