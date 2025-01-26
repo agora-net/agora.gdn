@@ -399,6 +399,12 @@ WAGTAILDOCS_EXTENSIONS = [
 AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     reverse_lazy("account_login"),
     reverse_lazy("account_signup"),
+    reverse_lazy("account_confirm_email"),
+    reverse_lazy("account_email_verification_sent"),
+    reverse_lazy("account_reset_password"),
+    reverse_lazy("account_reset_password_done"),
+    reverse_lazy("account_reset_password_from_key"),
+    reverse_lazy("account_reset_password_from_key_done"),
 ]
 
 for db in DATABASES.values():
