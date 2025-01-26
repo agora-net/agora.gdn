@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 
 import environ
+from django.urls import reverse_lazy
 
 PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -389,6 +390,15 @@ WAGTAILDOCS_EXTENSIONS = [
     "txt",
     "xlsx",
     "zip",
+]
+
+# Agora settings
+# ------------------------------------
+
+# Which routes do not require the user to be fully onboarded
+AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
+    reverse_lazy("account_login"),
+    reverse_lazy("account_signup"),
 ]
 
 for db in DATABASES.values():
