@@ -99,7 +99,7 @@ createsuperuser *FLAGS:
 
 # Run the Django tests
 test *FLAGS:
-    @{{ manage }} test --parallel {{ FLAGS }}
+    @{{ manage }} test --parallel --shuffle {{ FLAGS }}
 
 ###############################################
 ## Infrastructure management
