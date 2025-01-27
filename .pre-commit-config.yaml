@@ -28,7 +28,6 @@ repos:
       - id: python-typecheck
         name: python-typecheck
         entry: just typecheck
-        always_run: true
         pass_filenames: false
         language: system
         files: "\\.(py)$"
@@ -37,7 +36,6 @@ repos:
       - id: django-test
         name: django-test
         entry: just test
-        always_run: true
         pass_filenames: false
         language: system
         files: "\\.(py)$"
