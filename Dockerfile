@@ -32,7 +32,8 @@ WORKDIR ${APP_HOME}
 # Install apt packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
     # dependencies for building Python packages
-    build-essential
+    build-essential \
+    curl
 RUN pip install rust-just && curl -LsSf https://astral.sh/uv/install.sh | sh
 # Copy the uv dependency and lock files
 COPY Justfile pyproject.toml uv.lock ./
@@ -57,6 +58,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libjpeg62-turbo-dev \
     zlib1g-dev \
     libwebp-dev \
+    curl \
     # Clean up to reduce the size of the image.
     && rm -rf /var/lib/apt/lists/* \
     # Install uv and Just.
