@@ -4,9 +4,6 @@
 default:
     @just --list --unsorted
 
-# Ansible configuration file location
-export ANSIBLE_CONFIG := "ansible/ansible.cfg"
-
 # Variables
 APP_NAME := "agora"
 UV_RUN := "uv run"
@@ -65,14 +62,9 @@ install-node:
 install-python *FLAGS:
     @uv sync {{ FLAGS }}
 
-# Install ansible dependencies
-install-ansible:
-    @{{ UV_RUN }} ansible-galaxy install -r ansible/requirements.yaml
-
 # Install all dependencies
 install-dev: install-python install-node
     @{{ UV_RUN }} pre-commit install
-    @just install-ansible
 
 install: install-python install-node
 
@@ -100,22 +92,6 @@ createsuperuser *FLAGS:
 # Run the Django tests
 test *FLAGS:
     @{{ manage }} test --parallel --shuffle {{ FLAGS }}
-
-###############################################
-## Infrastructure management
-###############################################
-# Run ansible commands
-ansible *ARGS:
-    @{{ UV_RUN }} ansible {{ ARGS }}
-
-# Run the ansible-playbook command
-ansible-playbook *ARGS:
-    @{{ UV_RUN }} ansible-playbook {{ ARGS }}
-
-# Run the ansible/main.yaml playbook
-ansible-playbook-main *ARGS:
-    @{{ UV_RUN }} ansible-playbook ansible/main.yaml {{ ARGS }}
-
 
 ###############################################
 ## Docker commands
