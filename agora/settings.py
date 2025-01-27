@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 import environ
@@ -260,6 +261,23 @@ SQLITE_OPTIONS = {
         f"PRAGMA cache_size = -{20 * 1024 * 1024};"  # 20MB of 4096 bytes pages
     ),
     "transaction_mode": "IMMEDIATE",
+}
+
+# Cache
+# https://docs.djangoproject.com/en/5.1/topics/cache/
+CACHES = {
+    "default": {
+        "BACKEND": "diskcache.DjangoCache",
+        "LOCATION": env.str("CACHE_FILEPATH", tempfile.gettempdir()),
+        "TIMEOUT": 300,
+        # ^-- Django setting for default timeout of each key.
+        "SHARDS": 8,
+        "DATABASE_TIMEOUT": 0.010,  # 10 milliseconds
+        # ^-- Timeout for each DjangoCache database transaction.
+        "OPTIONS": {
+            "size_limit": 2**30  # 1 gigabyte
+        },
+    },
 }
 
 # Password validation
