@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.middleware import LoginRequiredMiddleware  # type: ignore[attr-defined]
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
+from django.urls import Resolver404, resolve
 
 from . import selectors
 
@@ -30,8 +31,14 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
 
         # If the user is trying to access a page that doesn't require onboarding, skip it
         exempt_routes = getattr(settings, "AGORA_ONBOARDING_NOT_REQUIRED_ROUTES", [])
-        if request.path in exempt_routes:
-            return None
+        try:
+            resolved = resolve(request.path)
+            if resolved.url_name in exempt_routes:
+                return None
+        except Resolver404:
+            if request.path in exempt_routes:
+                return None
+            pass
 
         if not request.user.is_authenticated:
             return redirect("account_login")

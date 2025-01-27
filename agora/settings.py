@@ -15,7 +15,6 @@ import os
 from pathlib import Path
 
 import environ
-from django.urls import reverse_lazy
 
 PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -395,16 +394,17 @@ WAGTAILDOCS_EXTENSIONS = [
 # Agora settings
 # ------------------------------------
 
-# Which routes do not require the user to be fully onboarded
+# Which routes do not require the user to be fully onboarded?
+# Each of these can be an explicit path or a URL name.
 AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
-    reverse_lazy("account_login"),
-    reverse_lazy("account_signup"),
-    reverse_lazy("account_confirm_email"),
-    reverse_lazy("account_email_verification_sent"),
-    reverse_lazy("account_reset_password"),
-    reverse_lazy("account_reset_password_done"),
-    reverse_lazy("account_reset_password_from_key"),
-    reverse_lazy("account_reset_password_from_key_done"),
+    "account_login",
+    "account_signup",
+    "account_confirm_email",
+    "account_email_verification_sent",
+    "account_reset_password",
+    "account_reset_password_done",
+    "account_reset_password_from_key",
+    "account_reset_password_from_key_done",
 ]
 
 for db in DATABASES.values():
