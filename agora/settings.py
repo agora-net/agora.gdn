@@ -445,15 +445,22 @@ RESULTS_CACHE_SIZE = 100
 # Which routes do not require the user to be fully onboarded?
 # Each of these can be an explicit path or a URL name.
 AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
+    # Allauth
     "account_login",
     "account_signup",
+    "account_signup_by_passkey",
     "account_confirm_email",
     "account_email_verification_sent",
     "account_reset_password",
     "account_reset_password_done",
     "account_reset_password_from_key",
     "account_reset_password_from_key_done",
+    "mfa_login_webauthn",
+    "mfa_signup_webauthn",
 ]
+
+if DEBUG:
+    AGORA_ONBOARDING_NOT_REQUIRED_ROUTES += ["/__debug__/"]
 
 for db in DATABASES.values():
     if "sqlite3" in db["ENGINE"]:

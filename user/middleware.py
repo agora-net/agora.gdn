@@ -36,9 +36,10 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
             if resolved.url_name in exempt_routes:
                 return None
         except Resolver404:
-            if request.path in exempt_routes:
-                return None
             pass
+
+        if any(request.path.startswith(route) for route in exempt_routes):
+            return None
 
         if not request.user.is_authenticated:
             return redirect("account_login")
