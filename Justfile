@@ -62,6 +62,11 @@ install-node:
 install-python *FLAGS:
     @uv sync {{ FLAGS }}
 
+# Install playwright browsers and dependencies
+install-playwright:
+    @{{ UV_RUN }} playwright install
+    @{{ UV_RUN }} playwright install-deps
+
 # Install all dependencies
 install-dev: install-python install-node
     @{{ UV_RUN }} pre-commit install
@@ -91,7 +96,11 @@ createsuperuser *FLAGS:
 
 # Run the Django tests
 test *FLAGS:
-    @{{ manage }} test --parallel --shuffle {{ FLAGS }}
+    @{{ manage }} test --parallel --shuffle --exclude-tag e2e {{ FLAGS }}
+
+# Run end-to-end tests with playwright
+test-e2e: install-playwright
+    @{{ manage }} test --tag e2e
 
 ###############################################
 ## Docker commands
