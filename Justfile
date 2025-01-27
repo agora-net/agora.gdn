@@ -38,6 +38,7 @@ migrate *FLAGS:
 
 # Collect static files
 collectstatic:
+    @mkdir -p static
     @{{ manage }} collectstatic --noinput --clear
 
 # Run a NPM command in the brand directory
