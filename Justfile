@@ -99,7 +99,7 @@ test *FLAGS:
     @{{ manage }} test --parallel --shuffle --exclude-tag e2e {{ FLAGS }}
 
 # Run end-to-end tests with playwright
-test-e2e: install-playwright
+test-e2e:
     @{{ manage }} test --tag e2e
 
 ###############################################
