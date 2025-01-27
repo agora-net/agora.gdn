@@ -29,12 +29,12 @@ FROM python:3.12-slim-bookworm  AS python
 FROM python AS python-build-stage
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
+COPY --from=ghcr.io/astral-sh/uv:0.5.24 /uv /uvx /bin/
 # Install apt packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
     # dependencies for building Python packages
-    build-essential \
-    curl
-RUN pip install rust-just && curl -LsSf https://astral.sh/uv/install.sh | sh
+    build-essential
+RUN pip install rust-just
 # Copy the uv dependency and lock files
 COPY Justfile pyproject.toml uv.lock ./
 # Use Just for consistency with the rest of the project.
@@ -48,21 +48,19 @@ FROM python AS python-run-stage
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
 # Add user that will be used in the container.
-RUN useradd wagtail
+RUN useradd -m wagtail
 # Set environment variables.
 # 1. Force Python stdout and stderr streams to be unbuffered.
 ENV PYTHONUNBUFFERED=1
+COPY --from=ghcr.io/astral-sh/uv:0.5.24 /uv /uvx /bin/
 # Install system packages required by Wagtail and Django.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
     build-essential \
     libjpeg62-turbo-dev \
     zlib1g-dev \
     libwebp-dev \
-    curl \
     # Clean up to reduce the size of the image.
     && rm -rf /var/lib/apt/lists/* \
-    # Install uv and Just.
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
     && pip install rust-just \
     # Create the file structure for gunicorn
     && mkdir -p /run/gunicorn \
