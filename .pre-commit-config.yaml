@@ -23,3 +23,11 @@ repos:
         language: system
         types: [text]
         files: "\\.(jsx?|tsx?|c(js|ts)|m(js|ts)|d\\.(ts|cts|mts)|jsonc?|css|svelte|vue|astro|graphql|gql)$"
+  - repo: local
+    hooks:
+      - id: django-test
+        name: django-test
+        entry: just test
+        always_run: true
+        pass_filenames: false
+        language: system
