@@ -143,8 +143,7 @@ LOGGING = {
     "formatters": {
         "superverbose": {
             "format": (
-                "%(levelname)s %(asctime)s %(module)s:%(lineno)d "
-                "%(process)d %(thread)d %(message)s"
+                "%(levelname)s %(asctime)s %(module)s:%(lineno)d %(process)d %(thread)d %(message)s"
             )
         },
         "verbose": {"format": "%(levelname)s %(asctime)s %(module)s:%(lineno)d %(message)s"},
