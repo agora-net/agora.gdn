@@ -31,5 +31,8 @@ jobs:
       - name: Typecheck
         run: just typecheck
 
+      - name: Collect static for testing
+        run: just collectstatic
+
       - name: Run tests
         run: just test
