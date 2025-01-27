@@ -71,7 +71,6 @@ install-ansible:
 
 # Install all dependencies
 install-dev: install-python install-node
-    @uv sync --dev
     @{{ UV_RUN }} pre-commit install
     @just install-ansible
 
