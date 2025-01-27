@@ -35,6 +35,7 @@ dev = [
     "pyopenssl>=25.0.0",
     "django-stubs[compatible-mypy]>=5.1.2",
     "mypy>=1.14.1",
+    "django-debug-toolbar>=5.0.1",
 ]
 
 [tool.ruff.format]

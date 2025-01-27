@@ -12,12 +12,15 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 from pathlib import Path
 
 import environ
 
 PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+TESTING = "test" in sys.argv
 
 environ.Env.read_env(BASE_DIR / ".env")
 environ.Env.read_env(BASE_DIR / ".env.local")
@@ -33,6 +36,10 @@ SECRET_KEY = env.str("SECRET_KEY", default="!!!SET DJANGO_SECRET_KEY!!!")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=False)
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # Application definition
 
@@ -70,6 +77,11 @@ INSTALLED_APPS = [
     "user",  # Custom user model
 ]
 
+if DEBUG and not TESTING:
+    INSTALLED_APPS += [
+        "debug_toolbar",
+    ]
+
 MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -85,6 +97,9 @@ MIDDLEWARE = [
     # Whitelist views with `onboarding_required = False` to bypass this middleware.
     "user.middleware.FullyOnboardedUserRequiredMiddleware",
 ]
+
+if DEBUG and not TESTING:
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "agora.urls"
 
@@ -401,6 +416,10 @@ WAGTAILDOCS_EXTENSIONS = [
     "xlsx",
     "zip",
 ]
+
+# Debug toolbar settings
+# https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html
+RESULTS_CACHE_SIZE = 100
 
 # Agora settings
 # ------------------------------------
