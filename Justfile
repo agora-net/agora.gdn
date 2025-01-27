@@ -123,4 +123,3 @@ docker-run: docker-rm
         --publish 8000:8000 \
         {{ DOCKER_IMAGE }}:latest
         
-docker-migrate:
