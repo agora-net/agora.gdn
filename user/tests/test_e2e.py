@@ -1,9 +1,10 @@
-from django.test import LiveServerTestCase, tag
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import tag
 from playwright.sync_api import Browser, Playwright, sync_playwright
 
 
 @tag("e2e")
-class UserRegistrationTestCase(LiveServerTestCase):
+class UserRegistrationTestCase(StaticLiveServerTestCase):
     playwright: Playwright
     browser: Browser
 
@@ -15,21 +16,9 @@ class UserRegistrationTestCase(LiveServerTestCase):
         """
         return self.live_server_url
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        super().setUpClass()
-        playwright = sync_playwright().start()
-        browser = playwright.firefox.launch()
-        cls.playwright = playwright
-        cls.browser = browser
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.browser.close()
-        cls.playwright.stop()
-        super().tearDownClass()
-
     def test_user_registration(self) -> None:
-        page = self.browser.new_page()
-        page.goto(self.get_server_url())
-        self.assertEqual(page.title(), "Sign In")
+        with sync_playwright() as p:
+            browser = p.firefox.launch()
+            page = browser.new_page()
+            page.goto(self.get_server_url())
+            self.assertEqual(page.title(), "Sign In")
