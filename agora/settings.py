@@ -321,8 +321,8 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_URL = "account_login"
 # todo(ewan): Update these to proper values
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = "profile"
+LOGOUT_REDIRECT_URL = "/"
 
 # All Auth
 # https://docs.allauth.org/en/latest/account/configuration.html
@@ -344,10 +344,12 @@ ACCOUNT_USERNAME_REQUIRED = False
 
 # All Auth MFA
 # https://docs.allauth.org/en/latest/mfa/configuration.html
-MFA_PASSKEY_LOGIN_ENABLED = True
-MFA_PASSKEY_SIGNUP_ENABLED = True
+MFA_PASSKEY_LOGIN_ENABLED = False
+MFA_PASSKEY_SIGNUP_ENABLED = False
 MFA_TOTP_ISSUER = "Agora"
-MFA_SUPPORTED_TYPES = ["recovery_codes", "totp", "webauthn"]
+MFA_SUPPORTED_TYPES = ["recovery_codes", "totp"]
+MFA_RECOVERY_CODE_COUNT = 12
+MFA_TOTP_DIGITS = 8
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -454,8 +456,13 @@ AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     "account_reset_password_done",
     "account_reset_password_from_key",
     "account_reset_password_from_key_done",
-    "mfa_login_webauthn",
-    "mfa_signup_webauthn",
+    "mfa_index",
+    "mfa_authenticate",
+    "mfa_reauthenticate",
+    "mfa_activate_totp",
+    "mfa_generate_recovery_codes",
+    "mfa_download_recovery_codes",
+    "mfa_view_recovery_codes",
 ]
 
 if DEBUG:
