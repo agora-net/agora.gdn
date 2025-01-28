@@ -99,8 +99,8 @@ test *FLAGS:
     @{{ manage }} test --parallel --shuffle --exclude-tag e2e {{ FLAGS }}
 
 # Run end-to-end tests with playwright
-test-e2e:
-    @{{ manage }} test --shuffle --parallel --tag e2e
+test-e2e *FLAGS:
+    @{{ manage }} test --shuffle --parallel --tag e2e {{ FLAGS }}
 
 ###############################################
 ## Docker commands
