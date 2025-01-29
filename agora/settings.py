@@ -349,7 +349,6 @@ MFA_PASSKEY_SIGNUP_ENABLED = False
 MFA_TOTP_ISSUER = "Agora"
 MFA_SUPPORTED_TYPES = ["recovery_codes", "totp"]
 MFA_RECOVERY_CODE_COUNT = 12
-MFA_TOTP_DIGITS = 8
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -452,6 +451,7 @@ AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     "account_signup_by_passkey",
     "account_confirm_email",
     "account_email_verification_sent",
+    "account_reauthenticate",
     "account_reset_password",
     "account_reset_password_done",
     "account_reset_password_from_key",
