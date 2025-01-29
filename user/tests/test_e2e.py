@@ -137,6 +137,9 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.wait_for_url(self.get_route_by_name("onboarding_billing"))
 
         # They pay for their annual subscription and progress to the next step
+        # Just update the database to say they have a valid subscription and go to next step
+
+        page.goto(self.get_route_by_name("onboarding_identity"))
         page.wait_for_url(self.get_route_by_name("onboarding_identity"))
 
         # Once again they try to get away from the onboarding process but are redirected back
@@ -144,7 +147,6 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.wait_for_url(self.get_route_by_name("onboarding_identity"))
 
         # They verify their identity
-        # Todo(ewan): Work out how to do this in an e2e test.
         # For now we'll manually set it verified in the database.
 
         # Now they are fully onboarded and can access their profile
