@@ -7,7 +7,10 @@ from django.test import tag
 from django.urls import reverse
 from playwright.sync_api import Browser, Playwright, expect, sync_playwright
 
+from user import selectors
+
 from .utils import faker
+from .utils import services as test_services
 
 
 def extract_verification_code(email_body: str) -> str | None:
@@ -138,8 +141,9 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
 
         # They pay for their annual subscription and progress to the next step
         # Just update the database to say they have a valid subscription and go to next step
-
-        page.goto(self.get_route_by_name("onboarding_identity"))
+        user_obj = selectors.user_from_email(email=user_email)
+        test_services.create_valid_subscription(user=user_obj)
+        page.reload()  # Refresh the page to get the updated subscription status
         page.wait_for_url(self.get_route_by_name("onboarding_identity"))
 
         # Once again they try to get away from the onboarding process but are redirected back
@@ -148,7 +152,8 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
 
         # They verify their identity
         # For now we'll manually set it verified in the database.
-
+        test_services.create_verified_identity(user=user_obj)
+        page.reload()  # Refresh the page to get the updated identity status
         # Now they are fully onboarded and can access their profile
         page.wait_for_url(self.get_route_by_name("profile"))
         self.assertEqual(page.title(), "Your profile")
