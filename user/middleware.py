@@ -41,17 +41,10 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
         if any(request.path.startswith(route) for route in exempt_routes):
             return None
 
-        if not request.user.is_authenticated:
-            return redirect("account_login")
+        route = selectors.next_onboarding_step_route(user=request.user)
 
-        if not selectors.user_has_mfa_enabled(user=request.user):
-            return redirect("mfa_activate_totp")
-
-        if not selectors.user_has_valid_subscription(user=request.user):
-            return redirect("onboarding_billing")
-
-        if not selectors.user_has_verified_identity(user=request.user):
-            return redirect("onboarding_identity")
+        if route is not None:
+            return redirect(route)
 
         return None
 
