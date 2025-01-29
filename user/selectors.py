@@ -12,8 +12,6 @@ def next_onboarding_step_route(user: models.AgoraUser | AnonymousUser) -> str | 
 
     If the user is fully onboarded, return None.
     """
-    route = None
-
     if user.is_anonymous or not user.is_authenticated:
         return "account_login"
 
@@ -21,15 +19,15 @@ def next_onboarding_step_route(user: models.AgoraUser | AnonymousUser) -> str | 
     assert isinstance(user, models.AgoraUser)
 
     if not user_has_mfa_enabled(user=user):
-        route = "mfa_activate_totp"
+        return "mfa_activate_totp"
 
     if not user_has_valid_subscription(user=user):
-        route = "onboarding_billing"
+        return "onboarding_billing"
 
     if not user_has_verified_identity(user=user):
-        route = "onboarding_identity"
+        return "onboarding_identity"
 
-    return route
+    return None
 
 
 def user_has_mfa_enabled(*, user: models.AgoraUser) -> bool:
