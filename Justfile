@@ -64,8 +64,7 @@ install-python *FLAGS:
 
 # Install playwright browsers and dependencies
 install-playwright:
-    @{{ UV_RUN }} playwright install
-    @{{ UV_RUN }} playwright install-deps
+    @{{ UV_RUN }} playwright install --with-deps
 
 # Install all dependencies
 install-dev: install-python install-node
