@@ -62,6 +62,7 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         user_email = faker.fake_email()
         page = self.browser.new_page()
         page.set_default_navigation_timeout(500)
+        page.set_default_timeout(500)
 
         # First of all they visit the login page
         page.goto(self.get_route_by_name("account_login"))
