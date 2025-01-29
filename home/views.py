@@ -62,3 +62,7 @@ def join_waiting_list(request: HttpRequest) -> TemplateResponse:
             )
 
     return page.specific.serve(request, additional_context={"form": form})
+
+
+def profile(request: HttpRequest) -> TemplateResponse:
+    return TemplateResponse(request, "home/profile.html")
