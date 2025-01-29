@@ -115,6 +115,7 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.goto(self.get_route_by_name("profile"))
         page.wait_for_url(self.get_route_by_name("mfa_activate_totp"))
 
+        # They have to set up MFA and choose TOTP (Authenticator app).
         totp_secret_input = page.locator("input#authenticator_secret")
         self.assertTrue(totp_secret_input.is_visible())
         totp_secret = totp_secret_input.input_value()
@@ -122,8 +123,13 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.fill("input[name=code]", totp_authenticator_code)
         page.click("button:has-text('Activate')")
 
-        # They have to set up MFA and choose TOTP (Authenticator app).
+        # They get shown their recovery codes
+        page.wait_for_url(self.get_route_by_name("mfa_view_recovery_codes"))
+        recovery_codes = page.locator("textarea#recovery_codes").input_value().split("\n")
+        self.assertEqual(len(recovery_codes), 12)
+
         # After successful setup they progress to the next step
+        page.goto(self.get_route_by_name("onboarding_billing"))
         page.wait_for_url(self.get_route_by_name("onboarding_billing"))
 
         # They try again to get away from the onboarding process but are redirected back
