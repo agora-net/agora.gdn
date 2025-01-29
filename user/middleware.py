@@ -45,7 +45,7 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
             return redirect("account_login")
 
         if not selectors.user_has_mfa_enabled(user=request.user):
-            return redirect("onboarding_mfa")
+            return redirect("mfa_activate_totp")
 
         if not selectors.user_has_valid_subscription(user=request.user):
             return redirect("onboarding_billing")
