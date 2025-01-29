@@ -460,9 +460,9 @@ AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     "mfa_authenticate",
     "mfa_reauthenticate",
     "mfa_activate_totp",
+    "mfa_view_recovery_codes",
     "mfa_generate_recovery_codes",
     "mfa_download_recovery_codes",
-    "mfa_view_recovery_codes",
 ]
 
 if DEBUG:
