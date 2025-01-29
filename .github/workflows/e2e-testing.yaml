@@ -32,4 +32,4 @@ jobs:
         run: just install-playwright
 
       - name: Run end-to-end tests
-        run: just e2e-test
+        run: just test-e2e
