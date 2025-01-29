@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
 
+import utils.models
 from utils.models import SnowflakeIdPrimaryKeyMixin
 
 
@@ -71,9 +72,9 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
 class VerifiableMixin(models.Model):
     verification_code = models.CharField(
         _("verification code"),
-        blank=True,
         unique=True,
         max_length=255,
+        default=utils.models.cuid2_generator,
     )
     verified = models.DateField(_("verified"), blank=True, null=True)
 
@@ -135,6 +136,7 @@ class Customer(TimeStampedModel):
 class Subscription(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     stripe_subscription_id = models.CharField(max_length=255)
+    expiration_date = models.DateField()
 
     def __str__(self) -> str:
         return self.stripe_subscription_id

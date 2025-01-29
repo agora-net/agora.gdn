@@ -1,5 +1,6 @@
 import os
 
+from cuid2 import Cuid
 from django.db import models
 from snowflake import SnowflakeGenerator
 
@@ -17,3 +18,8 @@ class SnowflakeIdPrimaryKeyMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+def cuid2_generator(length: int = 10) -> str:
+    cuid2: Cuid = Cuid()
+    return cuid2.generate(length=length)

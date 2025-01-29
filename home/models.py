@@ -2,7 +2,6 @@ from typing import Any
 
 import readtime
 import readtime.result
-from cuid2 import Cuid
 from django.db import models
 from django.http import HttpRequest
 from django.template.response import TemplateResponse
@@ -16,6 +15,8 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
 from wagtail.models import Page
 
+import utils.models
+
 
 # -----------------------------------------
 # Regular Models
@@ -24,7 +25,7 @@ class WaitingListSignup(TimeStampedModel):
     email = models.EmailField(unique=True, max_length=255)
     referral_code = models.CharField(
         max_length=10,
-        default=Cuid(length=10).generate,
+        default=utils.models.cuid2_generator,
         unique=True,
         editable=False,
     )
