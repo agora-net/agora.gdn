@@ -91,7 +91,7 @@ test-e2e *FLAGS:
 ## Node / static assets commands    
 ###############################################
 
-# Run a pnpm command in the brand directory
+# Run a pnpm command in the fronted directory
 pnpm *ARGS:
     @{{ PNPM }} {{ ARGS }}
 
@@ -101,8 +101,7 @@ install-node:
 
 # Compile and watch the static assets
 watch-static:
-    # TODO(kisamoto): Add a watch command for the frontend
-    @{{ PNPM }}
+    @{{ PNPM }} run dev
 
 # Compile the static assets
 build-static:
