@@ -10,7 +10,7 @@ DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
 
 UV_RUN := "uv run"
 
-PNPM := "pnpm --dir fronted/@agora/agora"
+PNPM := "pnpm --dir frontend/@agora/agora"
 
 ###############################################
 ## General commands
