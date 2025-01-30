@@ -469,7 +469,6 @@ RESULTS_CACHE_SIZE = 100
 # Which routes do not require the user to be fully onboarded?
 # Each of these can be an explicit path or a URL name.
 AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
-    "test",
     # Allauth
     "account_login",
     "account_signup",

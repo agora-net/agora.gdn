@@ -24,7 +24,6 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     path("join/", home_views.join_waiting_list, name="join_waiting_list"),
-    path("test/", TemplateView.as_view(template_name="base.html"), name="test"),
 ]
 
 
