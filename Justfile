@@ -6,10 +6,43 @@ default:
 
 # Variables
 APP_NAME := "agora"
-UV_RUN := "uv run"
-NPM := "npm --prefix brand"
-NPX := "npx --prefix brand"
 DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
+
+UV_RUN := "uv run"
+
+PNPM := "pnpm --dir fronted/@agora/agora"
+
+###############################################
+## General commands
+###############################################
+
+# Run a uv command
+uv *ARGS:
+    @uv {{ ARGS }}
+
+# Install python dependencies
+install-python *FLAGS:
+    @uv sync {{ FLAGS }}
+
+# Install playwright browsers and dependencies
+install-playwright:
+    @{{ UV_RUN }} playwright install --with-deps
+
+# Install all dependencies (python, node, and playwright) and pre-commit hooks
+install-dev: install-python install-node install-playwright
+    @{{ UV_RUN }} pre-commit install
+
+# Install dependencies for production
+install: install-python install-node
+
+# Run the linter and formatter
+format:
+    @{{ UV_RUN }} ruff check --fix
+    @{{ UV_RUN }} ruff format
+
+# Use mypy to check types
+typecheck:
+    @{{ UV_RUN }} mypy .
 
 ###############################################
 ## Django management
@@ -38,56 +71,9 @@ collectstatic:
     @mkdir -p static
     @{{ manage }} collectstatic --noinput --clear
 
-# Run a NPM command in the brand directory
-npm *ARGS:
-    @{{ NPM }} {{ ARGS }}
-
 # Remove all generated migrations
 clean-migrations:
     @find . -path "*/migrations/*.py" -not -name "__init__.py" -not -path "./.venv/*" -type f -delete
-
-# Use mypy to check types
-typecheck:
-    @{{ UV_RUN }} mypy .
-
-# Run a uv command
-uv *ARGS:
-    @uv {{ ARGS }}
-
-# Install node dependencies
-install-node:
-    @{{ NPM }} install -d
-
-# Install python dependencies
-install-python *FLAGS:
-    @uv sync {{ FLAGS }}
-
-# Install playwright browsers and dependencies
-install-playwright:
-    @{{ UV_RUN }} playwright install --with-deps
-
-# Install all dependencies
-install-dev: install-python install-node
-    @{{ UV_RUN }} pre-commit install
-
-install: install-python install-node
-
-# Compile and watch the static assets
-watch-static:
-    @{{ UV_RUN }} watchfiles --target-type command --ignore-paths 'brand/node_modules,ansible,brand/static,brand/.parcel-cache' '{{ NPM }} run build -- --no-cache' agora assets brand home
-
-# Compile the static assets
-build-static:
-    @{{ NPM }} run build
-
-# Expose the local Django server to the internet via localtunnel
-localtunnel:
-    @{{ NPX }} lt --port 8000
-
-# Run the linter and formatter
-format:
-    @{{ UV_RUN }} ruff check --fix
-    @{{ UV_RUN }} ruff format
 
 # Create a Django superuser
 createsuperuser *FLAGS:
@@ -100,6 +86,27 @@ test *FLAGS:
 # Run end-to-end tests with playwright
 test-e2e *FLAGS:
     @{{ manage }} test --shuffle --parallel --tag e2e {{ FLAGS }}
+
+###############################################
+## Node / static assets commands    
+###############################################
+
+# Run a pnpm command in the brand directory
+pnpm *ARGS:
+    @{{ PNPM }} {{ ARGS }}
+
+# Install node dependencies
+install-node:
+    @{{ PNPM }} install --dev
+
+# Compile and watch the static assets
+watch-static:
+    # TODO(kisamoto): Add a watch command for the frontend
+    @{{ PNPM }}
+
+# Compile the static assets
+build-static:
+    @{{ PNPM }} run build
 
 ###############################################
 ## Docker commands
