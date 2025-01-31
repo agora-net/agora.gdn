@@ -19,6 +19,7 @@ export default {
 		rollupOptions: {
 			input: {
 				tailwind: "src/tailwind.css",
+				agora: "src/agora.ts",
 			},
 		},
 		modulePreload: {
