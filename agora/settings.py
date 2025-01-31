@@ -76,7 +76,6 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_countries",
     "django_vite",
-    "brand",  # Custom styling in the brand app
     "user",  # Custom user model
 ]
 
