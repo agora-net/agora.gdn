@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import re
 import sys
 import tempfile
 from pathlib import Path
@@ -74,7 +75,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "django_countries",
-    "brand",  # Custom styling in the brand app
+    "django_vite",
     "user",  # Custom user model
 ]
 
@@ -363,6 +364,15 @@ USE_TZ = True
 
 EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 
+# Vite
+# https://github.com/MrBin99/django-vite?tab=readme-ov-file#configuration-variables
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": DEBUG,
+        "dev_server_protocol": "https",
+    }
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -373,6 +383,7 @@ STATICFILES_FINDERS = [
 
 STATICFILES_DIRS = [
     PROJECT_DIR / "static",
+    BASE_DIR / "frontend" / "@agora" / "agora" / "dist",
 ]
 
 STATIC_ROOT = BASE_DIR / "static"
@@ -397,6 +408,18 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+
+vite_regex = re.compile(r"^.+[.-][0-9a-zA-Z_-]{8,12}\..+$")
+
+
+def immutable_file_test(path: str, url: str) -> bool:
+    # Match vite (rollup)-generated hashes, à la, `some_file-CSliV9zW.js`
+    return bool(vite_regex.match(url))
+
+
+# WhiteNoise settings
+WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 
 # Taggit settings
 # https://django-taggit.readthedocs.io/en/latest/getting_started.html#settings

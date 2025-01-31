@@ -1,8 +1,45 @@
+# Agora
+
+Bringing trust to the web.
+
 ## Development
 
 ### Prerequisites
 
+- [`just`](https://github.com/casey/just) to run pretty much all commands (defined in `Justfile`)
 - [`mkcert`](https://github.com/FiloSottile/mkcert)
+- [`nvm`](https://github.com/nvm-sh/nvm) (optional but recommended)
+- [`pnpm`](https://pnpm.io/installation)
+
+### Installing dependencies
+
+```
+just install-dev
+```
+
+### Configure the app
+
+Copy the `.env.template` into `.env` and adjust values as necessary.
+
+### Run database migrations
+
+```
+just migrate
+```
+
+### Running everything locally
+
+Run the Django app (with [HTTPS](#https)):
+
+```
+just runserver
+```
+
+and in another terminal (to trigger rebuilding of static assets):
+
+```
+just watch-static
+```
 
 ### HTTPS
 

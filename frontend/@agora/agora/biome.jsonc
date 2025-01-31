@@ -18,7 +18,8 @@
 			".venv/**",
 			".mypy_cache/**",
 			"ansible/roles/**",
-			"static/**"
+			"static/**",
+			"dist/**"
 		]
 	},
 	"formatter": {

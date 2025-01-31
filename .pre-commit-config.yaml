@@ -19,7 +19,7 @@ repos:
     hooks:
       - id: local-biome-check
         name: biome check
-        entry: bash -c '[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh && npx --prefix brand biome check --write --files-ignore-unknown=true --no-errors-on-unmatched --config-path=brand/biome.jsonc'
+        entry: bash -c '[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh && cd frontend/@agora/agora && nvm use && pnpm biome check --write --files-ignore-unknown=true --no-errors-on-unmatched --config-path=./biome.jsonc'
         language: system
         types: [text]
         files: "\\.(jsx?|tsx?|c(js|ts)|m(js|ts)|d\\.(ts|cts|mts)|jsonc?|css|svelte|vue|astro|graphql|gql)$"
