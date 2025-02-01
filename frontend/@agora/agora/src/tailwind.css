@@ -1,2 +1,8 @@
 @import "@fontsource-variable/figtree";
 @import "tailwindcss";
+@source "../../../../";
+@plugin "daisyui";
+
+/* @theme {
+
+} */

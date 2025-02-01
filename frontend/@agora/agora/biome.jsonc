@@ -24,7 +24,9 @@
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		// Temporarily enable format with errors until biome better supports Tailwind CSS v4
+		"formatWithErrors": true
 	},
 	"organizeImports": {
 		"enabled": true
