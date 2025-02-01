@@ -97,7 +97,7 @@ pnpm *ARGS:
 
 # Install node dependencies
 install-node:
-    @{{ PNPM }} install --dev
+    @{{ PNPM }} install
 
 # Compile and watch the static assets
 watch-static:
