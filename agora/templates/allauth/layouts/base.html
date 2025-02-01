@@ -6,72 +6,80 @@
 {% endblock title %}
 {% block base_content %}
     {% block body %}
-        {% if messages %}
-            <div>
-                <strong>{% trans "Messages:" %}</strong>
-                <ul>
-                    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        <div>
-            <strong>{% trans "Menu:" %}</strong>
-            <ul>
+        <div class="flex flex-col min-h-full justify-center gap-8 px-2 max-w-xl">
+            {% if messages %}
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4"
+                     role="alert">
+                    <strong>{% trans "Messages:" %}</strong>
+                    <ul>
+                        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <ul role="tablist" class="tabs justify-center">
                 {% if user.is_authenticated %}
                     {% url 'account_email' as email_url_ %}
                     {% if email_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'account_email' %}tab-active{% endif %}">
                             <a href="{{ email_url_ }}">{% trans "Change Email" %}</a>
                         </li>
                     {% endif %}
                     {% url 'account_change_password' as change_password_url_ %}
                     {% if change_password_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'account_change_password' %}tab-active{% endif %}">
                             <a href="{{ change_password_url_ }}">{% trans "Change Password" %}</a>
                         </li>
                     {% endif %}
                     {% url 'socialaccount_connections' as connections_url_ %}
                     {% if connections_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'socialaccount_connections' %}tab-active{% endif %}">
                             <a href="{{ connections_url_ }}">{% trans "Account Connections" %}</a>
                         </li>
                     {% endif %}
                     {% url 'mfa_index' as mfa_url_ %}
                     {% if mfa_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'mfa_index' %}tab-active{% endif %}">
                             <a href="{{ mfa_url_ }}">{% trans "Two-Factor Authentication" %}</a>
                         </li>
                     {% endif %}
                     {% url 'usersessions_list' as usersessions_list_url_ %}
                     {% if usersessions_list_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'usersessions_list' %}tab-active{% endif %}">
                             <a href="{{ usersessions_list_url_ }}">{% trans "Sessions" %}</a>
                         </li>
                     {% endif %}
                     {% url 'account_logout' as logout_url_ %}
                     {% if logout_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'account_logout' %}tab-active{% endif %}">
                             <a href="{{ logout_url_ }}">{% trans "Sign Out" %}</a>
                         </li>
                     {% endif %}
                 {% else %}
                     {% url 'account_login' as login_url_ %}
                     {% if login_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'account_login' %}tab-active{% endif %}">
                             <a href="{{ login_url_ }}">{% trans "Sign In" %}</a>
                         </li>
                     {% endif %}
                     {% url 'account_signup' as signup_url_ %}
                     {% if signup_url_ %}
-                        <li>
+                        <li role="tab"
+                            class="tab {% if request.resolver_match.url_name == 'account_signup' %}tab-active{% endif %}">
                             <a href="{{ signup_url_ }}">{% trans "Sign Up" %}</a>
                         </li>
                     {% endif %}
                 {% endif %}
             </ul>
+            {% block content %}
+            {% endblock content %}
         </div>
-        {% block content %}
-        {% endblock content %}
     {% endblock body %}
     {% block extra_body %}
     {% endblock extra_body %}
