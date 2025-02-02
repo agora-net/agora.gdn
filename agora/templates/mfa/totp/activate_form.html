@@ -13,8 +13,10 @@
 {% url 'mfa_activate_totp' as action_url %}
 {% element form form=form method="post" action=action_url %}
 {% slot body %}
-{% element img src=totp_svg_data_uri alt=form.secret tags="mfa,totp,qr" %}
+<div class="bg-white w-fit mx-auto">
+    {% element img src=totp_svg_data_uri alt=form.secret tags="mfa,totp,qr" %}
 {% endelement %}
+</div>
 {% csrf_token %}
 {% element field id="authenticator_secret" type="text" value=form.secret disabled=True %}
 {% slot label %}
