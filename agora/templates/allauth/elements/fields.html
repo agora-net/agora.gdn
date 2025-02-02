@@ -10,14 +10,14 @@
 {% endblock extra_css %}
 {% for field in attrs.form %}
     {% if field.name == "remember" %}
-        <div class="form-control">
+        <div class="form-control md:w-1/2">
             <label class="label cursor-pointer w-full justify-between">
                 <span class="label-text">{{ field.label }}</span>
                 {{ field|add_class:"checkbox" }}
             </label>
         </div>
     {% else %}
-        <label class="form-control w-full max-w-xs">
+        <label class="form-control w-full">
             <div class="label">
                 <span class="label-text">{{ field.label }}</span>
             </div>
