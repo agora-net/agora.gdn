@@ -1,4 +1,13 @@
 {% load widget_tweaks %}
+{% block extra_css %}
+    <style>
+    .field-help-text > ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    }
+    </style>
+{% endblock extra_css %}
 {% for field in attrs.form %}
     {% if field.name == "remember" %}
         <div class="form-control">
@@ -12,9 +21,18 @@
             <div class="label">
                 <span class="label-text">{{ field.label }}</span>
             </div>
-            {{ field | add_class:"input input-bordered w-full
-            {% if field.errors %}input-error{% endif %}
-            " }}
-        </label>
-    {% endif %}
+            {% comment %} djlint:off {% endcomment %}
+            {{ field | add_class:"input input-bordered w-full {% if field.errors %}input-error{% endif %}" }}
+{% comment %} djlint:on {% endcomment %}
+{% if field.help_text %}
+<div role="alert" class="alert my-4 text-neutral-content/70 ">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info h-6 w-6 shrink-0">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+</path>
+</svg>
+<div class="flex flex-col gap-2 prose prose-sm field-help-text">{{ field.help_text|safe }}</div>
+</div>
+{% endif %}
+</label>
+{% endif %}
 {% endfor %}

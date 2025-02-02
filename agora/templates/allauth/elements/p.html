@@ -1,1 +1,3 @@
-{% comment %} djlint:off {% endcomment %}{% load allauth %}<p>{% slot %}{% endslot %}</p>
+{% comment %} djlint:off {% endcomment %}
+{% load allauth %}
+<p class="{{ attrs.class }}">{% slot %}{% endslot %}</p>
