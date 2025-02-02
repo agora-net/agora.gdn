@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_countries",
     "django_vite",
+    "widget_tweaks",
     "user",  # Custom user model
 ]
 
