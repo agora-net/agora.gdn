@@ -6,16 +6,20 @@
 {% endblock title %}
 {% block base_content %}
     {% block body %}
-        <div class="flex flex-col min-h-full justify-center gap-8 px-2 max-w-xl mx-auto">
-            {% if messages %}
-                <div class="alert alert-outline max-sm:alert-vertical alert-info"
-                     role="alert">
-                    <ul>
-                        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-            <ul role="tablist" class="tabs tabs-border justify-center">
+        <div class="flex flex-col min-h-full justify-center gap-8">
+            <div class=" flex flex-col gap-8 w-11/12 p-10 mx-auto mt-5 rounded-lg shadow-md md:mt-15 lg:mt-32 sm:p-5 md:w-6/12 lg:w-5/12 xl:w-4/12 md:p-10 xl:p-13 bg-base-100">
+                {% if messages %}
+                    <div class="alert alert-outline max-sm:alert-vertical alert-info"
+                         role="alert">
+                        <ul>
+                            {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% block content %}
+                {% endblock content %}
+            </div>
+            <ul role="tablist" class="tabs tabs-xs tabs-border justify-center">
                 {% if user.is_authenticated %}
                     {% url 'account_email' as email_url_ %}
                     {% if email_url_ %}
@@ -76,8 +80,6 @@
                     {% endif %}
                 {% endif %}
             </ul>
-            {% block content %}
-            {% endblock content %}
         </div>
     {% endblock body %}
     {% block extra_body %}
