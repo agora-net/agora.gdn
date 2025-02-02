@@ -470,11 +470,14 @@ RESULTS_CACHE_SIZE = 100
 AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     # Allauth
     "account_login",
+    "account_logout",
     "account_signup",
     "account_signup_by_passkey",
+    "account_email",
     "account_confirm_email",
     "account_email_verification_sent",
     "account_reauthenticate",
+    "account_change_password",
     "account_reset_password",
     "account_reset_password_done",
     "account_reset_password_from_key",
