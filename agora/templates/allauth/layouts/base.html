@@ -6,7 +6,8 @@
 {% endblock title %}
 {% block base_content %}
     {% block body %}
-        <div class="flex flex-col min-h-full justify-center gap-8">
+        <div class="flex flex-col min-h-full justify-center items-center gap-8">
+            {% include "logo/agora.svg" %}
             <div class=" flex flex-col gap-8 w-11/12 p-10 mx-auto mt-5 rounded-lg shadow-md md:mt-15 lg:mt-32 sm:p-5 md:w-6/12 lg:w-5/12 xl:w-4/12 md:p-10 xl:p-13 bg-base-100">
                 {% if messages %}
                     <div class="alert alert-outline max-sm:alert-vertical alert-info"
