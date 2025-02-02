@@ -14,6 +14,7 @@ dependencies = [
     { name = "django-environ" },
     { name = "django-extensions" },
     { name = "django-model-utils" },
+    { name = "django-widget-tweaks" },
     { name = "gunicorn" },
     { name = "mintotp" },
     { name = "nh3" },
@@ -53,6 +54,7 @@ requires-dist = [
     { name = "django-environ" },
     { name = "django-extensions" },
     { name = "django-model-utils" },
+    { name = "django-widget-tweaks", specifier = ">=1.5.0" },
     { name = "gunicorn" },
     { name = "mintotp", specifier = ">=0.3.0" },
     { name = "nh3" },
@@ -617,6 +619,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c4/ac/7a162675d34e8e7fc97c2e444ea26b5d06c12ffb7f8479dd1b7c4a670b3a/django_vite-3.0.6.tar.gz", hash = "sha256:363ca9fd774eb228b27f710a9179c68f61e27bb95b41b1f790ee5a0a0e215b14", size = 21462 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f6/27/9901193991945213c1fd07b14d1726b8712ee4a1910ebe6b3be24fe24813/django_vite-3.0.6-py3-none-any.whl", hash = "sha256:3ad3716e2afe4569353cda8080f557bac37a5b29ab7a5826d5defd67bfbe8e72", size = 19112 },
+]
+
+[[package]]
+name = "django-widget-tweaks"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/fe/26eb92fba83844e71bbec0ced7fc2e843e5990020e3cc676925204031654/django-widget-tweaks-1.5.0.tar.gz", hash = "sha256:1c2180681ebb994e922c754804c7ffebbe1245014777ac47897a81f57cc629c7", size = 14767 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/46/6a/6cb6deb5c38b785c77c3ba66f53051eada49205979c407323eb666930915/django_widget_tweaks-1.5.0-py3-none-any.whl", hash = "sha256:a41b7b2f05bd44d673d11ebd6c09a96f1d013ee98121cb98c384fe84e33b881e", size = 8960 },
 ]
 
 [[package]]
