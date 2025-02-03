@@ -1,19 +1,18 @@
 {% load widget_tweaks %}
 {% for field in attrs.form %}
-    {% if field.hidden %}<div class="hidden">{% endif %}
-        {% if field.name == "remember" %}
-            <div class="form-control md:w-1/2">
-                <label class="label cursor-pointer w-full justify-between">
-                    <span class="label-text">{{ field.label }}</span>
-                    {{ field|add_class:"checkbox" }}
-                </label>
+    {% if field.name == "remember" %}
+        <div class="form-control md:w-1/2">
+            <label class="label cursor-pointer w-full justify-between">
+                <span class="label-text">{{ field.label }}</span>
+                {{ field|add_class:"checkbox" }}
+            </label>
+        </div>
+    {% else %}
+        <label class="form-control w-full">
+            <div class="label">
+                <span class="label-text">{{ field.label }}</span>
             </div>
-        {% else %}
-            <label class="form-control w-full">
-                <div class="label">
-                    <span class="label-text">{{ field.label }}</span>
-                </div>
-                {% comment %} djlint:off {% endcomment %}
+            {% comment %} djlint:off {% endcomment %}
             {{ field | add_class:"input input-bordered w-full" }}
 {% comment %} djlint:on {% endcomment %}
 {% if field.help_text %}
@@ -28,5 +27,4 @@
 {% endif %}
 </label>
 {% endif %}
-{% if field.hidden %}</div>{% endif %}
 {% endfor %}
