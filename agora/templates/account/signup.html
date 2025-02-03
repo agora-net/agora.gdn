@@ -3,6 +3,14 @@
 {% block head_title %}
     {% trans "Signup" %}
 {% endblock head_title %}
+{% block extra_css %}
+    <style>
+        {% comment %} Hide the honeypot field {% endcomment %}
+    #id_user_name_required {
+        display: none;
+    }
+    </style>
+{% endblock extra_css %}
 {% block progress %}
     <ul class="steps steps-horizontal">
         <li class="step step-secondary">{% trans "Register" %}</li>
