@@ -185,7 +185,7 @@ class BlogPage(Page, models.Model):  # type: ignore[django-manager-missing]
         JOB_POSTING = "job_posting", _("Job Posting")
 
     category = models.CharField(
-        choices=CategoryChoices,
+        choices=CategoryChoices.choices,
         max_length=255,
         blank=True,
         help_text="Text for a category above the title",

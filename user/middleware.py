@@ -4,9 +4,11 @@ from typing import Any
 # django-stubs doesn't seem to have the LoginRequiredMiddleware type yet
 from django.conf import settings
 from django.contrib.auth.middleware import LoginRequiredMiddleware  # type: ignore[attr-defined]
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import Resolver404, resolve
+
+from utils.typing.request import HttpRequest
 
 from . import selectors
 

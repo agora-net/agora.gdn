@@ -40,9 +40,9 @@ format:
     @{{ UV_RUN }} ruff check --fix
     @{{ UV_RUN }} ruff format
 
-# Use mypy to check types
+# Use pyright to check types
 typecheck:
-    @{{ UV_RUN }} mypy .
+    @{{ UV_RUN }} pyright .
 
 ###############################################
 ## Django management

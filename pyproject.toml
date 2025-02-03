@@ -20,6 +20,7 @@ dependencies = [
     "diskcache>=5.6.3",
     "mintotp>=0.3.0",
     "django-widget-tweaks>=1.5.0",
+    "stripe>=11.5.0",
 ]
 requires-python = ">=3.12"
 
@@ -36,14 +37,14 @@ dev = [
     "ansible",
     "werkzeug>=3.1.3",
     "pyopenssl>=25.0.0",
-    "django-stubs[compatible-mypy]>=5.1.2",
-    "mypy>=1.14.1",
     "django-debug-toolbar>=5.0.1",
     "playwright>=1.49.1",
     "factory-boy>=3.3.1",
     "faker>=35.0.0",
     "tblib>=3.0.0",
     "django-vite>=3.0.6",
+    "pyright>=1.1.393",
+    "django-types>=0.20.0",
 ]
 
 [tool.ruff.format]
@@ -88,15 +89,17 @@ ignore = [
 profile="django"
 ignore="H030,H031,H021"
 
-[tool.mypy]
-mypy_path = "."
-plugins = ["mypy_django_plugin.main"]
-ignore_missing_imports = true
-exclude = ["migrations", "node_modules", ".venv", "ansible/roles", ".ruff_cache"]
-strict_optional = true
-check_untyped_defs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+[tool.pyright]
+exclude = ["**/migrations", "**/node_modules", "**/.*", "**/__pycache__", "**/ansible/roles"]
+# "none", "warning", "information", or "error"
+reportMissingTypeArgument = "information"
+reportPrivateUsage        = "information"
+typeCheckingMode          = "standard"    # "off", "basic", "standard", "strict"
+
+# Reports:
+#   https://github.com/microsoft/pyright/blob/main/docs/configuration.md#type-check-diagnostics-settings
+# place ignored rules here
+reportAttributeAccessIssue = false # too many false positives with Django models
 
 [tool.django-stubs]
 django_settings_module = "agora.settings"

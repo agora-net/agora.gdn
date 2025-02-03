@@ -9,14 +9,14 @@ from ... import models
 
 
 class CustomerFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type: ignore
         model = models.Customer
 
     stripe_customer_id = factory.LazyFunction(lambda: "cus_" + cuid2_generator())
 
 
 class SubscriptionFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type: ignore
         model = models.Subscription
 
     customer = factory.SubFactory(CustomerFactory)
@@ -25,7 +25,7 @@ class SubscriptionFactory(DjangoModelFactory):
 
 
 class IdentityVerificationFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type: ignore
         model = models.IdentityVerification
 
     stripe_identity_verification_session_id = factory.LazyFunction(

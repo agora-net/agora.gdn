@@ -89,14 +89,14 @@ class UserContactScope(models.Model):
     class AbstractContactClaim(TimeStampedModel):
         contact_scope = models.ForeignKey("user.UserContactScope", on_delete=models.CASCADE)
 
-        class Meta:
+        class Meta:  # type: ignore
             abstract = True
 
     user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE)
 
 
 # Claims for the Contact Scope
-class UserEmail(UserContactScope.AbstractContactClaim, VerifiableMixin):
+class UserEmail(UserContactScope.AbstractContactClaim, VerifiableMixin):  # type: ignore
     """Users can have multiple emails that all need to be verified."""
 
     email = models.EmailField(_("email address"), blank=True)
@@ -105,7 +105,7 @@ class UserEmail(UserContactScope.AbstractContactClaim, VerifiableMixin):
         return self.email
 
 
-class UserPhoneNumber(UserContactScope.AbstractContactClaim, VerifiableMixin):
+class UserPhoneNumber(UserContactScope.AbstractContactClaim, VerifiableMixin):  # type: ignore
     """Users can have multiple phone numbers that all need to be verified."""
 
     phone_number = models.CharField(_("phone number"), blank=True, max_length=255)
@@ -115,7 +115,7 @@ class UserPhoneNumber(UserContactScope.AbstractContactClaim, VerifiableMixin):
         return self.phone_number
 
 
-class UserDomain(UserContactScope.AbstractContactClaim, VerifiableMixin):
+class UserDomain(UserContactScope.AbstractContactClaim, VerifiableMixin):  # type: ignore
     """Users can have multiple domains (e.g. `example.com`) that all need to be verified."""
 
     domain = models.CharField(_("domain"), blank=True, max_length=255)

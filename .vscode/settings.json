@@ -36,6 +36,8 @@
 		"nostatic",
 		"pageurl",
 		"PIPENV",
+		"pycache",
+		"pyright",
 		"readtime",
 		"repokey",
 		"rollup",
