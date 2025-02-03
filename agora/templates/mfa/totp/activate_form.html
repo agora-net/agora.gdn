@@ -3,6 +3,20 @@
 {% block head_title %}
     {% translate "Activate Authenticator App" %}
 {% endblock head_title %}
+{% block progress %}
+    <ul class="steps steps-horizontal">
+        <li class="step step-secondary">{% trans "Register" %}</li>
+        <li class="step step-secondary">
+            <span class="hidden lg:block">{% trans "Enable MFA" %}</span>
+            <span class="lg:hidden">{% trans "MFA" %}</span>
+        </li>
+        <li class="step">{% trans "Subscribe" %}</li>
+        <li class="step">
+            <span class="hidden lg:block">{% trans "Verify Identity" %}</span>
+            <span class="lg:hidden">{% trans "Verify" %}</span>
+        </li>
+    </ul>
+{% endblock progress %}
 {% block content %}
     {% element h1 %}
     {% translate "Activate Authenticator App" %}
