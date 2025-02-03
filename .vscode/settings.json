@@ -73,6 +73,7 @@
 		"alvistack",
 		"chdir",
 		"endelement",
+		"endslot",
 		"fontsource",
 		"getpid",
 		"itemprop",

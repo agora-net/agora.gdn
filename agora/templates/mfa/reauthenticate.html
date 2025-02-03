@@ -2,14 +2,11 @@
 {% load i18n %}
 {% load allauth %}
 {% block reauthenticate_content %}
-    {% element p %}
-    {% blocktranslate %}Enter an authenticator code:{% endblocktranslate %}
-{% endelement %}
-{% url 'mfa_reauthenticate' as action_url %}
-{% element form form=form method="post" action=action_url %}
-{% slot body %}
-{% csrf_token %}
-{% element fields form=form unlabeled=True %}
+    {% url 'mfa_reauthenticate' as action_url %}
+    {% element form form=form method="post" action=action_url %}
+    {% slot body %}
+    {% csrf_token %}
+    {% element fields form=form unlabeled=True %}
 {% endelement %}
 {{ redirect_field }}
 {% endslot %}
@@ -19,4 +16,4 @@
 {% endelement %}
 {% endslot %}
 {% endelement %}
-{% endblock %}
+{% endblock reauthenticate_content %}

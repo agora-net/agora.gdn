@@ -21,7 +21,7 @@
     {% element h1 %}
     {% translate "Activate Authenticator App" %}
 {% endelement %}
-{% element p class="text-neutral-content/70" %}
+{% element p class="text-base-content" %}
 {% blocktranslate %}All users must enable multi-factor authentication (MFA) to secure their account. Scan the QR below and enter the generated code.{% endblocktranslate %}
 {% endelement %}
 {% url 'mfa_activate_totp' as action_url %}
