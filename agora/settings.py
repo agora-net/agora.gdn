@@ -18,6 +18,7 @@ import tempfile
 from pathlib import Path
 
 import environ
+import stripe
 
 PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,12 +33,15 @@ env = environ.Env()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-DEBUG = env.bool("DEBUG", default=False)
+# Todo(kisamoto): We can remove the `# type: ignore` once environ supports union types
+# https://github.com/joke2k/django-environ/pull/546
 
-SECRET_KEY = env.str("SECRET_KEY", default="!!!SET DJANGO_SECRET_KEY!!!")
+DEBUG = env.bool("DEBUG", default=False)  # type: ignore
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
-USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=False)
+SECRET_KEY = env.str("SECRET_KEY", default="!!!SET DJANGO_SECRET_KEY!!!")  # type: ignore
+
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])  # type: ignore
+USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=False)  # type: ignore
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -76,6 +80,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_countries",
     "django_vite",
+    "widget_tweaks",
     "user",  # Custom user model
 ]
 
@@ -130,8 +135,8 @@ WSGI_APPLICATION = "agora.wsgi.application"
 # Taken from: https://www.reddit.com/r/django/comments/x2h6cq/whats_your_logging_setup/
 
 
-LOG_LEVEL = env.str("LOG_LEVEL", default="WARNING")
-LOGS_SAVE_TO_FILE = env.bool("LOGS_SAVE_TO_FILE", default=False)
+LOG_LEVEL = env.str("LOG_LEVEL", default="WARNING")  # type: ignore
+LOGS_SAVE_TO_FILE = env.bool("LOGS_SAVE_TO_FILE", default=False)  # type: ignore
 LOGS_DIR = BASE_DIR / "logs"
 LOGGING = {
     "version": 1,
@@ -239,7 +244,7 @@ LOGGING_CONFIG = "utils.log.load_logging_config_start_listener"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": env.db_url("DB_DEFAULT_URL", "sqlite:///db.sqlite3"),
+    "default": env.db_url("DB_DEFAULT_URL", "sqlite:///db.sqlite3"),  # type: ignore
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -268,7 +273,7 @@ SQLITE_OPTIONS = {
 CACHES = {
     "default": {
         "BACKEND": "diskcache.DjangoCache",
-        "LOCATION": env.str("CACHE_FILEPATH", tempfile.gettempdir()),
+        "LOCATION": env.str("CACHE_FILEPATH", tempfile.gettempdir()),  # type: ignore
         "TIMEOUT": 300,
         # ^-- Django setting for default timeout of each key.
         "SHARDS": 8,
@@ -362,7 +367,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")  # type: ignore
 
 # Vite
 # https://github.com/MrBin99/django-vite?tab=readme-ov-file#configuration-variables
@@ -387,11 +392,11 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / "static"
-STATIC_HOST = env.str("STATIC_HOST", "")
+STATIC_HOST: str = env.str("STATIC_HOST", "")  # type: ignore
 STATIC_URL = STATIC_HOST + "/static/"
 
-MEDIA_ROOT = env.str("MEDIA_ROOT", BASE_DIR / "media")
-MEDIA_HOST = env.str("MEDIA_HOST", "")
+MEDIA_ROOT = env.str("MEDIA_ROOT", BASE_DIR / "media")  # type: ignore
+MEDIA_HOST: str = env.str("MEDIA_HOST", "")  # type: ignore
 MEDIA_URL = MEDIA_HOST + "/media/"
 
 # Default storage settings, with the staticfiles storage updated.
@@ -462,6 +467,13 @@ WAGTAILDOCS_EXTENSIONS = [
 # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html
 RESULTS_CACHE_SIZE = 100
 
+# Stripe settings
+# ------------------------------------
+STRIPE_SECRET_KEY = env.str("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = env.str("STRIPE_PUBLISHABLE_KEY")
+
+stripe.api_key = STRIPE_SECRET_KEY
+
 # Agora settings
 # ------------------------------------
 
@@ -470,11 +482,14 @@ RESULTS_CACHE_SIZE = 100
 AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     # Allauth
     "account_login",
+    "account_logout",
     "account_signup",
     "account_signup_by_passkey",
+    "account_email",
     "account_confirm_email",
     "account_email_verification_sent",
     "account_reauthenticate",
+    "account_change_password",
     "account_reset_password",
     "account_reset_password_done",
     "account_reset_password_from_key",

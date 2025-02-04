@@ -1,4 +1,4 @@
-from typing import Any, ClassVar
+from typing import Any, ClassVar, LiteralString
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -11,7 +11,7 @@ import utils.models
 from utils.models import SnowflakeIdPrimaryKeyMixin
 
 
-class AgoraUserManager(BaseUserManager["AgoraUser"]):
+class AgoraUserManager(BaseUserManager):
     def create_user(
         self, email: str, password: str | None = None, **extra_fields: Any
     ) -> "AgoraUser":
@@ -55,7 +55,10 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     # https://github.com/typeddjango/django-stubs/issues/174
     objects: ClassVar[AgoraUserManager] = AgoraUserManager()  # type: ignore[assignment]
 
-    def get_full_name(self) -> str:
+    class Meta(AbstractUser.Meta):
+        pass
+
+    def get_full_name(self) -> LiteralString:
         """
         Return the first_name plus the last_name, with a space and optional nickname in between.
         """
@@ -63,7 +66,8 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
         if self.nickname != "":
             nickname = f"""({self.nickname.strip()})"""
         full_name = f"{self.first_name.strip()} {nickname} {self.last_name.strip()}"
-        return full_name.strip()
+        # Apparently there's some issue with Python typing when using string operations
+        return full_name.strip()  # type: ignore
 
     def clean(self) -> None:
         return super().clean()
@@ -89,14 +93,14 @@ class UserContactScope(models.Model):
     class AbstractContactClaim(TimeStampedModel):
         contact_scope = models.ForeignKey("user.UserContactScope", on_delete=models.CASCADE)
 
-        class Meta:
+        class Meta:  # type: ignore
             abstract = True
 
     user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE)
 
 
 # Claims for the Contact Scope
-class UserEmail(UserContactScope.AbstractContactClaim, VerifiableMixin):
+class UserEmail(UserContactScope.AbstractContactClaim, VerifiableMixin):  # type: ignore
     """Users can have multiple emails that all need to be verified."""
 
     email = models.EmailField(_("email address"), blank=True)
@@ -105,7 +109,7 @@ class UserEmail(UserContactScope.AbstractContactClaim, VerifiableMixin):
         return self.email
 
 
-class UserPhoneNumber(UserContactScope.AbstractContactClaim, VerifiableMixin):
+class UserPhoneNumber(UserContactScope.AbstractContactClaim, VerifiableMixin):  # type: ignore
     """Users can have multiple phone numbers that all need to be verified."""
 
     phone_number = models.CharField(_("phone number"), blank=True, max_length=255)
@@ -115,7 +119,7 @@ class UserPhoneNumber(UserContactScope.AbstractContactClaim, VerifiableMixin):
         return self.phone_number
 
 
-class UserDomain(UserContactScope.AbstractContactClaim, VerifiableMixin):
+class UserDomain(UserContactScope.AbstractContactClaim, VerifiableMixin):  # type: ignore
     """Users can have multiple domains (e.g. `example.com`) that all need to be verified."""
 
     domain = models.CharField(_("domain"), blank=True, max_length=255)

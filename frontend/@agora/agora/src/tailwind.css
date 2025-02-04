@@ -1,2 +1,15 @@
 @import "@fontsource-variable/figtree";
 @import "tailwindcss";
+@source "../../../../";
+@plugin '@tailwindcss/typography';
+@plugin "daisyui";
+
+:root {
+	--color-primary: oklch(74.71% 0.1656 52.98);
+	--color-primary-content: #212121;
+
+	--color-secondary: oklch(65% 0.241 354.308);
+
+	--font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif,
+		"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}

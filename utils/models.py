@@ -8,16 +8,16 @@ SNOWFLAKE_GENERATOR = SnowflakeGenerator(instance=(os.getpid() % 1024))
 
 
 def snowflake_generator() -> int:
-    return next(SNOWFLAKE_GENERATOR)
+    next_id = next(SNOWFLAKE_GENERATOR)
+    if next_id is None:
+        raise ValueError("Snowflake generator returned None")
+    return next_id
 
 
-class SnowflakeIdPrimaryKeyMixin(models.Model):
+class SnowflakeIdPrimaryKeyMixin:
     id = models.PositiveBigIntegerField(
         primary_key=True, default=snowflake_generator, editable=False
     )
-
-    class Meta:
-        abstract = True
 
 
 def cuid2_generator(length: int = 10) -> str:

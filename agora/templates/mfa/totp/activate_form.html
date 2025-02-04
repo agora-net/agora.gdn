@@ -1,0 +1,75 @@
+{% extends "mfa/totp/base.html" %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% translate "Activate Authenticator App" %}
+{% endblock head_title %}
+{% block progress %}
+    <ul class="steps steps-horizontal">
+        <li class="step step-secondary">{% trans "Register" %}</li>
+        <li class="step step-secondary">
+            <span class="hidden lg:block">{% trans "Enable MFA" %}</span>
+            <span class="lg:hidden">{% trans "Secure" %}</span>
+        </li>
+        <li class="step">{% trans "Subscribe" %}</li>
+        <li class="step">
+            <span class="hidden lg:block">{% trans "Verify Identity" %}</span>
+            <span class="lg:hidden">{% trans "Verify" %}</span>
+        </li>
+    </ul>
+{% endblock progress %}
+{% block content %}
+    {% element h1 %}
+    {% translate "Activate Authenticator App" %}
+{% endelement %}
+{% element p class="text-base-content" %}
+{% blocktranslate %}All users must enable multi-factor authentication (MFA) to secure their account. Scan the QR below and enter the generated code.{% endblocktranslate %}
+{% endelement %}
+{% url 'mfa_activate_totp' as action_url %}
+{% element form form=form method="post" action=action_url %}
+{% slot body %}
+<div class="bg-white w-fit mx-auto">
+    {% element img src=totp_svg_data_uri alt=form.secret tags="mfa,totp,qr" %}
+{% endelement %}
+</div>
+{% csrf_token %}
+{% element field id="authenticator_secret" type="text" value=form.secret disabled=True %}
+{% slot help_text %}
+{% translate "You can store this secret and use it to reinstall your authenticator app at a later time." %}
+{% endslot %}
+{% endelement %}
+<button type="button"
+        onClick="copyToClipboard(this, 'authenticator_secret')"
+        class="btn">Copy to clipboard</button>
+{% element fields form=form %}
+{% endelement %}
+{% endslot %}
+{% slot actions %}
+{% element button type="submit" %}
+{% trans "Activate" %}
+{% endelement %}
+{% endslot %}
+{% endelement %}
+{% endblock content %}
+{% block extra_js %}
+    <script>
+    const copyToClipboard = (btn, elementId) => {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        const originalText = btn.textContent;
+
+        const text = element.value || element.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            btn.classList.add('btn-success');
+            btn.textContent = 'Copied!';
+        
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('btn-success');
+            }, 1000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    }
+    </script>
+{% endblock extra_js %}

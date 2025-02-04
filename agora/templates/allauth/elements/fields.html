@@ -1,0 +1,30 @@
+{% load widget_tweaks %}
+{% for field in attrs.form %}
+    {% if field.name == "remember" %}
+        <div class="form-control md:w-1/2">
+            <label class="label cursor-pointer w-full justify-between">
+                <span class="label-text">{{ field.label }}</span>
+                {{ field|add_class:"checkbox" }}
+            </label>
+        </div>
+    {% else %}
+        <label class="form-control w-full">
+            <div class="label">
+                <span class="label-text">{{ field.label }}</span>
+            </div>
+            {% comment %} djlint:off {% endcomment %}
+            {{ field | add_class:"input input-bordered w-full" }}
+{% comment %} djlint:on {% endcomment %}
+{% if field.help_text %}
+<div role="alert" class="alert my-4">
+<div class="flex flex-col gap-2 prose prose-sm field-help-text text-base-content">{{ field.help_text }}</div>
+</div>
+{% endif %}
+{% if field.errors %}
+<div role="alert" class="alert alert-error my-4">
+<div class="flex flex-col gap-2 prose prose-sm">{{ field.errors }}</div>
+</div>
+{% endif %}
+</label>
+{% endif %}
+{% endfor %}

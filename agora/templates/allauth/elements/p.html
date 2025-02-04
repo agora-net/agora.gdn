@@ -1,0 +1,3 @@
+{% comment %} djlint:off {% endcomment %}
+{% load allauth %}
+<p class="{% if attrs.class %}{{ attrs.class }}{% else %}text-base-content{% endif %}">{% slot %}{% endslot %}</p>
