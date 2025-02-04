@@ -65,10 +65,11 @@ def stripe_price_details() -> stripe.Price:
     lookup_key = "standard_annual"
 
     matching_price_list = stripe.Price.search(query=f"lookup_key:{lookup_key}")
-    if len(matching_price_list.data) == 0:
+    if matching_price_list.is_empty:
         raise ValueError(f"No price found for lookup key {lookup_key}")
 
     if len(matching_price_list.data) != 1:
         raise ValueError(f"Multiple prices found for lookup key {lookup_key}")
 
-    return matching_price_list.data[0]
+    # Pyright doesn't like this but we narrow the type using Price.search so we know this is a Price
+    return matching_price_list.data[0]  # type: ignore
