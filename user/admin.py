@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from . import models as user_models
 
 
-class UserCreationForm(forms.ModelForm[user_models.AgoraUser]):
+class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
 
@@ -39,7 +39,7 @@ class UserCreationForm(forms.ModelForm[user_models.AgoraUser]):
         return user
 
 
-class UserChangeForm(forms.ModelForm[user_models.AgoraUser]):
+class UserChangeForm(forms.ModelForm):
     """A form for updating users. Includes all the fields on
     the user, but replaces the password field with admin's
     disabled password hash display field.
@@ -53,7 +53,7 @@ class UserChangeForm(forms.ModelForm[user_models.AgoraUser]):
 
 
 @admin.register(user_models.AgoraUser)
-class AgoraUserAdmin(BaseUserAdmin[user_models.AgoraUser]):
+class AgoraUserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
