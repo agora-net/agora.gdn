@@ -3,6 +3,7 @@ from enum import Enum
 import stripe
 from allauth.mfa.utils import is_mfa_enabled
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.db.models.query import QuerySet
 
 from . import models
@@ -62,14 +63,23 @@ def user_from_email(*, email: str) -> models.AgoraUser:
 
 def stripe_price_details() -> stripe.Price:
     """Stripe is our source of truth so use the Stripe API to get the price details."""
-    lookup_key = "standard_annual"
+    stripe_lookup_key = "standard_annual"
+    cache_lookup_key = f"stripe:price:{stripe_lookup_key}"
 
-    matching_price_list = stripe.Price.search(query=f"lookup_key:{lookup_key}")
+    cached_price = cache.get(cache_lookup_key)
+    if cached_price is not None:
+        return cached_price
+
+    matching_price_list = stripe.Price.search(query=f"lookup_key:{stripe_lookup_key}")
     if matching_price_list.is_empty:
-        raise ValueError(f"No price found for lookup key {lookup_key}")
+        raise ValueError(f"No price found for lookup key {stripe_lookup_key}")
 
     if len(matching_price_list.data) != 1:
-        raise ValueError(f"Multiple prices found for lookup key {lookup_key}")
+        raise ValueError(f"Multiple prices found for lookup key {stripe_lookup_key}")
 
     # Pyright doesn't like this but we narrow the type using Price.search so we know this is a Price
-    return matching_price_list.data[0]  # type: ignore
+    stripe_price: stripe.Price = matching_price_list.data[0]  # type: ignore
+
+    cache.set(cache_lookup_key, stripe_price, timeout=60 * 60 * 24)
+
+    return stripe_price
