@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from . import views
+from . import views, webhooks
 
 urlpatterns = [
     path(
@@ -11,5 +11,6 @@ urlpatterns = [
                 path("identity/", view=views.onboarding_identity, name="onboarding_identity"),
             ]
         ),
-    )
+    ),
+    path("webhooks/", webhooks.api.urls),
 ]
