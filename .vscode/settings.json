@@ -86,6 +86,7 @@
 		"ratelimit",
 		"runas",
 		"setcap",
+		"whsec",
 		"zstd"
 	],
 	"github.copilot.chat.commitMessageGeneration.instructions": [
