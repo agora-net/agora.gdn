@@ -14,13 +14,10 @@ def snowflake_generator() -> int:
     return next_id
 
 
-class SnowflakeIdPrimaryKeyMixin(models.Model):
+class SnowflakeIdPrimaryKeyMixin:
     id = models.PositiveBigIntegerField(
         primary_key=True, default=snowflake_generator, editable=False
     )
-
-    class Meta:
-        abstract = True
 
 
 def cuid2_generator(length: int = 10) -> str:

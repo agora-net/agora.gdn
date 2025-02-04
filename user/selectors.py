@@ -70,7 +70,7 @@ def stripe_price_details() -> stripe.Price:
     if cached_price is not None:
         return cached_price
 
-    matching_price_list = stripe.Price.search(query=f"lookup_key:{stripe_lookup_key}")
+    matching_price_list = stripe.Price.search(query=f'lookup_key:"{stripe_lookup_key}"')
     if matching_price_list.is_empty:
         raise ValueError(f"No price found for lookup key {stripe_lookup_key}")
 
@@ -79,6 +79,8 @@ def stripe_price_details() -> stripe.Price:
 
     # Pyright doesn't like this but we narrow the type using Price.search so we know this is a Price
     stripe_price: stripe.Price = matching_price_list.data[0]  # type: ignore
+
+    print(stripe_price)
 
     cache.set(cache_lookup_key, stripe_price, timeout=60 * 60 * 24)
 

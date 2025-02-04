@@ -1,5 +1,5 @@
 {% extends "user/onboarding/base.html" %}
-{% load i18n %}
+{% load i18n humanize %}
 {% block base_content %}
     <div class="flex flex-col min-h-full justify-center items-center gap-6 lg:gap-8">
         {% include "logo/agora.svg" %}
@@ -17,7 +17,7 @@
         </ul>
         <div class=" flex flex-col gap-8 w-11/12 p-10 mx-auto mt-5 rounded-lg shadow-md md:mt-10 lg:mt-15 sm:p-5 md:w-6/12 lg:w-5/12 xl:w-4/12 md:p-10 xl:p-13 bg-base-100">
             <div class="text-primary font-bold text-4xl flex gap-2 items-end justify-center">
-                $30 <span class="text-lg font-bold">/ year</span>
+                ${{ stripe_price_amount | floatformat | intcomma }} <span class="text-lg font-bold">/ year</span>
             </div>
             <div class="prose text-base-content">
                 <p>
@@ -25,9 +25,9 @@
                 </p>
                 <p>{% blocktranslate %}Discount codes can be entered on the next page.{% endblocktranslate %}</p>
             </div>
-            <form action="" method="post" class="w-full">
+            <form action="" method="post" class="w-full flex flex-col">
                 {% csrf_token %}
-                <input type="hidden" name="price_id" value="{{ price.id }}" />
+                <input type="hidden" name="price_id" value="{{ stripe_price_id }}" />
                 <button class="btn btn-primary">{% trans "Start Subscription" %}</button>
             </form>
         </div>

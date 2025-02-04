@@ -1,4 +1,4 @@
-from typing import Any, ClassVar
+from typing import Any, ClassVar, LiteralString
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -11,7 +11,7 @@ import utils.models
 from utils.models import SnowflakeIdPrimaryKeyMixin
 
 
-class AgoraUserManager(BaseUserManager["AgoraUser"]):
+class AgoraUserManager(BaseUserManager):
     def create_user(
         self, email: str, password: str | None = None, **extra_fields: Any
     ) -> "AgoraUser":
@@ -55,7 +55,10 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     # https://github.com/typeddjango/django-stubs/issues/174
     objects: ClassVar[AgoraUserManager] = AgoraUserManager()  # type: ignore[assignment]
 
-    def get_full_name(self) -> str:
+    class Meta(AbstractUser.Meta):
+        pass
+
+    def get_full_name(self) -> LiteralString:
         """
         Return the first_name plus the last_name, with a space and optional nickname in between.
         """
@@ -63,7 +66,8 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
         if self.nickname != "":
             nickname = f"""({self.nickname.strip()})"""
         full_name = f"{self.first_name.strip()} {nickname} {self.last_name.strip()}"
-        return full_name.strip()
+        # Apparently there's some issue with Python typing when using string operations
+        return full_name.strip()  # type: ignore
 
     def clean(self) -> None:
         return super().clean()

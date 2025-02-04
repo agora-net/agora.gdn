@@ -392,11 +392,11 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / "static"
-STATIC_HOST = env.str("STATIC_HOST", "")  # type: ignore
+STATIC_HOST: str = env.str("STATIC_HOST", "")  # type: ignore
 STATIC_URL = STATIC_HOST + "/static/"
 
 MEDIA_ROOT = env.str("MEDIA_ROOT", BASE_DIR / "media")  # type: ignore
-MEDIA_HOST = env.str("MEDIA_HOST", "")  # type: ignore
+MEDIA_HOST: str = env.str("MEDIA_HOST", "")  # type: ignore
 MEDIA_URL = MEDIA_HOST + "/media/"
 
 # Default storage settings, with the staticfiles storage updated.

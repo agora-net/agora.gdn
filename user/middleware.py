@@ -4,7 +4,7 @@ from typing import Any
 # django-stubs doesn't seem to have the LoginRequiredMiddleware type yet
 from django.conf import settings
 from django.contrib.auth.middleware import LoginRequiredMiddleware  # type: ignore[attr-defined]
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import Resolver404, resolve
 
@@ -26,7 +26,7 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
         view_func: Callable,
         view_args: tuple[Any, ...],
         view_kwargs: dict[str, Any],
-    ) -> None | HttpResponse:
+    ) -> None | HttpResponseRedirect:
         # If a decorator on the view function has disabled the onboarding check, skip it
         if not getattr(view_func, "onboarding_required", True):
             return None
@@ -46,10 +46,10 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
         route = selectors.next_onboarding_step_route(user=request.user)
 
         if route is not None:
-            return redirect(route)
+            return redirect(route, permanent=False)  # pyright: ignore [reportReturnType]
 
         return None
 
     # If a user fails the onboarding checks don't bother recording where they were trying to go
-    def get_redirect_field_name(self) -> None:
+    def get_redirect_field_name(self, view_func) -> None:
         return None
