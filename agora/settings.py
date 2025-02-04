@@ -18,6 +18,7 @@ import tempfile
 from pathlib import Path
 
 import environ
+import stripe
 
 PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -465,6 +466,13 @@ WAGTAILDOCS_EXTENSIONS = [
 # Debug toolbar settings
 # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html
 RESULTS_CACHE_SIZE = 100
+
+# Stripe settings
+# ------------------------------------
+STRIPE_SECRET_KEY = env.str("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = env.str("STRIPE_PUBLISHABLE_KEY")
+
+stripe.api_key = STRIPE_SECRET_KEY
 
 # Agora settings
 # ------------------------------------
