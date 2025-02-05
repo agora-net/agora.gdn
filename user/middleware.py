@@ -49,7 +49,3 @@ class FullyOnboardedUserRequiredMiddleware(LoginRequiredMiddleware):
             return redirect(route, permanent=False)  # pyright: ignore [reportReturnType]
 
         return None
-
-    # If a user fails the onboarding checks don't bother recording where they were trying to go
-    def get_redirect_field_name(self, view_func) -> None:
-        return None

@@ -7,6 +7,21 @@ from django.core.exceptions import ValidationError
 from . import models as user_models
 
 
+class SubscriptionInline(admin.StackedInline):
+    model = user_models.Subscription
+    extra = 0
+
+
+class PaymentMethodInline(admin.StackedInline):
+    model = user_models.PaymentMethod
+    extra = 0
+
+
+class IdentityVerificationInline(admin.StackedInline):
+    model = user_models.IdentityVerification
+    extra = 0
+
+
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
@@ -82,3 +97,17 @@ class AgoraUserAdmin(BaseUserAdmin):
     search_fields = ["email"]
     ordering = ["email"]
     filter_horizontal = []
+    inlines = [
+        IdentityVerificationInline,
+    ]
+
+
+@admin.register(user_models.Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ["user", "stripe_customer_id"]
+    search_fields = ["user__email", "stripe_customer_id"]
+    readonly_fields = ["stripe_customer_id"]
+    inlines = [
+        SubscriptionInline,
+        PaymentMethodInline,
+    ]
