@@ -478,6 +478,8 @@ stripe.api_key = STRIPE_SECRET_KEY
 # Agora settings
 # ------------------------------------
 
+DJANGO_ADMIN_URL = env.str("DJANGO_ADMIN_URL", default="django-admin/")  # pyright: ignore
+
 # Which routes do not require the user to be fully onboarded?
 # Each of these can be an explicit path or a URL name.
 AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
@@ -505,7 +507,10 @@ AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
 ]
 
 if DEBUG:
-    AGORA_ONBOARDING_NOT_REQUIRED_ROUTES += ["/__debug__/"]
+    AGORA_ONBOARDING_NOT_REQUIRED_ROUTES += [
+        "/__debug__/",
+        f"/{DJANGO_ADMIN_URL}",
+    ]
 
 for db in DATABASES.values():
     if "sqlite3" in db["ENGINE"]:
