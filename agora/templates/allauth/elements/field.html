@@ -4,7 +4,17 @@
         <div class="label">
             <span class="label-text">{% slot label %}{% endslot %}</span>
         </div>
-        <textarea class="textarea textarea-bordered h-24" placeholder="Bio"></textarea>
+        <textarea {% if attrs.required %}required{% endif %}
+                  {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+                  {% if attrs.disabled %}disabled{% endif %}
+                  {% if attrs.readonly %}readonly{% endif %}
+                  {% if attrs.checked %}checked{% endif %}
+                  {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+                  {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                  {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+                  {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+                  type="{{ attrs.type }}"
+                  class="textarea textarea-bordered h-24">{% slot value %}{% endslot %}</textarea>
     </label>
 {% elif attrs.type == "checkbox" %}
     <div class="form-control">
