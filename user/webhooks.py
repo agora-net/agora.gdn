@@ -43,16 +43,13 @@ def stripe_webhook(request: HttpRequest):
         logger.error(f"Error verifying webhook signature: {str(e)}")
         return 400, {}
 
+    if event is None:
+        logger.error("Event is None (for unknown reasons)")
+        return 400, {}
+
     # Handle the event
-    if event.type == "payment_intent.succeeded":
-        payment_intent = event.data.object  # contains a stripe.PaymentIntent
-        # Then define and call a method to handle the successful payment intent.
-        # handle_payment_intent_succeeded(payment_intent)
-    elif event.type == "payment_method.attached":
-        payment_method = event.data.object  # contains a stripe.PaymentMethod
-        # Then define and call a method to handle the successful attachment of a PaymentMethod.
-        # handle_payment_method_attached(payment_method)
-    # ... handle other event types
+    if event.type == "checkout.session.completed" or event.type == "invoice.paid":
+        raise NotImplementedError()
     else:
         logger.warning(f"Unhandled event type: {event.type}")
 

@@ -5,6 +5,7 @@ from allauth.mfa.utils import is_mfa_enabled
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.db.models.query import QuerySet
+from django.utils import timezone
 
 from . import models
 
@@ -50,7 +51,7 @@ def user_subscriptions(*, user: models.AgoraUser) -> "QuerySet[models.Subscripti
 
 
 def user_has_valid_subscription(*, user: models.AgoraUser) -> bool:
-    return user_subscriptions(user=user).exists()
+    return user_subscriptions(user=user).filter(expiration_date__gte=timezone.now().date()).exists()
 
 
 def user_has_verified_identity(*, user: models.AgoraUser) -> bool:
@@ -80,8 +81,13 @@ def stripe_price_details() -> stripe.Price:
     # Pyright doesn't like this but we narrow the type using Price.search so we know this is a Price
     stripe_price: stripe.Price = matching_price_list.data[0]  # type: ignore
 
-    print(stripe_price)
-
     cache.set(cache_lookup_key, stripe_price, timeout=60 * 60 * 24)
 
     return stripe_price
+
+
+def customer_obj(*, for_user: models.AgoraUser) -> models.Customer | None:
+    try:
+        return for_user.customer
+    except models.AgoraUser.customer.RelatedObjectDoesNotExist:
+        return None
