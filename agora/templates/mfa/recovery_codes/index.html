@@ -28,6 +28,7 @@
 {% element button href=generate_url %}
 {% translate "Generate new codes" %}
 {% endelement %}
+<a href="{% url 'profile' %}" class="btn btn-accent">Continue</a>
 {% endblock content %}
 {% block extra_js %}
 {% vite_asset 'src/clipboard.ts' %}
