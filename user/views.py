@@ -65,7 +65,7 @@ onboarding_billing = OnboardingBillingView.as_view()
 @method_decorator(onboarding_not_required, name="dispatch")
 class OnboardingIdentityView(TemplateView):
     template_name = "user/onboarding/identity.html"
-    http_method_names = ["get"]
+    http_method_names = ["get", "post"]
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
         # First off, check and process the session if we can
@@ -93,6 +93,9 @@ class OnboardingIdentityView(TemplateView):
             return redirect(redirect_route)  # type: ignore
 
         return super().get(request, *args, **kwargs)
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
+        return super().post(request, *args, **kwargs)
 
 
 onboarding_identity = OnboardingIdentityView.as_view()

@@ -1,1 +1,38 @@
 {% extends "user/onboarding/base.html" %}
+{% load i18n humanize %}
+{% block base_content %}
+    <div class="flex flex-col min-h-full justify-center items-center gap-6 lg:gap-8">
+        {% include "logo/agora.svg" %}
+        <ul class="steps steps-horizontal">
+            <li class="step step-secondary">{% trans "Register" %}</li>
+            <li class="step step-secondary">
+                <span class="hidden lg:block">{% trans "Enable MFA" %}</span>
+                <span class="lg:hidden">{% trans "Secure" %}</span>
+            </li>
+            <li class="step step-secondary">{% trans "Subscribe" %}</li>
+            <li class="step step-secondary">
+                <span class="hidden lg:block">{% trans "Verify Identity" %}</span>
+                <span class="lg:hidden">{% trans "Verify" %}</span>
+            </li>
+        </ul>
+        <div class=" flex flex-col gap-8 w-11/12 p-10 mx-auto mt-5 rounded-lg shadow-md md:mt-10 lg:mt-15 sm:p-5 md:w-6/12 lg:w-5/12 xl:w-4/12 md:p-10 xl:p-13 bg-base-100">
+            <div class="prose text-base-content">
+                <p>
+                    {% blocktranslate %}Every Agora user must verify their identity. This proves you're a living human being and you are who you say you are.{% endblocktranslate %}
+                </p>
+            </div>
+            <form action="" method="post" class="w-full flex flex-col">
+                {% csrf_token %}
+                <button class="btn btn-primary">{% trans "Verify My Identity" %}</button>
+            </form>
+        </div>
+    </div>
+{% endblock base_content %}
+{% block extra_js %}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript">
+        // Set your publishable key: remember to change this to your live publishable key in production
+        // See your keys here: https://dashboard.stripe.com/apikeys
+        var stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}');
+    </script>
+{% endblock extra_js %}
