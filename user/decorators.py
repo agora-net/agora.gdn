@@ -33,17 +33,17 @@ def idempotent_webhook(prefix: str, id_field: str, timeout: int = 300):
                 raise ValueError(f"{id_field} is required")
             # Create unique lock and processed keys for this session
             stripped_prefix = prefix.strip(":")
-            lock_key = f"{stripped_prefix}:{id}"
-            processed_key = f"{stripped_prefix}:processed:{id}"
+            lock_key = f"{stripped_prefix}:{obj_id}"
+            processed_key = f"{stripped_prefix}:processed:{obj_id}"
 
             # Check if already processed
             if cache.get(processed_key):
-                logger.info(f"Session {id} already processed, skipping")
+                logger.info(f"Session {obj_id} already processed, skipping")
                 return
 
             # Try to acquire lock
             if not cache.add(lock_key, "lock", timeout):
-                logger.warning(f"Session {id} is being processed, skipping")
+                logger.warning(f"Session {obj_id} is being processed, skipping")
                 return
 
             try:
