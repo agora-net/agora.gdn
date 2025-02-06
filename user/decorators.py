@@ -19,12 +19,18 @@ def onboarding_not_required(view_func: F) -> F:
     return view_func
 
 
-def idempotent_webhook(prefix: str, timeout: int = 300):
-    """Decorator to make webhook handlers idempotent using cache-based locking"""
+def idempotent_webhook(prefix: str, id_field: str, timeout: int = 300):
+    """Decorator to make webhook handlers idempotent using cache-based locking.
+
+    Calls the function in a transaction for all-or-nothing processing.
+    """
 
     def decorator(func):
         @wraps(func)
-        def wrapper(id: str, *args, **kwargs):
+        def wrapper(*args, **kwargs):
+            obj_id = kwargs.get(id_field)
+            if obj_id is None:
+                raise ValueError(f"{id_field} is required")
             # Create unique lock and processed keys for this session
             stripped_prefix = prefix.strip(":")
             lock_key = f"{stripped_prefix}:{id}"
@@ -42,7 +48,7 @@ def idempotent_webhook(prefix: str, timeout: int = 300):
 
             try:
                 with transaction.atomic():
-                    result = func(id, *args, **kwargs)
+                    result = func(*args, **kwargs)
                     # Mark as processed if successful
                     cache.set(processed_key, True, timeout=60 * 60 * 24 * 7)  # 1 week
                     return result

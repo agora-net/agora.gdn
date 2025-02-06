@@ -1,10 +1,11 @@
 import stripe
 from django.conf import settings
 from django.http import HttpRequest
+from django.views.decorators.csrf import csrf_exempt
 from ninja import NinjaAPI, Schema
 from ninja.responses import codes_2xx, codes_4xx, codes_5xx
 
-from . import logger
+from . import logger, services
 
 api = NinjaAPI()
 
@@ -13,6 +14,7 @@ class StripeWebhookResponse(Schema):
     pass
 
 
+@csrf_exempt
 @api.post(
     "/stripe",
     response={
@@ -47,9 +49,16 @@ def stripe_webhook(request: HttpRequest):
         logger.error("Event is None (for unknown reasons)")
         return 400, {}
 
-    # Handle the event
-    if event.type == "checkout.session.completed" or event.type == "invoice.paid":
-        raise NotImplementedError()
+    if (
+        event.type == "checkout.session.completed"
+        or event.type == "checkout.session.async_payment_succeeded"
+    ):
+        services.handle_checkout_session_completed_webhook_event(
+            checkout_session_id=event.data.object.id
+        )
+    elif event.type == "invoice.paid":
+        invoice_obj: stripe.Invoice = event.data.object  # pyright: ignore
+        services.handle_invoice_paid_webhook_event(invoice=invoice_obj)
     else:
         logger.warning(f"Unhandled event type: {event.type}")
 

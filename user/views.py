@@ -68,11 +68,44 @@ class OnboardingIdentityView(TemplateView):
     http_method_names = ["get"]
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
+        # First off, check and process the session if we can
+        unsafe_checkout_session_id = str(request.GET.get("session_id", ""))
+        sanitized_checkout_session_id = nh3.clean(unsafe_checkout_session_id)
+
+        if sanitized_checkout_session_id:
+            try:
+                services.handle_checkout_session_completed(
+                    checkout_session_id=sanitized_checkout_session_id
+                )
+            except ValueError:
+                messages.error(
+                    request=request,
+                    message="Error processing checkout session, please come back later",
+                )
+                return redirect(selectors.OnboardingStep.BILLING)
+
+        # We would then know if we have a subscription or not, then decide if we need to redirect
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
             return redirect("profile")
         if redirect_route != selectors.OnboardingStep.IDENTITY:
             return redirect(redirect_route)  # type: ignore
+
+        unsafe_checkout_session_id = str(request.GET.get("session_id", ""))
+        sanitized_checkout_session_id = nh3.clean(unsafe_checkout_session_id)
+
+        if sanitized_checkout_session_id:
+            try:
+                services.handle_checkout_session_completed(
+                    checkout_session_id=sanitized_checkout_session_id
+                )
+            except ValueError:
+                messages.error(
+                    request=request,
+                    message="Error processing checkout session, please come back later",
+                )
+                return redirect(selectors.OnboardingStep.BILLING)
+
         return super().get(request, *args, **kwargs)
 
 

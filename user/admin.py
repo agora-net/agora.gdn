@@ -9,16 +9,19 @@ from . import models as user_models
 
 class SubscriptionInline(admin.StackedInline):
     model = user_models.Subscription
+    readonly_fields = ["stripe_subscription_id", "expiration_date"]
     extra = 0
 
 
 class PaymentMethodInline(admin.StackedInline):
     model = user_models.PaymentMethod
+    readonly_fields = ["stripe_payment_method_id", "issuing_country"]
     extra = 0
 
 
 class IdentityVerificationInline(admin.StackedInline):
     model = user_models.IdentityVerification
+    readonly_fields = ["stripe_identity_verification_session_id", "identity_issuing_country"]
     extra = 0
 
 
