@@ -28,11 +28,3 @@
         </div>
     </div>
 {% endblock base_content %}
-{% block extra_js %}
-    <script src="https://js.stripe.com/v3/"></script>
-    <script type="text/javascript">
-        // Set your publishable key: remember to change this to your live publishable key in production
-        // See your keys here: https://dashboard.stripe.com/apikeys
-        var stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}');
-    </script>
-{% endblock extra_js %}
