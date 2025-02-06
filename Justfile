@@ -44,6 +44,10 @@ format:
 typecheck:
     @{{ UV_RUN }} pyright .
 
+# Start a Stripe CLI webhook listener and forwards to the running server
+stripe-listen:
+    @stripe listen --forward-to https://localhost:8000/api/webhooks/stripe/
+
 ###############################################
 ## Django management
 ###############################################
