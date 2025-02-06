@@ -325,6 +325,9 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+# CSRF settings
+CSRF_COOKIE_SECURE = True
+
 LOGIN_URL = "account_login"
 # todo(ewan): Update these to proper values
 LOGIN_REDIRECT_URL = "profile"
@@ -504,6 +507,8 @@ AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     "mfa_view_recovery_codes",
     "mfa_generate_recovery_codes",
     "mfa_download_recovery_codes",
+    "/webhooks/",
+    "/api/",
 ]
 
 if DEBUG:
