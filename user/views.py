@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 
 from utils.typing.request import HttpRequest
 
-from . import forms, selectors, services
+from . import forms, logger, selectors, services
 from .decorators import onboarding_not_required
 
 
@@ -77,7 +77,8 @@ class OnboardingIdentityView(TemplateView):
                 services.handle_checkout_session_completed(
                     checkout_session_id=sanitized_checkout_session_id
                 )
-            except ValueError:
+            except ValueError as e:
+                logger.error("Error processing checkout session", exc_info=e)
                 messages.error(
                     request=request,
                     message="Error processing checkout session, please come back later",
@@ -90,21 +91,6 @@ class OnboardingIdentityView(TemplateView):
             return redirect("profile")
         if redirect_route != selectors.OnboardingStep.IDENTITY:
             return redirect(redirect_route)  # type: ignore
-
-        unsafe_checkout_session_id = str(request.GET.get("session_id", ""))
-        sanitized_checkout_session_id = nh3.clean(unsafe_checkout_session_id)
-
-        if sanitized_checkout_session_id:
-            try:
-                services.handle_checkout_session_completed(
-                    checkout_session_id=sanitized_checkout_session_id
-                )
-            except ValueError:
-                messages.error(
-                    request=request,
-                    message="Error processing checkout session, please come back later",
-                )
-                return redirect(selectors.OnboardingStep.BILLING)
 
         return super().get(request, *args, **kwargs)
 

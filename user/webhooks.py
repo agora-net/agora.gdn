@@ -14,15 +14,15 @@ class StripeWebhookResponse(Schema):
     pass
 
 
-@csrf_exempt
 @api.post(
-    "/stripe",
+    "/stripe/",
     response={
         codes_2xx: StripeWebhookResponse,
         codes_4xx: StripeWebhookResponse,
         codes_5xx: StripeWebhookResponse,
     },
 )
+@csrf_exempt
 def stripe_webhook(request: HttpRequest):
     payload = request.body
     event = None
@@ -53,9 +53,7 @@ def stripe_webhook(request: HttpRequest):
         event.type == "checkout.session.completed"
         or event.type == "checkout.session.async_payment_succeeded"
     ):
-        services.handle_checkout_session_completed_webhook_event(
-            checkout_session_id=event.data.object.id
-        )
+        services.handle_checkout_session_completed(checkout_session_id=event.data.object.id)
     elif event.type == "invoice.paid":
         invoice_obj: stripe.Invoice = event.data.object  # pyright: ignore
         services.handle_invoice_paid_webhook_event(invoice=invoice_obj)
