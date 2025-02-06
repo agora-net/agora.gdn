@@ -46,7 +46,7 @@ typecheck:
 
 # Start a Stripe CLI webhook listener and forwards to the running server
 stripe-listen:
-    @stripe listen --forward-to https://localhost:8000/api/webhooks/stripe/
+    @stripe listen --forward-to https://localhost:8000/webhooks/stripe/
 
 ###############################################
 ## Django management
