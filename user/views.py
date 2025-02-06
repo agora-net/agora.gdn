@@ -95,7 +95,17 @@ class OnboardingIdentityView(TemplateView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
-        return super().post(request, *args, **kwargs)
+        redirect_route = selectors.next_onboarding_step_route(user=request.user)
+        if redirect_route is None:
+            return redirect("profile")
+        if redirect_route != selectors.OnboardingStep.IDENTITY:
+            return redirect(redirect_route)
+
+        verification_session_obj = services.create_stripe_identity_verification_session(
+            request=request
+        )
+
+        return redirect(verification_session_obj.url)
 
 
 onboarding_identity = OnboardingIdentityView.as_view()
