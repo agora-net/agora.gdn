@@ -73,6 +73,16 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
         return super().clean()
 
 
+class UserDateOfBirth(models.Model):
+    user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE)
+    day = models.PositiveSmallIntegerField(_("day"), blank=True, null=True)
+    month = models.PositiveSmallIntegerField(_("month"), blank=True, null=True)
+    year = models.PositiveSmallIntegerField(_("year"), blank=True, null=True)
+
+    def __str__(self) -> str:
+        return f"{self.year}/{self.month}/{self.day}"
+
+
 class VerifiableMixin(models.Model):
     verification_code = models.CharField(
         _("verification code"),
@@ -161,6 +171,7 @@ class IdentityVerification(TimeStampedModel):
     # verify they are who they say they are (every couple of years or so)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     stripe_identity_verification_session_id = models.CharField(max_length=255)
+    verified_at = models.DateTimeField(null=True, default=None, blank=True)
     identity_issuing_country = CountryField(blank=False)
 
     def __str__(self) -> str:

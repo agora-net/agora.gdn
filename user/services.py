@@ -125,6 +125,16 @@ def create_stripe_identity_verification_session(
     return verification_session_obj
 
 
+def create_user_date_of_birth(
+    *, user_id: int, day: int | None, month: int | None, year: int | None
+) -> models.UserDateOfBirth:
+    user_date_of_birth = models.UserDateOfBirth(user=user_id, day=day, month=month, year=year)
+    user_date_of_birth.full_clean()
+    user_date_of_birth.save()
+
+    return user_date_of_birth
+
+
 @idempotent_webhook(prefix="stripe:checkout_session_completed", id_field="checkout_session_id")
 def handle_checkout_session_completed(*, checkout_session_id: str) -> None:
     logger.info(f"Handling checkout session completed event for {checkout_session_id}")
@@ -150,8 +160,6 @@ def handle_checkout_session_completed(*, checkout_session_id: str) -> None:
             user=user_id, stripe_customer_id=stripe_customer_id
         )
 
-        # user = models.AgoraUser.objects.get(id=user_id)
-
         line_items = checkout_session_obj.line_items
         if line_items is None or line_items.is_empty:
             raise ValueError("No line items in checkout session")
@@ -170,6 +178,48 @@ def handle_checkout_session_completed(*, checkout_session_id: str) -> None:
             customer=customer_obj,
             stripe_subscription_id=subscription_obj.id,
             expiration_date=subscription_end_date,
+        )
+
+
+@idempotent_webhook(
+    prefix="stripe:identity_verification_session_completed",
+    id_field="verification_session_id",
+)
+def handle_identity_verification_completed(*, verification_session_id: str) -> None:
+    verification_session_obj = stripe.identity.VerificationSession.retrieve(
+        id=verification_session_id, expand=["verified_outputs"]
+    )
+
+    # Todo(kisamoto): Handle problems with verification
+
+    if verification_session_obj.status == "verified":
+        user_id_str = str(verification_session_obj.client_reference_id)
+        try:
+            user_id = int(user_id_str)
+        except ValueError as e:
+            raise ValueError(f"Invalid user ID: {user_id_str}") from e
+
+        verified_outputs: stripe.identity.VerificationSession.VerifiedOutputs = (
+            verification_session_obj.verified_outputs
+        )  # type: ignore
+        identity_issuing_country_code = (
+            verified_outputs.address.country if verified_outputs.address else None
+        )
+        if verified_outputs.dob:
+            create_user_date_of_birth(
+                user_id=user_id,
+                day=verified_outputs.dob.day,
+                month=verified_outputs.dob.month,
+                year=verified_outputs.dob.year,
+            )
+
+        identity_verification_obj, _ = models.IdentityVerification.objects.get_or_create(
+            user=user_id,
+            stripe_identity_verification_session_id=verification_session_id,
+            defaults={
+                "verified_at": datetime.fromtimestamp(verification_session_obj.created),
+                "identity_issuing_country": identity_issuing_country_code,
+            },
         )
 
 
