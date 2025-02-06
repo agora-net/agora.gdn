@@ -18,6 +18,7 @@ export default {
 		outDir: "dist/",
 		rollupOptions: {
 			input: {
+				copyToClipboard: "src/clipboard.ts",
 				tailwind: "src/tailwind.css",
 				agora: "src/agora.ts",
 			},

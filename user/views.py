@@ -1,5 +1,7 @@
 from typing import Any
 
+import nh3
+from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -7,7 +9,7 @@ from django.views.generic import TemplateView
 
 from utils.typing.request import HttpRequest
 
-from . import selectors
+from . import forms, logger, selectors, services
 from .decorators import onboarding_not_required
 
 
@@ -41,7 +43,20 @@ class OnboardingBillingView(TemplateView):
         if redirect_route != selectors.OnboardingStep.BILLING:
             return redirect(redirect_route)
 
-        return super().post(request, *args, **kwargs)
+        form = forms.StartStripeSubscriptionForm(request.POST)
+        if not form.is_valid():
+            messages.error(request, "Invalid form data")
+            return self.get(request, *args, **kwargs)
+
+        unsafe_price_id = form.cleaned_data["price_id"]
+
+        sanitized_price_id = nh3.clean(unsafe_price_id)
+
+        stripe_checkout_session = services.create_stripe_checkout_session_for_subscription(
+            request=request, stripe_price_id=sanitized_price_id
+        )
+
+        return redirect(stripe_checkout_session.url)
 
 
 onboarding_billing = OnboardingBillingView.as_view()
@@ -53,11 +68,30 @@ class OnboardingIdentityView(TemplateView):
     http_method_names = ["get"]
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
+        # First off, check and process the session if we can
+        unsafe_checkout_session_id = str(request.GET.get("session_id", ""))
+        sanitized_checkout_session_id = nh3.clean(unsafe_checkout_session_id)
+
+        if sanitized_checkout_session_id:
+            try:
+                services.handle_checkout_session_completed(
+                    checkout_session_id=sanitized_checkout_session_id
+                )
+            except ValueError as e:
+                logger.error("Error processing checkout session", exc_info=e)
+                messages.error(
+                    request=request,
+                    message="Error processing checkout session, please come back later",
+                )
+                return redirect(selectors.OnboardingStep.BILLING)
+
+        # We would then know if we have a subscription or not, then decide if we need to redirect
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
             return redirect("profile")
         if redirect_route != selectors.OnboardingStep.IDENTITY:
             return redirect(redirect_route)  # type: ignore
+
         return super().get(request, *args, **kwargs)
 
 

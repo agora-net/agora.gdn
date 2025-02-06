@@ -1,5 +1,5 @@
 {% extends "mfa/totp/base.html" %}
-{% load allauth i18n %}
+{% load allauth i18n django_vite %}
 {% block head_title %}
     {% translate "Activate Authenticator App" %}
 {% endblock head_title %}
@@ -51,25 +51,5 @@
 {% endelement %}
 {% endblock content %}
 {% block extra_js %}
-    <script>
-    const copyToClipboard = (btn, elementId) => {
-        const element = document.getElementById(elementId);
-        if (!element) return;
-
-        const originalText = btn.textContent;
-
-        const text = element.value || element.textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            btn.classList.add('btn-success');
-            btn.textContent = 'Copied!';
-        
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.classList.remove('btn-success');
-            }, 1000);
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-        });
-    }
-    </script>
+    {% vite_asset 'src/clipboard.ts' %}
 {% endblock extra_js %}

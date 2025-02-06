@@ -70,6 +70,7 @@
 	"cSpell.ignoreWords": [
 		"DONT",
 		"Mountpoint",
+		"Referer",
 		"accesslog",
 		"agorausermedia",
 		"alvistack",
@@ -86,6 +87,7 @@
 		"ratelimit",
 		"runas",
 		"setcap",
+		"whsec",
 		"zstd"
 	],
 	"github.copilot.chat.commitMessageGeneration.instructions": [
