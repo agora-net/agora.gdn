@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import stripe
+from django.conf import settings
 from django.urls import reverse
 
 from user.decorators import idempotent_webhook
@@ -78,6 +79,50 @@ def create_stripe_checkout_session_for_subscription(
     )
 
     return checkout_session_obj
+
+
+def create_identity_verification(
+    *,
+    user: models.AgoraUser,
+    stripe_identity_verification_session_id: str,
+    identity_issuing_country: str | None,
+) -> models.IdentityVerification:
+    identity_verification = models.IdentityVerification(
+        user=user,
+        stripe_identity_verification_session_id=stripe_identity_verification_session_id,
+        identity_issuing_country=identity_issuing_country,
+    )
+    identity_verification.full_clean()
+    identity_verification.save()
+
+    return identity_verification
+
+
+def create_stripe_identity_verification_session(
+    *, request: HttpRequest
+) -> stripe.identity.VerificationSession:
+    if request.user.is_anonymous:
+        raise ValueError("User must be authenticated to create a verification session")
+
+    user: models.AgoraUser = request.user  # type: ignore
+
+    verification_session_obj = stripe.identity.VerificationSession.create(
+        client_reference_id=str(user.id),
+        provided_details={
+            "email": user.email,
+        },
+        related_customer=user.customer.stripe_customer_id,
+        verification_flow=settings.STRIPE_VERIFICATION_FLOW_ID,
+        return_url=request.build_absolute_uri(reverse("profile")),
+    )
+
+    create_identity_verification(
+        user=user,
+        stripe_identity_verification_session_id=verification_session_obj.id,
+        identity_issuing_country=None,
+    )
+
+    return verification_session_obj
 
 
 @idempotent_webhook(prefix="stripe:checkout_session_completed", id_field="checkout_session_id")
