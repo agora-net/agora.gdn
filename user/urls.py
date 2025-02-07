@@ -11,14 +11,14 @@ urlpatterns = [
                     "billing/", view=views.onboarding_billing, name=selectors.OnboardingStep.BILLING
                 ),
                 path(
-                    "identity/",
-                    view=views.onboarding_identity,
-                    name=selectors.OnboardingStep.IDENTITY,
-                ),
-                path(
                     "identity/pending",
                     view=views.onboarding_identity_pending,
                     name=selectors.OnboardingStep.IDENTITY_PENDING,
+                ),
+                path(
+                    "identity/",
+                    view=views.onboarding_identity,
+                    name=selectors.OnboardingStep.IDENTITY,
                 ),
             ]
         ),

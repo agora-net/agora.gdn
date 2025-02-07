@@ -111,7 +111,17 @@ class OnboardingIdentityView(TemplateView):
 onboarding_identity = OnboardingIdentityView.as_view()
 
 
+@method_decorator(onboarding_not_required, name="dispatch")
 class OnboardingIdentityPendingView(TemplateView):
+    """Identity verification can take some time.
+    When a user is redirected here after completing the verification process, check to
+    see if we have verification data in the database (added via webhook).
+
+    If not, the template can show a message and poll in the background with a gradually increasing
+    backoff.
+
+    If we do have verification data the user can progress."""
+
     template_name = "user/onboarding/identity_pending.html"
     http_method_names = ["get"]
 
