@@ -1,14 +1,25 @@
 from django.urls import include, path
 
-from . import views, webhooks
+from . import selectors, views, webhooks
 
 urlpatterns = [
     path(
         "onboarding/",
         include(
             [
-                path("billing/", view=views.onboarding_billing, name="onboarding_billing"),
-                path("identity/", view=views.onboarding_identity, name="onboarding_identity"),
+                path(
+                    "billing/", view=views.onboarding_billing, name=selectors.OnboardingStep.BILLING
+                ),
+                path(
+                    "identity/",
+                    view=views.onboarding_identity,
+                    name=selectors.OnboardingStep.IDENTITY,
+                ),
+                path(
+                    "identity/pending",
+                    view=views.onboarding_identity_pending,
+                    name=selectors.OnboardingStep.IDENTITY_PENDING,
+                ),
             ]
         ),
     ),

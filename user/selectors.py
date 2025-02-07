@@ -15,6 +15,7 @@ class OnboardingStep(str, Enum):
     MFA = "mfa_activate_totp"
     BILLING = "onboarding_billing"
     IDENTITY = "onboarding_identity"
+    IDENTITY_PENDING = "onboarding_identity_pending"
 
 
 def next_onboarding_step_route(user: models.AgoraUser | AnonymousUser) -> str | None:
@@ -55,7 +56,8 @@ def user_has_valid_subscription(*, user: models.AgoraUser) -> bool:
 
 
 def user_has_verified_identity(*, user: models.AgoraUser) -> bool:
-    return models.IdentityVerification.objects.filter(user=user).exists()
+    now = timezone.now()
+    return models.IdentityVerification.objects.filter(user=user, verified_at__lte=now).exists()
 
 
 def user_from_email(*, email: str) -> models.AgoraUser:

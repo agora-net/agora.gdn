@@ -146,7 +146,7 @@ def create_stripe_identity_verification_session(
         },
         related_customer=user.customer.stripe_customer_id,
         verification_flow=settings.STRIPE_VERIFICATION_FLOW_ID,
-        return_url=request.build_absolute_uri(reverse("profile")),
+        return_url=request.build_absolute_uri(reverse(selectors.OnboardingStep.IDENTITY_PENDING)),
     )
 
     create_identity_verification(

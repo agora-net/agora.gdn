@@ -109,3 +109,11 @@ class OnboardingIdentityView(TemplateView):
 
 
 onboarding_identity = OnboardingIdentityView.as_view()
+
+
+class OnboardingIdentityPendingView(TemplateView):
+    template_name = "user/onboarding/identity_pending.html"
+    http_method_names = ["get"]
+
+
+onboarding_identity_pending = OnboardingIdentityPendingView.as_view()
