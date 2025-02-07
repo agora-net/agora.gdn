@@ -44,18 +44,35 @@ def create_subscription(
 
 
 def create_verified_phone_number(
-    *, user_id: str, phone_number: str, verified_at: datetime | None = None
+    *, user_id: int, phone_number: str, verified_at: datetime | None = None
 ) -> models.UserPhoneNumber:
     parsed_phone_number_obj = phonenumbers.parse(phone_number)
     country_code = phonenumbers.region_code_for_number(parsed_phone_number_obj)
 
     user_phone_number = models.UserPhoneNumber(
-        user=user_id, phone_number=phone_number, country=country_code, verified=verified_at
+        user=user_id,
+        phone_number="REDACTED:STRIPE_IDENTITY",
+        country=country_code,
+        verified=verified_at,
     )
     user_phone_number.full_clean()
     user_phone_number.save()
 
     return user_phone_number
+
+
+def update_user_first_last_names(
+    *, user_id: int, first_name: str | None, last_name: str | None
+) -> models.AgoraUser:
+    user = models.AgoraUser.objects.get(id=user_id)
+    if first_name:
+        user.first_name = first_name
+    if last_name:
+        user.last_name = last_name
+    user.full_clean()
+    user.save()
+
+    return user
 
 
 def create_stripe_checkout_session_for_subscription(
@@ -209,6 +226,9 @@ def handle_identity_verification_completed(*, verification_session_id: str) -> N
     # Todo(kisamoto): Handle problems with verification
 
     if verification_session_obj.status == "verified":
+        # We don't have a "verified_at" field so we'll use the created field
+        verification_datetime = datetime.fromtimestamp(verification_session_obj.created)
+
         user_id_str = str(verification_session_obj.client_reference_id)
         try:
             user_id = int(user_id_str)
@@ -222,6 +242,9 @@ def handle_identity_verification_completed(*, verification_session_id: str) -> N
             verified_outputs.address.country if verified_outputs.address else None
         )
 
+        # There's a chance we can get lots of verified outputs so wherever
+        # possible we'll update the user's information
+
         if verified_outputs.dob:
             create_user_date_of_birth(
                 user_id=user_id,
@@ -230,23 +253,25 @@ def handle_identity_verification_completed(*, verification_session_id: str) -> N
                 year=verified_outputs.dob.year,
             )
 
-        if verified_outputs.first_name:
-            # Todo(kisamoto): Store first name
-            pass
-
-        if verified_outputs.last_name:
-            # Todo(kisamoto): Store last name
-            pass
+        if verified_outputs.first_name or verified_outputs.last_name:
+            update_user_first_last_names(
+                user_id=user_id,
+                first_name=verified_outputs.first_name,
+                last_name=verified_outputs.last_name,
+            )
 
         if verified_outputs.phone:
-            # Todo(kisamoto): Store phone number
-            pass
+            create_verified_phone_number(
+                user_id=user_id,
+                phone_number=verified_outputs.phone.number,
+                verified_at=verification_datetime,
+            )
 
         identity_verification_obj, _ = models.IdentityVerification.objects.get_or_create(
             user=user_id,
             stripe_identity_verification_session_id=verification_session_id,
             defaults={
-                "verified_at": datetime.fromtimestamp(verification_session_obj.created),
+                "verified_at": verification_datetime,
                 "identity_issuing_country": identity_issuing_country_code,
             },
         )
