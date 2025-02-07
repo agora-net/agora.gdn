@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import phonenumbers
 import stripe
 from django.conf import settings
 from django.urls import reverse
@@ -40,6 +41,21 @@ def create_subscription(
     logger.debug(f"Created subscription {subscription.id} for customer {customer.id}")
 
     return subscription
+
+
+def create_verified_phone_number(
+    *, user_id: str, phone_number: str, verified_at: datetime | None = None
+) -> models.UserPhoneNumber:
+    parsed_phone_number_obj = phonenumbers.parse(phone_number)
+    country_code = phonenumbers.region_code_for_number(parsed_phone_number_obj)
+
+    user_phone_number = models.UserPhoneNumber(
+        user=user_id, phone_number=phone_number, country=country_code, verified=verified_at
+    )
+    user_phone_number.full_clean()
+    user_phone_number.save()
+
+    return user_phone_number
 
 
 def create_stripe_checkout_session_for_subscription(
@@ -205,6 +221,7 @@ def handle_identity_verification_completed(*, verification_session_id: str) -> N
         identity_issuing_country_code = (
             verified_outputs.address.country if verified_outputs.address else None
         )
+
         if verified_outputs.dob:
             create_user_date_of_birth(
                 user_id=user_id,
@@ -212,6 +229,18 @@ def handle_identity_verification_completed(*, verification_session_id: str) -> N
                 month=verified_outputs.dob.month,
                 year=verified_outputs.dob.year,
             )
+
+        if verified_outputs.first_name:
+            # Todo(kisamoto): Store first name
+            pass
+
+        if verified_outputs.last_name:
+            # Todo(kisamoto): Store last name
+            pass
+
+        if verified_outputs.phone:
+            # Todo(kisamoto): Store phone number
+            pass
 
         identity_verification_obj, _ = models.IdentityVerification.objects.get_or_create(
             user=user_id,
