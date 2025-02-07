@@ -152,7 +152,7 @@ def create_stripe_identity_verification_session(
     create_identity_verification(
         user=user,
         stripe_identity_verification_session_id=verification_session_obj.id,
-        identity_issuing_country=None,
+        identity_issuing_country="",
     )
 
     return verification_session_obj

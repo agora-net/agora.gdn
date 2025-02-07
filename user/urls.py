@@ -11,7 +11,7 @@ urlpatterns = [
                     "billing/", view=views.onboarding_billing, name=selectors.OnboardingStep.BILLING
                 ),
                 path(
-                    "identity/pending",
+                    "identity/pending/",
                     view=views.onboarding_identity_pending,
                     name=selectors.OnboardingStep.IDENTITY_PENDING,
                 ),

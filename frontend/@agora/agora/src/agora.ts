@@ -1,4 +1,10 @@
-interface PollingOptions<T> {
+declare global {
+	interface Window {
+		pollWithBackoff: typeof pollWithBackoff;
+	}
+}
+
+export interface PollingOptions<T> {
 	initialDelayMs?: number;
 	maxDelayMs?: number;
 	maxDurationMs?: number;
@@ -6,13 +12,14 @@ interface PollingOptions<T> {
 }
 
 /**
+/**
  * Example usage
  *     const result = await pollWithBackoff<{status: string}>(
-       'https://api.example.com/status',
-       {
-         shouldContinue: (data) => data.status === 'pending'
-       }
-     );
+	   'https://api.example.com/status',
+	   {
+		 shouldContinue: (data) => data.status === 'pending'
+	   }
+	 );
  *
  */
 export const pollWithBackoff = async <T>(
@@ -55,3 +62,5 @@ export const pollWithBackoff = async <T>(
 		}
 	}
 };
+
+window.pollWithBackoff = pollWithBackoff;

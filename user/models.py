@@ -172,7 +172,8 @@ class IdentityVerification(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     stripe_identity_verification_session_id = models.CharField(max_length=255)
     verified_at = models.DateTimeField(null=True, default=None, blank=True)
-    identity_issuing_country = CountryField(blank=False)
+    # Issuing country can be blank until the user has verified their identity
+    identity_issuing_country = CountryField(blank=True)
 
     def __str__(self) -> str:
         return self.stripe_identity_verification_session_id
