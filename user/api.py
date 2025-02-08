@@ -1,4 +1,4 @@
-from ninja import NinjaAPI, Schema
+from ninja import Router, Schema
 from ninja.security import django_auth
 
 from user.models import AgoraUser
@@ -6,14 +6,14 @@ from utils.typing.request import HttpRequest
 
 from . import selectors
 
-api = NinjaAPI(auth=django_auth, urls_namespace="user-api")
+router = Router(auth=django_auth)
 
 
 class UserVerificationStatusResponse(Schema):
     status: selectors.UserVerificationStatus
 
 
-@api.get(
+@router.get(
     "/identity/verification/",
     response={200: UserVerificationStatusResponse},
     url_name="verification_status",

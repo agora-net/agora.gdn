@@ -46,7 +46,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(async () => {
                 try {
-                    await pollWithBackoff('{% url "user-api:verification_status" %}', {
+                    await pollWithBackoff('{% url "api-1.0.0:verification_status" %}', {
                         shouldContinue: (data) => data.status !== 'verified'
                     });
                     window.location.href = '{{ dashboard_url }}';

@@ -9,7 +9,8 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from home import views as home_views
 from search import views as search_views
-from user import api as user_api
+
+from . import api
 
 urlpatterns = [
     path(
@@ -25,7 +26,7 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     path("join/", home_views.join_waiting_list, name="join_waiting_list"),
-    path("api/v1/", user_api.api.urls),
+    path("api/v1/", api.api.urls),
 ]
 
 

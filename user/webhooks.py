@@ -2,19 +2,19 @@ import stripe
 from django.conf import settings
 from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
-from ninja import NinjaAPI, Schema
+from ninja import Router, Schema
 from ninja.responses import codes_2xx, codes_4xx, codes_5xx
 
 from . import logger, services
 
-api = NinjaAPI(urls_namespace="user:webhooks")
+router = Router()
 
 
 class StripeWebhookResponse(Schema):
     pass
 
 
-@api.post(
+@router.post(
     "/stripe/",
     response={
         codes_2xx: StripeWebhookResponse,
