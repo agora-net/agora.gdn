@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from . import selectors, views, webhooks
+from . import selectors, views
 
 urlpatterns = [
     path(
@@ -23,5 +23,4 @@ urlpatterns = [
             ]
         ),
     ),
-    path("webhooks/", webhooks.api.urls),
 ]
