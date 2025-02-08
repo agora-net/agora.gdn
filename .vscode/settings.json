@@ -35,6 +35,7 @@
 		"nopassword",
 		"nostatic",
 		"pageurl",
+		"phonenumberutil",
 		"PIPENV",
 		"pycache",
 		"pyright",

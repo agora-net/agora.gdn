@@ -31,7 +31,7 @@ class OnboardingBillingView(TemplateView):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
-            return redirect("profile")
+            return redirect("dashboard")
         if redirect_route != selectors.OnboardingStep.BILLING:
             return redirect(redirect_route)
         return super().get(request, *args, **kwargs)
@@ -39,7 +39,7 @@ class OnboardingBillingView(TemplateView):
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
-            return redirect("profile")
+            return redirect("dashboard")
         if redirect_route != selectors.OnboardingStep.BILLING:
             return redirect(redirect_route)
 
@@ -65,7 +65,7 @@ onboarding_billing = OnboardingBillingView.as_view()
 @method_decorator(onboarding_not_required, name="dispatch")
 class OnboardingIdentityView(TemplateView):
     template_name = "user/onboarding/identity.html"
-    http_method_names = ["get"]
+    http_method_names = ["get", "post"]
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
         # First off, check and process the session if we can
@@ -88,11 +88,42 @@ class OnboardingIdentityView(TemplateView):
         # We would then know if we have a subscription or not, then decide if we need to redirect
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
-            return redirect("profile")
+            return redirect("dashboard")
         if redirect_route != selectors.OnboardingStep.IDENTITY:
             return redirect(redirect_route)  # type: ignore
 
         return super().get(request, *args, **kwargs)
 
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
+        redirect_route = selectors.next_onboarding_step_route(user=request.user)
+        if redirect_route is None:
+            return redirect("dashboard")
+        if redirect_route != selectors.OnboardingStep.IDENTITY:
+            return redirect(redirect_route)
+
+        verification_session_obj = services.create_stripe_identity_verification_session(
+            request=request
+        )
+
+        return redirect(verification_session_obj.url)
+
 
 onboarding_identity = OnboardingIdentityView.as_view()
+
+
+@method_decorator(onboarding_not_required, name="dispatch")
+class OnboardingIdentityPendingView(TemplateView):
+    """Identity verification can take some time.
+    When a user is redirected here after completing the verification process, check to
+    see if we have verification data in the database (added via webhook).
+
+    If not, the template can show a message and poll in the background with a gradually increasing
+    backoff.
+
+    If we do have verification data the user can progress."""
+
+    template_name = "user/onboarding/identity_pending.html"
+    http_method_names = ["get"]
+
+
+onboarding_identity_pending = OnboardingIdentityPendingView.as_view()

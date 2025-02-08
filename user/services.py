@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
+import phonenumbers
 import stripe
+from django.conf import settings
 from django.urls import reverse
 
 from user.decorators import idempotent_webhook
@@ -39,6 +41,43 @@ def create_subscription(
     logger.debug(f"Created subscription {subscription.id} for customer {customer.id}")
 
     return subscription
+
+
+def create_verified_phone_number(
+    *, user_id: int, phone_number: str, verified_at: datetime | None = None
+) -> models.UserPhoneNumber | None:
+    try:
+        parsed_phone_number_obj = phonenumbers.parse(phone_number)
+    except phonenumbers.phonenumberutil.NumberParseException:
+        logger.error(f"Invalid phone number: {phone_number}")
+        return None
+
+    country_code = phonenumbers.region_code_for_number(parsed_phone_number_obj)
+
+    user_phone_number = models.UserPhoneNumber(
+        user=user_id,
+        phone_number="REDACTED:STRIPE_IDENTITY",
+        country=country_code,
+        verified=verified_at,
+    )
+    user_phone_number.full_clean()
+    user_phone_number.save()
+
+    return user_phone_number
+
+
+def update_user_first_last_names(
+    *, user_id: int, first_name: str | None, last_name: str | None
+) -> models.AgoraUser:
+    user = models.AgoraUser.objects.get(id=user_id)
+    if first_name:
+        user.first_name = first_name
+    if last_name:
+        user.last_name = last_name
+    user.full_clean()
+    user.save()
+
+    return user
 
 
 def create_stripe_checkout_session_for_subscription(
@@ -80,6 +119,60 @@ def create_stripe_checkout_session_for_subscription(
     return checkout_session_obj
 
 
+def create_identity_verification(
+    *,
+    user: models.AgoraUser,
+    stripe_identity_verification_session_id: str,
+    identity_issuing_country: str | None,
+) -> models.IdentityVerification:
+    identity_verification = models.IdentityVerification(
+        user=user,
+        stripe_identity_verification_session_id=stripe_identity_verification_session_id,
+        identity_issuing_country=identity_issuing_country,
+    )
+    identity_verification.full_clean()
+    identity_verification.save()
+
+    return identity_verification
+
+
+def create_stripe_identity_verification_session(
+    *, request: HttpRequest
+) -> stripe.identity.VerificationSession:
+    if request.user.is_anonymous:
+        raise ValueError("User must be authenticated to create a verification session")
+
+    user: models.AgoraUser = request.user  # type: ignore
+
+    verification_session_obj = stripe.identity.VerificationSession.create(
+        client_reference_id=str(user.id),
+        provided_details={
+            "email": user.email,
+        },
+        related_customer=user.customer.stripe_customer_id,
+        verification_flow=settings.STRIPE_VERIFICATION_FLOW_ID,
+        # The flow configures everything including the return URL
+    )
+
+    create_identity_verification(
+        user=user,
+        stripe_identity_verification_session_id=verification_session_obj.id,
+        identity_issuing_country="",
+    )
+
+    return verification_session_obj
+
+
+def create_user_date_of_birth(
+    *, user_id: int, day: int | None, month: int | None, year: int | None
+) -> models.UserDateOfBirth:
+    user_date_of_birth = models.UserDateOfBirth(user=user_id, day=day, month=month, year=year)
+    user_date_of_birth.full_clean()
+    user_date_of_birth.save()
+
+    return user_date_of_birth
+
+
 @idempotent_webhook(prefix="stripe:checkout_session_completed", id_field="checkout_session_id")
 def handle_checkout_session_completed(*, checkout_session_id: str) -> None:
     logger.info(f"Handling checkout session completed event for {checkout_session_id}")
@@ -105,8 +198,6 @@ def handle_checkout_session_completed(*, checkout_session_id: str) -> None:
             user=user_id, stripe_customer_id=stripe_customer_id
         )
 
-        # user = models.AgoraUser.objects.get(id=user_id)
-
         line_items = checkout_session_obj.line_items
         if line_items is None or line_items.is_empty:
             raise ValueError("No line items in checkout session")
@@ -125,6 +216,75 @@ def handle_checkout_session_completed(*, checkout_session_id: str) -> None:
             customer=customer_obj,
             stripe_subscription_id=subscription_obj.id,
             expiration_date=subscription_end_date,
+        )
+
+
+@idempotent_webhook(
+    prefix="stripe:identity_verification_session_completed",
+    id_field="verification_session_id",
+)
+def handle_identity_verification_completed(*, verification_session_id: str) -> None:
+    verification_session_obj = stripe.identity.VerificationSession.retrieve(
+        id=verification_session_id, expand=["verified_outputs"]
+    )
+
+    # Todo(kisamoto): Handle problems with verification
+
+    if verification_session_obj.status == "verified":
+        # We don't have a "verified_at" field so we'll use the created field
+        verification_datetime = datetime.fromtimestamp(verification_session_obj.created)
+
+        user_id_str = str(verification_session_obj.client_reference_id)
+        try:
+            user_id = int(user_id_str)
+        except ValueError as e:
+            raise ValueError(f"Invalid user ID: {user_id_str}") from e
+
+        verified_outputs: stripe.identity.VerificationSession.VerifiedOutputs = (
+            verification_session_obj.verified_outputs
+        )  # type: ignore
+        identity_issuing_country_code = (
+            verified_outputs.address.country if verified_outputs.address else None
+        )
+
+        # There's a chance we can get lots of verified outputs so wherever
+        # possible we'll update the user's information
+
+        dob: stripe.identity.VerificationSession.VerifiedOutputs.Dob | None = verified_outputs.get(
+            "dob"
+        )
+        if dob is not None:
+            create_user_date_of_birth(
+                user_id=user_id,
+                day=dob.day,
+                month=dob.month,
+                year=dob.year,
+            )
+
+        first_name: str | None = verified_outputs.get("first_name")
+        last_name: str | None = verified_outputs.get("last_name")
+        if first_name or last_name:
+            update_user_first_last_names(
+                user_id=user_id,
+                first_name=first_name,
+                last_name=last_name,
+            )
+
+        phone: str | None = verified_outputs.get("phone")
+        if phone:
+            create_verified_phone_number(
+                user_id=user_id,
+                phone_number=phone,
+                verified_at=verification_datetime,
+            )
+
+        models.IdentityVerification.objects.update_or_create(
+            user=user_id,
+            stripe_identity_verification_session_id=verification_session_id,
+            defaults={
+                "verified_at": verification_datetime,
+                "identity_issuing_country": identity_issuing_country_code,
+            },
         )
 
 

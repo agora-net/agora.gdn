@@ -7,7 +7,7 @@ from ninja.responses import codes_2xx, codes_4xx, codes_5xx
 
 from . import logger, services
 
-api = NinjaAPI()
+api = NinjaAPI(urls_namespace="user:webhooks")
 
 
 class StripeWebhookResponse(Schema):
@@ -54,6 +54,10 @@ def stripe_webhook(request: HttpRequest):
         or event.type == "checkout.session.async_payment_succeeded"
     ):
         services.handle_checkout_session_completed(checkout_session_id=event.data.object.id)
+    elif event.type == "identity.verification_session.verified":
+        services.handle_identity_verification_completed(
+            verification_session_id=event.data.object.id
+        )
     elif event.type == "invoice.paid":
         invoice_obj: stripe.Invoice = event.data.object  # pyright: ignore
         services.handle_invoice_paid_webhook_event(invoice=invoice_obj)

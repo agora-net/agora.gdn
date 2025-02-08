@@ -15,6 +15,15 @@ class OnboardingStep(str, Enum):
     MFA = "mfa_activate_totp"
     BILLING = "onboarding_billing"
     IDENTITY = "onboarding_identity"
+    IDENTITY_PENDING = "onboarding_identity_pending"
+
+
+class UserVerificationStatus(str, Enum):
+    MISSING = "missing"
+    VERIFIED = "verified"
+    PENDING = "pending"
+    MORE_INFO_REQUIRED = "more_info_required"
+    REJECTED = "rejected"
 
 
 def next_onboarding_step_route(user: models.AgoraUser | AnonymousUser) -> str | None:
@@ -36,8 +45,19 @@ def next_onboarding_step_route(user: models.AgoraUser | AnonymousUser) -> str | 
     if not user_has_valid_subscription(user=user):
         return OnboardingStep.BILLING
 
-    if not user_has_verified_identity(user=user):
+    identity_verification_status = user_identity_verification_status(user=user)
+
+    if identity_verification_status == UserVerificationStatus.MISSING:
         return OnboardingStep.IDENTITY
+
+    if identity_verification_status == UserVerificationStatus.PENDING:
+        return OnboardingStep.IDENTITY_PENDING
+
+    if identity_verification_status == UserVerificationStatus.REJECTED:
+        raise NotImplementedError("Handle rejected identity verification")
+
+    if identity_verification_status == UserVerificationStatus.MORE_INFO_REQUIRED:
+        raise NotImplementedError("Handle more info required for identity verification")
 
     return None
 
@@ -55,7 +75,27 @@ def user_has_valid_subscription(*, user: models.AgoraUser) -> bool:
 
 
 def user_has_verified_identity(*, user: models.AgoraUser) -> bool:
-    return models.IdentityVerification.objects.filter(user=user).exists()
+    now = timezone.now()
+    return models.IdentityVerification.objects.filter(user=user, verified_at__lte=now).exists()
+
+
+def user_identity_verification_status(*, user: models.AgoraUser) -> UserVerificationStatus:
+    user_identity_verification_queryset = models.IdentityVerification.objects.filter(user=user)
+
+    if not user_identity_verification_queryset.exists():
+        return UserVerificationStatus.MISSING
+
+    if user_identity_verification_queryset.filter(verified_at__isnull=True).exists():
+        return UserVerificationStatus.PENDING
+
+    if (
+        user_identity_verification_queryset.filter(last_error_code__isnull=False)
+        .exclude(last_error_code="")
+        .exists()
+    ):
+        return UserVerificationStatus.REJECTED
+
+    return UserVerificationStatus.VERIFIED
 
 
 def user_from_email(*, email: str) -> models.AgoraUser:

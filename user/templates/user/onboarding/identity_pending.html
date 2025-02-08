@@ -1,0 +1,59 @@
+{% extends "user/onboarding/base.html" %}
+{% load i18n humanize %}
+{% block base_content %}
+    <div class="flex flex-col min-h-full justify-center items-center gap-6 lg:gap-8">
+        {% include "logo/agora.svg" %}
+        <ul class="steps steps-horizontal">
+            <li class="step step-secondary">{% trans "Register" %}</li>
+            <li class="step step-secondary">
+                <span class="hidden lg:block">{% trans "Enable MFA" %}</span>
+                <span class="lg:hidden">{% trans "Secure" %}</span>
+            </li>
+            <li class="step step-secondary">{% trans "Subscribe" %}</li>
+            <li class="step step-secondary">
+                <span class="hidden lg:block">{% trans "Verify Identity" %}</span>
+                <span class="lg:hidden">{% trans "Verify" %}</span>
+            </li>
+        </ul>
+        <div class=" flex flex-col gap-8 w-11/12 p-10 mx-auto mt-5 rounded-lg shadow-md md:mt-10 lg:mt-15 sm:p-5 md:w-6/12 lg:w-5/12 xl:w-4/12 md:p-10 xl:p-13 bg-base-100">
+            <div class="flex flex-col gap-1 items-end">
+                <div style="width:100%;height:0;padding-bottom:100%;position:relative;">
+                    <iframe src="https://giphy.com/embed/Ie3U6gTmbY4KTQtOPJ"
+                            width="100%"
+                            height="100%"
+                            style="position:absolute"
+                            frameBorder="0"
+                            class="giphy-embed"
+                            allowFullScreen></iframe>
+                </div>
+                <a class="text-xs link"
+                   href="https://giphy.com/gifs/art-sterossetti-stefanorossetti-Ie3U6gTmbY4KTQtOPJ">via GIPHY</a>
+            </div>
+            <div class="prose text-base-content">
+                {% url "dashboard" as dashboard_url %}
+                <p>
+                    {% blocktranslate %}Your identity is being verified and you will shortly be redirected to your <a href="{{ dashboard_url }}" class="link">dashboard</a>. This usually takes a few seconds but can take up to 24 hours.{% endblocktranslate %}
+                </p>
+                <p>
+                    {% blocktranslate %}We will email you if we need any additional information. Please be patient.{% endblocktranslate %}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock base_content %}
+{% block extra_js %}
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(async () => {
+                try {
+                    await pollWithBackoff('{% url "user-api:verification_status" %}', {
+                        shouldContinue: (data) => data.status !== 'verified'
+                    });
+                    window.location.href = '{{ dashboard_url }}';
+                } catch (error) {
+                    console.error('Polling failed:', error);
+                }
+            }, 5*1000); // A few seconds delay to allow the server to process the request and the user to read the message
+        });
+    </script>
+{% endblock extra_js %}

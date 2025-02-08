@@ -123,6 +123,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "agora.context_processors.stripe_keys",
             ],
         },
     },
@@ -329,8 +330,7 @@ AUTHENTICATION_BACKENDS = [
 CSRF_COOKIE_SECURE = True
 
 LOGIN_URL = "account_login"
-# todo(ewan): Update these to proper values
-LOGIN_REDIRECT_URL = "profile"
+LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "/"
 
 # All Auth
@@ -475,6 +475,7 @@ RESULTS_CACHE_SIZE = 100
 STRIPE_SECRET_KEY = env.str("STRIPE_SECRET_KEY")
 STRIPE_PUBLISHABLE_KEY = env.str("STRIPE_PUBLISHABLE_KEY")
 STRIPE_WEBHOOK_SECRET = env.str("STRIPE_WEBHOOK_SECRET")
+STRIPE_VERIFICATION_FLOW_ID = env.str("STRIPE_VERIFICATION_FLOW_ID")
 
 stripe.api_key = STRIPE_SECRET_KEY
 
