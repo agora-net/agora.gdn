@@ -30,8 +30,9 @@
                    href="https://giphy.com/gifs/art-sterossetti-stefanorossetti-Ie3U6gTmbY4KTQtOPJ">via GIPHY</a>
             </div>
             <div class="prose text-base-content">
+                {% url "dashboard" as dashboard_url %}
                 <p>
-                    {% blocktranslate %}Your identity is being verified. This usually takes a few minutes but can take up to 24 hours. {% endblocktranslate %}
+                    {% blocktranslate %}Your identity is being verified and you will shortly be redirected to your <a href="{{ dashboard_url }}" class="link">dashboard</a>. This usually takes a few seconds but can take up to 24 hours.{% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate %}We will email you if we need any additional information. Please be patient.{% endblocktranslate %}
@@ -48,11 +49,11 @@
                     await pollWithBackoff('{% url "user-api:verification_status" %}', {
                         shouldContinue: (data) => data.status !== 'verified'
                     });
-                    window.location.href = '{% url "dashboard" %}';
+                    window.location.href = '{{ dashboard_url }}';
                 } catch (error) {
                     console.error('Polling failed:', error);
                 }
-            }, 3*1000); // 3 seconds
+            }, 5*1000); // A few seconds delay to allow the server to process the request and the user to read the message
         });
     </script>
 {% endblock extra_js %}
