@@ -18,6 +18,13 @@ class OnboardingStep(str, Enum):
     IDENTITY_PENDING = "onboarding_identity_pending"
 
 
+class UserVerificationStatus(str, Enum):
+    VERIFIED = "verified"
+    PENDING = "pending"
+    MORE_INFO_REQUIRED = "more_info_required"
+    REJECTED = "rejected"
+
+
 def next_onboarding_step_route(user: models.AgoraUser | AnonymousUser) -> str | None:
     """
     Given a user, determine which onboarding step they should be redirected to and
@@ -58,6 +65,13 @@ def user_has_valid_subscription(*, user: models.AgoraUser) -> bool:
 def user_has_verified_identity(*, user: models.AgoraUser) -> bool:
     now = timezone.now()
     return models.IdentityVerification.objects.filter(user=user, verified_at__lte=now).exists()
+
+
+def user_identity_verification_status(*, user: models.AgoraUser) -> UserVerificationStatus:
+    if not user_has_verified_identity(user=user):
+        return UserVerificationStatus.PENDING
+
+    return UserVerificationStatus.VERIFIED
 
 
 def user_from_email(*, email: str) -> models.AgoraUser:

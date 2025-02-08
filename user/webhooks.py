@@ -7,7 +7,7 @@ from ninja.responses import codes_2xx, codes_4xx, codes_5xx
 
 from . import logger, services
 
-api = NinjaAPI()
+api = NinjaAPI(urls_namespace="user:webhooks")
 
 
 class StripeWebhookResponse(Schema):
