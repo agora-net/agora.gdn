@@ -174,6 +174,9 @@ class IdentityVerification(TimeStampedModel):
     verified_at = models.DateTimeField(null=True, default=None, blank=True)
     # Issuing country can be blank until the user has verified their identity
     identity_issuing_country = CountryField(blank=True)
+    # In some situations we need more info from the user or they can get rejected
+    last_error_code = models.TextField(blank=True, null=True, default=None)
+    last_error_message = models.TextField(blank=True, null=True, default=None)
 
     def __str__(self) -> str:
         return self.stripe_identity_verification_session_id
