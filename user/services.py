@@ -45,8 +45,13 @@ def create_subscription(
 
 def create_verified_phone_number(
     *, user_id: int, phone_number: str, verified_at: datetime | None = None
-) -> models.UserPhoneNumber:
-    parsed_phone_number_obj = phonenumbers.parse(phone_number)
+) -> models.UserPhoneNumber | None:
+    try:
+        parsed_phone_number_obj = phonenumbers.parse(phone_number)
+    except phonenumbers.phonenumberutil.NumberParseException:
+        logger.error(f"Invalid phone number: {phone_number}")
+        return None
+
     country_code = phonenumbers.region_code_for_number(parsed_phone_number_obj)
 
     user_phone_number = models.UserPhoneNumber(
@@ -146,7 +151,7 @@ def create_stripe_identity_verification_session(
         },
         related_customer=user.customer.stripe_customer_id,
         verification_flow=settings.STRIPE_VERIFICATION_FLOW_ID,
-        return_url=request.build_absolute_uri(reverse(selectors.OnboardingStep.IDENTITY_PENDING)),
+        # The flow configures everything including the return URL
     )
 
     create_identity_verification(
@@ -245,29 +250,35 @@ def handle_identity_verification_completed(*, verification_session_id: str) -> N
         # There's a chance we can get lots of verified outputs so wherever
         # possible we'll update the user's information
 
-        if verified_outputs.dob:
+        dob: stripe.identity.VerificationSession.VerifiedOutputs.Dob | None = verified_outputs.get(
+            "dob"
+        )
+        if dob is not None:
             create_user_date_of_birth(
                 user_id=user_id,
-                day=verified_outputs.dob.day,
-                month=verified_outputs.dob.month,
-                year=verified_outputs.dob.year,
+                day=dob.day,
+                month=dob.month,
+                year=dob.year,
             )
 
-        if verified_outputs.first_name or verified_outputs.last_name:
+        first_name: str | None = verified_outputs.get("first_name")
+        last_name: str | None = verified_outputs.get("last_name")
+        if first_name or last_name:
             update_user_first_last_names(
                 user_id=user_id,
-                first_name=verified_outputs.first_name,
-                last_name=verified_outputs.last_name,
+                first_name=first_name,
+                last_name=last_name,
             )
 
-        if verified_outputs.phone:
+        phone: str | None = verified_outputs.get("phone")
+        if phone:
             create_verified_phone_number(
                 user_id=user_id,
-                phone_number=verified_outputs.phone.number,
+                phone_number=phone,
                 verified_at=verification_datetime,
             )
 
-        identity_verification_obj, _ = models.IdentityVerification.objects.get_or_create(
+        models.IdentityVerification.objects.update_or_create(
             user=user_id,
             stripe_identity_verification_session_id=verification_session_id,
             defaults={

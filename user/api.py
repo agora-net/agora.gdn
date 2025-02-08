@@ -6,7 +6,7 @@ from utils.typing.request import HttpRequest
 
 from . import selectors
 
-api = NinjaAPI(auth=django_auth, urls_namespace="user:api")
+api = NinjaAPI(auth=django_auth, urls_namespace="user-api")
 
 
 class UserVerificationStatusResponse(Schema):

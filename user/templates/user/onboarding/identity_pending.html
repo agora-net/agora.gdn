@@ -45,9 +45,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(async () => {
                 try {
-                    const result = await pollWithBackoff('/api/verify-status', {
-                        shouldContinue: (data) => data.status === 'pending'
+                    await pollWithBackoff('{% url "user-api:verification_status" %}', {
+                        shouldContinue: (data) => data.status !== 'verified'
                     });
+                    window.location.href = '{% url "dashboard" %}';
                 } catch (error) {
                     console.error('Polling failed:', error);
                 }
