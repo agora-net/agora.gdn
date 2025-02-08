@@ -12,6 +12,22 @@
 			"django": true,
 			"autoStartBrowser": false,
 			"program": "${workspaceFolder}/manage.py"
+		},
+		{
+			"name": "Runserver",
+			"type": "debugpy",
+			"request": "launch",
+			"args": [
+				"runserver_plus",
+				"--nostatic",
+				"--cert",
+				"./certs/localhost.crt",
+				"--key-file",
+				"./certs/localhost.key"
+			],
+			"django": true,
+			"autoStartBrowser": false,
+			"program": "${workspaceFolder}/manage.py"
 		}
 	]
 }
