@@ -330,8 +330,7 @@ AUTHENTICATION_BACKENDS = [
 CSRF_COOKIE_SECURE = True
 
 LOGIN_URL = "account_login"
-# todo(ewan): Update these to proper values
-LOGIN_REDIRECT_URL = "profile"
+LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "/"
 
 # All Auth

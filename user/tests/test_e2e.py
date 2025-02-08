@@ -116,7 +116,7 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.wait_for_url(self.get_route_by_name("mfa_activate_totp"))
 
         # They try to manually get away from the onboarding process but are redirected back
-        page.goto(self.get_route_by_name("profile"))
+        page.goto(self.get_route_by_name("dashboard"))
         page.wait_for_url(self.get_route_by_name("mfa_activate_totp"))
 
         # They have to set up MFA and choose TOTP (Authenticator app).
@@ -137,7 +137,7 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.wait_for_url(self.get_route_by_name("onboarding_billing"))
 
         # They try again to get away from the onboarding process but are redirected back
-        page.goto(self.get_route_by_name("profile"))
+        page.goto(self.get_route_by_name("dashboard"))
         page.wait_for_url(self.get_route_by_name("onboarding_billing"))
 
         # They pay for their annual subscription and progress to the next step
@@ -148,34 +148,34 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.wait_for_url(self.get_route_by_name("onboarding_identity"))
 
         # Once again they try to get away from the onboarding process but are redirected back
-        page.goto(self.get_route_by_name("profile"))
+        page.goto(self.get_route_by_name("dashboard"))
         page.wait_for_url(self.get_route_by_name("onboarding_identity"))
 
         # They verify their identity
         # For now we'll manually set it verified in the database.
         test_services.create_verified_identity(user=user_obj)
         page.reload()  # Refresh the page to get the updated identity status
-        # Now they are fully onboarded and can access their profile
-        page.wait_for_url(self.get_route_by_name("profile"))
-        self.assertEqual(page.title(), "Your profile")
+        # Now they are fully onboarded and can access their dashboard
+        page.wait_for_url(self.get_route_by_name("dashboard"))
+        self.assertEqual(page.title(), "Your dashboard")
 
-        # They refresh the profile page and it works as expected
+        # They refresh the dashboard page and it works as expected
         page.reload()
-        self.assertEqual(page.title(), "Your profile")
+        self.assertEqual(page.title(), "Your dashboard")
 
         # When they log out they are redirected to the login page
         page.click("a:has-text('Sign out')")
         page.wait_for_url(self.get_route_by_name("account_login"))
 
-        # If they're not logged in they can't access the profile page
+        # If they're not logged in they can't access the dashboard page
         # and are redirected to the login page
-        page.goto(self.get_route_by_name("profile"))
+        page.goto(self.get_route_by_name("dashboard"))
         page.wait_for_url(self.get_route_by_name("account_login"))
 
-        # They log in and are redirected back to the profile page
+        # They log in and are redirected back to the dashboard page
         page.goto(self.get_route_by_name("account_login"))
         page.fill("input[name=email]", user_email)
         page.fill("input[name=password]", secure_password)
         page.click("button:has-text('Sign in')")
-        page.wait_for_url(self.get_route_by_name("profile"))
-        self.assertEqual(page.title(), "Your profile")
+        page.wait_for_url(self.get_route_by_name("dashboard"))
+        self.assertEqual(page.title(), "Your dashboard")

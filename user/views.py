@@ -31,7 +31,7 @@ class OnboardingBillingView(TemplateView):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
-            return redirect("profile")
+            return redirect("dashboard")
         if redirect_route != selectors.OnboardingStep.BILLING:
             return redirect(redirect_route)
         return super().get(request, *args, **kwargs)
@@ -39,7 +39,7 @@ class OnboardingBillingView(TemplateView):
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
-            return redirect("profile")
+            return redirect("dashboard")
         if redirect_route != selectors.OnboardingStep.BILLING:
             return redirect(redirect_route)
 
@@ -88,7 +88,7 @@ class OnboardingIdentityView(TemplateView):
         # We would then know if we have a subscription or not, then decide if we need to redirect
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
-            return redirect("profile")
+            return redirect("dashboard")
         if redirect_route != selectors.OnboardingStep.IDENTITY:
             return redirect(redirect_route)  # type: ignore
 
@@ -97,7 +97,7 @@ class OnboardingIdentityView(TemplateView):
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:  # pyright: ignore [reportIncompatibleMethodOverride]
         redirect_route = selectors.next_onboarding_step_route(user=request.user)
         if redirect_route is None:
-            return redirect("profile")
+            return redirect("dashboard")
         if redirect_route != selectors.OnboardingStep.IDENTITY:
             return redirect(redirect_route)
 
