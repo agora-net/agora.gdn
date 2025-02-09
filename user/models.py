@@ -3,6 +3,7 @@ from typing import Any, ClassVar, LiteralString
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
@@ -71,6 +72,14 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
 
     def clean(self) -> None:
         return super().clean()
+
+    def __str__(self):
+        return self.get_full_name()
+
+    def get_absolute_url(self):
+        if self.handle:
+            return reverse("user_detail", kwargs={"handle": self.handle})
+        return reverse("user_detail", kwargs={"pk": self.pk})
 
 
 class UserDateOfBirth(models.Model):
@@ -180,3 +189,33 @@ class IdentityVerification(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.stripe_identity_verification_session_id
+
+
+class UserProfile(TimeStampedModel):
+    user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE, related_name="profile")
+    profile_picture = models.ImageField(upload_to="profile_pics/", blank=True, null=True)
+
+    def __str__(self) -> str:
+        return f"{self.user.email}"
+
+
+class UserSettings(TimeStampedModel):
+    class VisibilityStatus(models.TextChoices):
+        UNLISTED = "UN", _("Unlisted - accessible via URL only")
+        PRIVATE = "PRV", _("Private - visible to verified users only")
+        PUBLIC = "PUB", _("Public - visible in directory")
+
+    class Theme(models.TextChoices):
+        LIGHT = "light", _("Light")
+        DARK = "dark", _("Dark")
+
+    user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE, related_name="settings")
+    theme = models.CharField(max_length=10, choices=Theme, default="light")
+    visibility = models.CharField(
+        max_length=3,
+        choices=VisibilityStatus,
+        default=VisibilityStatus.UNLISTED,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.user.email}"

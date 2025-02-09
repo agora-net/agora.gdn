@@ -3,14 +3,15 @@ from typing import Any
 import nh3
 from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 
 from utils.typing.request import HttpRequest
 
 from . import forms, logger, selectors, services
 from .decorators import onboarding_not_required
+from .models import IdentityVerification
 
 
 @method_decorator(onboarding_not_required, name="dispatch")
@@ -127,3 +128,63 @@ class OnboardingIdentityPendingView(TemplateView):
 
 
 onboarding_identity_pending = OnboardingIdentityPendingView.as_view()
+
+
+class UserDashboardView(View):
+    template_name = "user/dashboard.html"
+
+    def get(self, request: HttpRequest, *args, **kwargs):
+        user = request.user
+
+        profile = getattr(user, "profile", None)
+        settings = getattr(user, "settings", None)
+        # Read read-only fields from user and related models
+        dob = getattr(user, "userdateofbirth", None)
+        year_of_birth = dob.year if dob and dob.year else ""
+        # For verified country, assume using latest IdentityVerification with a value (modify as needed)
+        identity = (
+            IdentityVerification.objects.filter(user=user, verified_at__isnull=False)
+            .order_by("-verified_at")
+            .first()
+        )
+        country_verified = identity.identity_issuing_country.name if identity else ""
+        form = forms.DashboardUserForm(
+            initial={
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "year_of_birth": year_of_birth,
+                "country_verified": country_verified,
+                "nickname": user.nickname,
+                "handle": user.handle or "",
+                "visibility": getattr(profile, "visibility", "unlisted") if profile else "unlisted",
+                "theme": getattr(settings, "theme", "light") if settings else "light",
+            }
+        )
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        user = request.user
+        form = forms.DashboardUserForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            # Update user fields
+            user.nickname = cd.get("nickname", user.nickname)
+            user.handle = cd.get("handle", user.handle) or None
+            user.save()
+
+            # Update or create profile
+            profile, _ = user.profile.get_or_create(user=user)
+            if "profile_picture" in request.FILES:
+                profile.profile_picture = request.FILES["profile_picture"]
+            profile.visibility = cd.get("visibility", profile.visibility)
+            profile.save()
+
+            # Update or create settings
+            settings, _ = user.settings.get_or_create(user=user)
+            settings.theme = cd.get("theme", settings.theme)
+            settings.save()
+
+            messages.success(request, "Profile updated successfully.")
+            return redirect("user-dashboard")
+        messages.error(request, "Please correct errors below.")
+        return render(request, self.template_name, {"form": form})
