@@ -80,7 +80,10 @@ def user_has_verified_identity(*, user: models.AgoraUser) -> bool:
 
 
 def latest_identity_verification(*, user: models.AgoraUser) -> models.IdentityVerification | None:
-    return models.IdentityVerification.objects.filter(user=user).latest("modified")
+    try:
+        return models.IdentityVerification.objects.filter(user=user).latest("modified")
+    except models.IdentityVerification.DoesNotExist:
+        return None
 
 
 def user_identity_verification_status(*, user: models.AgoraUser) -> UserVerificationStatus:
@@ -97,7 +100,7 @@ def user_identity_verification_status(*, user: models.AgoraUser) -> UserVerifica
             return UserVerificationStatus.REJECTED
 
         time_threshold = timezone.now() - timezone.timedelta(hours=48)
-        if not latest_session.verified_at and latest_session.created_at > time_threshold:
+        if not latest_session.verified_at and latest_session.created > time_threshold:
             return UserVerificationStatus.PENDING
 
     return UserVerificationStatus.MISSING
