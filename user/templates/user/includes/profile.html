@@ -1,7 +1,13 @@
-<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
-    <div class="col-span-1">Profile picture</div>
+<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-8">
+    <div class="col-span-1 flex justify-center lg:justify-end">Profile picture</div>
     <div class="col-span-1 md:col-span-2 xl:col-span-4 flex flex-col">
-        <h3 class="font-bold">User Name</h3>
-        <h4>Nickname</h4>
+        <div class="flex flex-col text-center lg:text-left gap-2 lg:gap-4">
+            {% if user.nickname %}
+                <h2 class="font-bold text-lg">{{ user.nickname }}</h2>
+                <h3>{{ user.get_full_name }}</h3>
+            {% else %}
+                <h2 class="font-bold text-lg">{{ user.get_full_name }}</h2>
+            {% endif %}
+        </div>
     </div>
 </div>
