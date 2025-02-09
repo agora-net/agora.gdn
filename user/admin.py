@@ -25,6 +25,24 @@ class IdentityVerificationInline(admin.StackedInline):
     extra = 0
 
 
+class UserEmailInline(admin.StackedInline):
+    model = user_models.UserEmail
+    readonly_fields = ["email"]
+    extra = 0
+
+
+class UserPhoneNumberInline(admin.StackedInline):
+    model = user_models.UserPhoneNumber
+    readonly_fields = ["phone_number", "country"]
+    extra = 0
+
+
+class UserDomainInline(admin.StackedInline):
+    model = user_models.UserDomain
+    readonly_fields = ["domain"]
+    extra = 0
+
+
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
@@ -113,4 +131,22 @@ class CustomerAdmin(admin.ModelAdmin):
     inlines = [
         SubscriptionInline,
         PaymentMethodInline,
+    ]
+
+
+@admin.register(user_models.UserContactScope)
+class UserContactScopeAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+    ]
+    search_fields = [
+        "user__email",
+    ]
+    readonly_fields = [
+        "user",
+    ]
+    inlines = [
+        UserEmailInline,
+        UserPhoneNumberInline,
+        UserDomainInline,
     ]
