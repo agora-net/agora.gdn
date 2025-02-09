@@ -164,10 +164,8 @@ def create_stripe_identity_verification_session(
     return verification_session_obj
 
 
-def create_user_date_of_birth(
-    *, user_id: int, day: int | None, month: int | None, year: int | None
-) -> models.UserDateOfBirth:
-    user_date_of_birth = models.UserDateOfBirth(user=user_id, day=day, month=month, year=year)
+def create_user_date_of_birth(*, user_id: int, year: int | None) -> models.UserDateOfBirth:
+    user_date_of_birth = models.UserDateOfBirth(user=user_id, year=year)
     user_date_of_birth.full_clean()
     user_date_of_birth.save()
 
@@ -257,8 +255,6 @@ def handle_identity_verification_completed(*, verification_session_id: str) -> N
         if dob is not None:
             create_user_date_of_birth(
                 user_id=user_id,
-                day=dob.day,
-                month=dob.month,
                 year=dob.year,
             )
 

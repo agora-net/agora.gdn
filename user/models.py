@@ -84,12 +84,10 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
 
 class UserDateOfBirth(models.Model):
     user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE)
-    day = models.PositiveSmallIntegerField(_("day"), blank=True, null=True)
-    month = models.PositiveSmallIntegerField(_("month"), blank=True, null=True)
     year = models.PositiveSmallIntegerField(_("year"), blank=True, null=True)
 
     def __str__(self) -> str:
-        return f"{self.year}/{self.month}/{self.day}"
+        return f"{self.user.pk} - {self.year}"
 
 
 class VerifiableMixin(models.Model):
