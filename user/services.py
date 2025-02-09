@@ -6,6 +6,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from user.decorators import idempotent_webhook
+from utils.privacy import redact_phone_number
 from utils.typing.request import HttpRequest
 
 from . import logger, models, selectors
@@ -56,7 +57,7 @@ def create_verified_phone_number(
 
     user_phone_number = models.UserPhoneNumber(
         user=user_id,
-        phone_number="REDACTED:STRIPE_IDENTITY",
+        phone_number=redact_phone_number(phone_number=phone_number),
         country=country_code,
         verified=verified_at,
     )
