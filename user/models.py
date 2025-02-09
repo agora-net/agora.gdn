@@ -57,7 +57,7 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     objects: ClassVar[AgoraUserManager] = AgoraUserManager()  # type: ignore[assignment]
 
     class Meta(AbstractUser.Meta):
-        pass
+        ordering = ["-date_joined"]
 
     def get_full_name(self) -> LiteralString:
         """
@@ -184,6 +184,9 @@ class IdentityVerification(TimeStampedModel):
     # In some situations we need more info from the user or they can get rejected
     last_error_code = models.TextField(blank=True, null=True, default=None)
     last_error_message = models.TextField(blank=True, null=True, default=None)
+
+    class Meta:  # type: ignore
+        ordering = ["-modified"]
 
     def __str__(self) -> str:
         return self.stripe_identity_verification_session_id
