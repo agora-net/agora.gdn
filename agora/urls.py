@@ -9,6 +9,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from home import views as home_views
 from search import views as search_views
+from user import views as user_views
 
 from . import api
 
@@ -18,7 +19,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
     path("", include("user.urls")),
-    path("dashboard", home_views.dashboard, name="dashboard"),
+    path("dashboard", user_views.dashboard, name="dashboard"),
     path("accounts/", include("allauth.urls")),
     path("careers/", TemplateView.as_view(template_name="home/careers.html"), name="careers"),
     path(settings.DJANGO_ADMIN_URL, admin.site.urls),

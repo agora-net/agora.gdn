@@ -141,7 +141,8 @@ class UserDashboardView(View):
         # Read read-only fields from user and related models
         dob = getattr(user, "userdateofbirth", None)
         year_of_birth = dob.year if dob and dob.year else ""
-        # For verified country, assume using latest IdentityVerification with a value (modify as needed)
+        # For verified country
+        # assume using latest IdentityVerification with a value (modify as needed)
         identity = (
             IdentityVerification.objects.filter(user=user, verified_at__isnull=False)
             .order_by("-verified_at")
@@ -188,3 +189,6 @@ class UserDashboardView(View):
             return redirect("user-dashboard")
         messages.error(request, "Please correct errors below.")
         return render(request, self.template_name, {"form": form})
+
+
+dashboard = UserDashboardView.as_view()
