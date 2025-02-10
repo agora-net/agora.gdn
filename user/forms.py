@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from . import models
 
@@ -11,10 +12,103 @@ class StartStripeSubscriptionForm(forms.Form):
     )
 
 
-RESERVED_HANDLES = {"admin", "agora", "official", "test", "example", "ewan"}
+RESERVED_HANDLES = {
+    # Personal entries
+    "ewan",
+    # Ambiguous/impersonation risk
+    "admin",
+    "official",
+    "moderator",
+    "administrator",
+    "support",
+    "unknown",
+    "anonymous",
+    "user",
+    "username",
+    "default",
+    "null",
+    "helpdesk",
+    "security",
+    "contact",
+    "verify",
+    "auth",
+    "login",
+    "register",
+    "abuse",
+    "legal",
+    "tos",
+    "privacy",
+    "sysadmin",
+    "root",
+    "sudo",
+    "superuser",
+    "webmaster",
+    "host",
+    "system",
+    "server",
+    "undefined",
+    "void",
+    "generic",
+    "placeholder",
+    "api",
+    "bot",
+    "status",
+    "staff",
+    "service",
+    "mail",
+    "news",
+    "internal",
+    "test",
+    "example",
+    "staging",
+    "dev",
+    "prod",
+    "beta",
+    "gamma",
+    "alpha",
+    "info",
+    "adminteam",
+    "sales",
+    "marketing",
+    "feedback",
+    "owner",
+    "ceo",
+    "founder",
+    "demo",
+    "temp",
+    "guest",
+    "billing",
+    "invoice",
+    "payment",
+    "survey",
+    "notification",
+    "alert",
+    # Agora specific
+    "agora",
+    "agoraapp",
+    "agorasupport",
+    "agoraadmin",
+    "getagora",
+    "helloagora",
+    "agorahelp",
+    "agoraofficial",
+    "askagora",
+}
 
 
 class DashboardUserForm(forms.Form):
+    # A way to break the form into separate groups in the UI
+    field_groups = {
+        "profile": {
+            # The title of the group in the UI
+            "title": _("Profile"),
+            "help_text": _("Update your profile information."),
+            # The fields in the group (order matters)
+            # Names must match the field names in the form
+            "fields": [],
+        }
+    }
+
     # Read-only fields
     first_name = forms.CharField(disabled=True, required=False, label="First name")
     last_name = forms.CharField(disabled=True, required=False, label="Last name")
@@ -31,15 +125,13 @@ class DashboardUserForm(forms.Form):
         choices=models.UserSettings.VisibilityStatus.choices,
         initial=models.UserSettings.VisibilityStatus.UNLISTED,
         label="Profile Visibility",
+        widget=forms.RadioSelect,
     )
     theme = forms.ChoiceField(
-        choices=(
-            ("light", "Light Mode"),
-            ("dark", "Dark Mode"),
-        ),
+        choices=models.UserSettings.Theme.choices,
         label="Theme",
+        widget=forms.RadioSelect,
     )
-    is_unlisted = forms.BooleanField(required=False, label="Unlisted Profile")
 
     def clean_handle(self):
         handle = self.cleaned_data.get("handle", "").strip()
