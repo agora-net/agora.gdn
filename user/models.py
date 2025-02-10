@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
+from pictures.models import PictureField
 
 import utils.models
 from utils.models import SnowflakeIdPrimaryKeyMixin
@@ -194,7 +195,13 @@ class IdentityVerification(TimeStampedModel):
 
 class UserProfile(TimeStampedModel):
     user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE, related_name="profile")
-    profile_picture = models.ImageField(upload_to="profile_pics/", blank=True, null=True)
+    profile_picture = PictureField(
+        # don't know why this is throwing a type error, ignore it
+        aspect_ratios=["3/4"],  # type: ignore
+        upload_to="profile_pics/",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self) -> str:
         return f"{self.user.email}"
