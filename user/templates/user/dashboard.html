@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load user %}
 {% block base_content %}
     <div class="p-4 lg:p-8">
         <div class="container mx-auto flex flex-col gap-8 lg:gap-16">
@@ -10,12 +11,24 @@
                 <h1 class="text-lg font-bold">Your Dashboard</h1>
                 <div class="bg-base-100 p-4 rounded-lg ">
                     <div class="flex flex-col max-w-2xl mx-auto">
-                        <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
-                            <div class="col-span-1">
-                                <h3 class="font-bold">Profile</h3>
-                            </div>
-                            <div class="col-span-1 md:col-span-2 xl:col-span-4">todo: form</div>
-                        </div>
+                        <form id="profile_form"
+                              class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
+                            {% csrf_token %}
+                            {% for group, config in form.field_groups.items %}
+                                <div class="col-span-1">
+                                    <h3 class="font-bold">{{ config.title }}</h3>
+                                    <p class="text-sm">{{ config.help_text }}</p>
+                                </div>
+                                <div class="col-span-1 md:col-span-2 xl:col-span-4">
+                                    {% for field_name in config.fields %}
+                                        {% with field=form|get_attribute:field_name %}{{ field }}{% endwith %}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </form>
+                        <button for="profile_form"
+                                type="submit"
+                                class="btn btn-primary w-full md:w-auto self-end">Save Changes</button>
                     </div>
                 </div>
             </div>
