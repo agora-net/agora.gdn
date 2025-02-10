@@ -1,12 +1,17 @@
-<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-8">
-    <div class="col-span-1 flex justify-center lg:justify-end">Profile picture</div>
+{% load pictures %}
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-8">
+    <div class="col-span-1 flex justify-center lg:justify-end">
+        {% with profile=user.profile %}
+            {% picture profile.profile_picture ratio="3/4" picture_class="w-full aspect-w-3 aspect-h-4" m=6 l=4 %}
+        {% endwith %}
+    </div>
     <div class="col-span-1 md:col-span-2 xl:col-span-4 flex flex-col">
-        <div class="flex flex-col text-center lg:text-left gap-2 lg:gap-4">
+        <div class="flex flex-col gap-2 lg:gap-4">
             {% if user.nickname %}
-                <h2 class="font-bold text-lg">{{ user.nickname }}</h2>
-                <h3>{{ user.get_full_name }}</h3>
+                <h2 class="font-bold text-2xl">{{ user.nickname }}</h2>
+                <h3 class="text-lg">{{ user.get_full_name }}</h3>
             {% else %}
-                <h2 class="font-bold text-lg">{{ user.get_full_name }}</h2>
+                <h2 class="font-bold text-2xl">{{ user.get_full_name }}</h2>
             {% endif %}
         </div>
     </div>
