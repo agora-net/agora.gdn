@@ -19,6 +19,11 @@ class PaymentMethodInline(admin.StackedInline):
     extra = 0
 
 
+class UserProfileInline(admin.StackedInline):
+    model = user_models.UserProfile
+    extra = 0
+
+
 class IdentityVerificationInline(admin.StackedInline):
     model = user_models.IdentityVerification
     readonly_fields = ["stripe_identity_verification_session_id", "identity_issuing_country"]
@@ -119,6 +124,7 @@ class AgoraUserAdmin(BaseUserAdmin):
     ordering = ["email"]
     filter_horizontal = []
     inlines = [
+        UserProfileInline,
         IdentityVerificationInline,
     ]
 
