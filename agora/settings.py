@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     "allauth.account",
     # Additional MFA
     "allauth.mfa",
-    "home",
     "search",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -81,6 +80,8 @@ INSTALLED_APPS = [
     "django_countries",
     "django_vite",
     "widget_tweaks",
+    "pictures",
+    "home",
     "user",  # Custom user model
 ]
 
@@ -429,6 +430,25 @@ def immutable_file_test(path: str, url: str) -> bool:
 # WhiteNoise settings
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 
+# Pictures settings
+# https://github.com/codingjoe/django-pictures?tab=readme-ov-file#settings
+PICTURES = {
+    "BREAKPOINTS": {
+        "xs": 576,
+        "s": 768,
+        "m": 992,
+        "l": 1200,
+        "xl": 1400,
+    },
+    "GRID_COLUMNS": 12,
+    "CONTAINER_WIDTH": 1200,
+    "FILE_TYPES": ["WEBP"],
+    "PIXEL_DENSITIES": [1, 2],
+    "USE_PLACEHOLDERS": True,
+    "QUEUE_NAME": "pictures",
+    "PROCESSOR": "pictures.tasks.process_picture",
+}
+
 # Taggit settings
 # https://django-taggit.readthedocs.io/en/latest/getting_started.html#settings
 TAGGIT_CASE_INSENSITIVE = True
@@ -510,6 +530,7 @@ AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     "mfa_download_recovery_codes",
     "/webhooks/",
     "/api/",
+    "/_pictures/",
 ]
 
 if DEBUG:

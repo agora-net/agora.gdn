@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
+from pictures.conf import get_settings as get_pictures_settings
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
@@ -40,6 +41,11 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     if not settings.TESTING:
         urlpatterns += debug_toolbar_urls()
+
+if get_pictures_settings().USE_PLACEHOLDERS:
+    urlpatterns += [
+        path("_pictures/", include("pictures.urls")),
+    ]
 
 urlpatterns = urlpatterns + [
     # For anything not caught by a more specific rule above, hand over to
