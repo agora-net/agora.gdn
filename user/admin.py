@@ -24,6 +24,11 @@ class UserProfileInline(admin.StackedInline):
     extra = 0
 
 
+class UserSettingsInline(admin.StackedInline):
+    model = user_models.UserSettings
+    extra = 0
+
+
 class IdentityVerificationInline(admin.StackedInline):
     model = user_models.IdentityVerification
     readonly_fields = ["stripe_identity_verification_session_id", "identity_issuing_country"]
@@ -125,6 +130,7 @@ class AgoraUserAdmin(BaseUserAdmin):
     filter_horizontal = []
     inlines = [
         UserProfileInline,
+        UserSettingsInline,
         IdentityVerificationInline,
     ]
 
