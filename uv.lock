@@ -15,6 +15,7 @@ dependencies = [
     { name = "django-extensions" },
     { name = "django-model-utils" },
     { name = "django-ninja" },
+    { name = "django-pictures" },
     { name = "django-widget-tweaks" },
     { name = "gunicorn" },
     { name = "mintotp" },
@@ -58,6 +59,7 @@ requires-dist = [
     { name = "django-extensions" },
     { name = "django-model-utils" },
     { name = "django-ninja", specifier = ">=1.3.0" },
+    { name = "django-pictures", specifier = ">=1.4.0" },
     { name = "django-widget-tweaks", specifier = ">=1.5.0" },
     { name = "gunicorn" },
     { name = "mintotp", specifier = ">=0.3.0" },
@@ -577,6 +579,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/94/4b/364fe61a161ead607dc6af311901ba8e62f537f8fdab94b5252cb6efe6d7/django-permissionedforms-0.1.tar.gz", hash = "sha256:4340bb20c4477fffb13b4cc5cccf9f1b1010b64f79956c291c72d2ad2ed243f8", size = 5856 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e6/5b/216157ff053f955b15b9dcdc13bfb6e406666445164fee9e332e141be96d/django_permissionedforms-0.1-py2.py3-none-any.whl", hash = "sha256:d341a961a27cc77fde8cc42141c6ab55cc1f0cb886963cc2d6967b9674fa47d6", size = 5744 },
+]
+
+[[package]]
+name = "django-pictures"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/79/e8/65f6aa27a56c410aa84e1c32820016c3b0df84a0510d7a8686037a4c3b17/django_pictures-1.4.0.tar.gz", hash = "sha256:7133ac74a1c054cd5666c921fe76eee4d00d171c68d19d508ddf196f862f2d77", size = 20900 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9e/cd/249c7cf59e38f60d1bdd6a3ec9151a7eafcc988487d41e814d57f6ff511a/django_pictures-1.4.0-py3-none-any.whl", hash = "sha256:4ef318525e70c1d2ae9f6f7ca370e99518283ee501ea77984cbb2da7c212c288", size = 21926 },
 ]
 
 [[package]]
