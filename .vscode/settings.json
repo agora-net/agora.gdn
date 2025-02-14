@@ -78,6 +78,7 @@
 		"chdir",
 		"endelement",
 		"endslot",
+		"endwith",
 		"fontsource",
 		"getpid",
 		"itemprop",
