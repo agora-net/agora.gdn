@@ -17,8 +17,11 @@ import sys
 import tempfile
 from pathlib import Path
 
+import django_stubs_ext
 import environ
 import stripe
+
+django_stubs_ext.monkeypatch()  # For type checking
 
 PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,6 +79,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
     "django_extensions",
     "django_countries",
     "django_vite",
@@ -129,6 +133,8 @@ TEMPLATES = [
         },
     },
 ]
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "agora.wsgi.application"
 

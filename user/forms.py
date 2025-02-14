@@ -96,39 +96,60 @@ RESERVED_HANDLES = {
 }
 
 
+class AgoraCharField(forms.CharField):
+    template_name = "form/fields/input.html"
+
+
 class DashboardUserForm(forms.Form):
     # A way to break the form into separate groups in the UI
     field_groups = {
+        "read_only": {
+            "title": _("Verified Information"),
+            "help_text": _("This is taken from your verified identity and cannot be changed."),
+            "fields": ["first_name", "last_name", "year_of_birth", "country_verified"],
+        },
         "profile": {
             # The title of the group in the UI
             "title": _("Profile"),
             "help_text": _("Update your profile information."),
             # The fields in the group (order matters)
             # Names must match the field names in the form
-            "fields": [],
-        }
+            "fields": ["nickname", "profile_picture", "about_you"],
+        },
+        "settings": {
+            "title": _("Settings"),
+            "help_text": _("Manage your account settings."),
+            "fields": ["visibility", "theme"],
+        },
     }
 
     # Read-only fields
-    first_name = forms.CharField(disabled=True, required=False, label="First name")
+    first_name = AgoraCharField(
+        disabled=True,
+        required=False,
+        label=_("First name"),
+    )
     last_name = forms.CharField(disabled=True, required=False, label="Last name")
     year_of_birth = forms.IntegerField(disabled=True, required=False, label="Year of Birth")
     country_verified = forms.CharField(
         disabled=True, required=False, label="Country of Verified ID"
     )
 
-    # Editable fields
-    nickname = forms.CharField(required=False, label="Nickname")
+    # Profile
+    nickname = AgoraCharField(required=False, label="Nickname")
     profile_picture = forms.ImageField(required=False, label="Profile Picture")
+    about_you = forms.CharField(required=False, label=_("About You"), widget=forms.Textarea)
+
+    # Settings
     handle = forms.CharField(required=False, label="Username for URL (handle)", max_length=150)
     visibility = forms.ChoiceField(
-        choices=models.UserSettings.VisibilityStatus.choices,
+        choices=models.UserSettings.VisibilityStatus,  # type: ignore
         initial=models.UserSettings.VisibilityStatus.UNLISTED,
         label="Profile Visibility",
         widget=forms.RadioSelect,
     )
     theme = forms.ChoiceField(
-        choices=models.UserSettings.Theme.choices,
+        choices=models.UserSettings.Theme,  # type: ignore
         label="Theme",
         widget=forms.RadioSelect,
     )
