@@ -218,10 +218,10 @@ class UserSettings(TimeStampedModel):
         DARK = "dark", _("Dark")
 
     user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE, related_name="settings")
-    theme = models.CharField(max_length=10, choices=Theme, default="light")
+    theme = models.CharField(max_length=10, choices=Theme.choices, default="light")
     visibility = models.CharField(
         max_length=3,
-        choices=VisibilityStatus,
+        choices=VisibilityStatus.choices,
         default=VisibilityStatus.UNLISTED,
     )
 

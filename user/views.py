@@ -57,7 +57,7 @@ class OnboardingBillingView(TemplateView):
             request=request, stripe_price_id=sanitized_price_id
         )
 
-        return redirect(stripe_checkout_session.url)
+        return redirect(to=stripe_checkout_session.url or selectors.OnboardingStep.BILLING)
 
 
 onboarding_billing = OnboardingBillingView.as_view()
@@ -106,7 +106,7 @@ class OnboardingIdentityView(TemplateView):
             request=request
         )
 
-        return redirect(verification_session_obj.url)
+        return redirect(verification_session_obj.url or selectors.OnboardingStep.IDENTITY)
 
 
 onboarding_identity = OnboardingIdentityView.as_view()
