@@ -6,7 +6,7 @@
             <div class="h-12 lg:h-16 flex justify-center lg:justify-start items-center ">
                 {% include "logo/agora.svg" with class="h-full w-fit fill-secondary" %}
             </div>
-            <div class="p-4">{% include "user/includes/profile.html" with user=user %}</div>
+            {% include "user/includes/profile.html" with user=user %}
             <div class="flex flex-col gap-8 ">
                 <h1 class="text-lg font-bold">Your Dashboard</h1>
                 <div class="bg-base-100 p-4 rounded-lg ">

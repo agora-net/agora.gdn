@@ -1,6 +1,6 @@
 {% load pictures user %}
-<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-8">
-    <div class="col-span-1 flex items-center justify-center">
+<div class="grid grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-8">
+    <div class="col-span-1 flex items-center xl:justify-center">
         {% with profile=user.profile %}
             {% if profile.profile_picture %}
                 {% picture profile.profile_picture ratio="3/4" picture_class="w-full aspect-w-3 aspect-h-4" m=6 l=4 %}
@@ -9,7 +9,7 @@
             {% endif %}
         {% endwith %}
     </div>
-    <div class="col-span-1 md:col-span-2 xl:col-span-4 flex flex-col">
+    <div class="col-span-2 xl:col-span-4 flex flex-col">
         <div class="flex flex-col gap-2 lg:gap-4">
             {% if user.nickname %}
                 <h2 class="font-bold text-2xl">{{ user.nickname }}</h2>

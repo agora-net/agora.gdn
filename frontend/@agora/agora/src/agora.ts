@@ -73,8 +73,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const options: IdenticonOptions = {
 		foreground: [255, 255, 255, 255],
 		background: [0, 0, 0, 255],
-		margin: 0.2,
-		size: 128,
+		margin: 0.25,
+		size: 256,
 		format: "svg",
 	};
 	// for each one extract the data value and create an identicon
