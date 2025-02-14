@@ -42,7 +42,7 @@ dev = [
     "pyopenssl>=25.0.0",
     "django-debug-toolbar>=5.0.1",
     "playwright>=1.49.1",
-    "factory-boy>=3.3.1",
+    "factory-boy==3.3.1", # Pinned to 3.3.1 to fix typing issues
     "faker>=35.0.0",
     "tblib>=3.0.0",
     "django-vite>=3.0.6",
