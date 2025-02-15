@@ -19,9 +19,37 @@ class PaymentMethodInline(admin.StackedInline):
     extra = 0
 
 
+class UserProfileInline(admin.StackedInline):
+    model = user_models.UserProfile
+    extra = 0
+
+
+class UserSettingsInline(admin.StackedInline):
+    model = user_models.UserSettings
+    extra = 0
+
+
 class IdentityVerificationInline(admin.StackedInline):
     model = user_models.IdentityVerification
     readonly_fields = ["stripe_identity_verification_session_id", "identity_issuing_country"]
+    extra = 0
+
+
+class UserEmailInline(admin.StackedInline):
+    model = user_models.UserEmail
+    readonly_fields = ["email"]
+    extra = 0
+
+
+class UserPhoneNumberInline(admin.StackedInline):
+    model = user_models.UserPhoneNumber
+    readonly_fields = ["phone_number", "country"]
+    extra = 0
+
+
+class UserDomainInline(admin.StackedInline):
+    model = user_models.UserDomain
+    readonly_fields = ["domain"]
     extra = 0
 
 
@@ -101,6 +129,8 @@ class AgoraUserAdmin(BaseUserAdmin):
     ordering = ["email"]
     filter_horizontal = []
     inlines = [
+        UserProfileInline,
+        UserSettingsInline,
         IdentityVerificationInline,
     ]
 
@@ -113,4 +143,22 @@ class CustomerAdmin(admin.ModelAdmin):
     inlines = [
         SubscriptionInline,
         PaymentMethodInline,
+    ]
+
+
+@admin.register(user_models.UserContactScope)
+class UserContactScopeAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+    ]
+    search_fields = [
+        "user__email",
+    ]
+    readonly_fields = [
+        "user",
+    ]
+    inlines = [
+        UserEmailInline,
+        UserPhoneNumberInline,
+        UserDomainInline,
     ]

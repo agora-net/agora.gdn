@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      identicon.js:
+        specifier: ^2.3.3
+        version: 2.3.3
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -27,12 +30,18 @@ importers:
       '@fontsource-variable/figtree':
         specifier: ^5.1.2
         version: 5.1.2
+      '@tailwindcss/aspect-ratio':
+        specifier: ^0.4.2
+        version: 0.4.2(tailwindcss@4.0.3)
       '@tailwindcss/typography':
         specifier: ^0.5.16
         version: 0.5.16(tailwindcss@4.0.3)
       '@tailwindcss/vite':
         specifier: ^4.0.1
         version: 4.0.3(vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1))
+      '@types/identicon.js':
+        specifier: ^2.3.5
+        version: 2.3.5
       '@types/node':
         specifier: ^22.12.0
         version: 22.13.0
@@ -540,6 +549,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@tailwindcss/aspect-ratio@0.4.2':
+    resolution: {integrity: sha512-8QPrypskfBa7QIMuKHg2TA7BqES6vhBrDLOv8Unb6FcFyd3TjKbc6lcmb9UPQHxfl24sXoJ41ux/H7qQQvfaSQ==}
+    peerDependencies:
+      tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
+
   '@tailwindcss/node@4.0.3':
     resolution: {integrity: sha512-QsVJokOl0pJ4AbJV33D2npvLcHGPWi5MOSZtrtE0GT3tSx+3D0JE2lokLA8yHS1x3oCY/3IyRyy7XX6tmzid7A==}
 
@@ -637,6 +651,9 @@ packages:
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
+
+  '@types/identicon.js@2.3.5':
+    resolution: {integrity: sha512-98yH/a9ZINEfHQDDiD+i7To71duqU1TV+RCw+17bLuzXmeAEFy7e5WJkhe3rmYIC9KpGpug2fHshwWXx72rk5w==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -948,6 +965,9 @@ packages:
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
+
+  identicon.js@2.3.3:
+    resolution: {integrity: sha512-/qgOkXKZ7YbeCYbawJ9uQQ3XJ3uBg9VDpvHjabCAPp6aRMhjLaFAxG90+1TxzrhKaj6AYpVGrx6UXQfQA41UEA==}
 
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
@@ -1711,6 +1731,10 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.34.0':
     optional: true
 
+  '@tailwindcss/aspect-ratio@0.4.2(tailwindcss@4.0.3)':
+    dependencies:
+      tailwindcss: 4.0.3
+
   '@tailwindcss/node@4.0.3':
     dependencies:
       enhanced-resolve: 5.18.0
@@ -1802,6 +1826,8 @@ snapshots:
       '@babel/types': 7.26.7
 
   '@types/estree@1.0.6': {}
+
+  '@types/identicon.js@2.3.5': {}
 
   '@types/json-schema@7.0.15': {}
 
@@ -2165,6 +2191,8 @@ snapshots:
   graphemer@1.4.0: {}
 
   has-flag@4.0.0: {}
+
+  identicon.js@2.3.3: {}
 
   ignore@5.3.2: {}
 

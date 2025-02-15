@@ -17,8 +17,11 @@ import sys
 import tempfile
 from pathlib import Path
 
+import django_stubs_ext
 import environ
 import stripe
+
+django_stubs_ext.monkeypatch()  # For type checking
 
 PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -55,7 +58,6 @@ INSTALLED_APPS = [
     "allauth.account",
     # Additional MFA
     "allauth.mfa",
-    "home",
     "search",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -77,10 +79,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
     "django_extensions",
     "django_countries",
     "django_vite",
     "widget_tweaks",
+    "pictures",
+    "home",
     "user",  # Custom user model
 ]
 
@@ -128,6 +133,8 @@ TEMPLATES = [
         },
     },
 ]
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "agora.wsgi.application"
 
@@ -429,6 +436,25 @@ def immutable_file_test(path: str, url: str) -> bool:
 # WhiteNoise settings
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 
+# Pictures settings
+# https://github.com/codingjoe/django-pictures?tab=readme-ov-file#settings
+PICTURES = {
+    "BREAKPOINTS": {
+        "xs": 576,
+        "s": 768,
+        "m": 992,
+        "l": 1200,
+        "xl": 1400,
+    },
+    "GRID_COLUMNS": 12,
+    "CONTAINER_WIDTH": 1200,
+    "FILE_TYPES": ["WEBP"],
+    "PIXEL_DENSITIES": [1, 2],
+    "USE_PLACEHOLDERS": True,
+    "QUEUE_NAME": "pictures",
+    "PROCESSOR": "pictures.tasks.process_picture",
+}
+
 # Taggit settings
 # https://django-taggit.readthedocs.io/en/latest/getting_started.html#settings
 TAGGIT_CASE_INSENSITIVE = True
@@ -510,6 +536,7 @@ AGORA_ONBOARDING_NOT_REQUIRED_ROUTES = [
     "mfa_download_recovery_codes",
     "/webhooks/",
     "/api/",
+    "/_pictures/",
 ]
 
 if DEBUG:

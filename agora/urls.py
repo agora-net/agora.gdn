@@ -3,12 +3,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
+from pictures.conf import get_settings as get_pictures_settings
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 from home import views as home_views
 from search import views as search_views
+from user import views as user_views
 
 from . import api
 
@@ -18,7 +20,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
     path("", include("user.urls")),
-    path("dashboard", home_views.dashboard, name="dashboard"),
+    path("dashboard", user_views.dashboard, name="dashboard"),
     path("accounts/", include("allauth.urls")),
     path("careers/", TemplateView.as_view(template_name="home/careers.html"), name="careers"),
     path(settings.DJANGO_ADMIN_URL, admin.site.urls),
@@ -39,6 +41,11 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     if not settings.TESTING:
         urlpatterns += debug_toolbar_urls()
+
+if get_pictures_settings().USE_PLACEHOLDERS:
+    urlpatterns += [
+        path("_pictures/", include("pictures.urls")),
+    ]
 
 urlpatterns = urlpatterns + [
     # For anything not caught by a more specific rule above, hand over to

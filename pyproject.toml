@@ -23,6 +23,7 @@ dependencies = [
     "stripe>=11.5.0",
     "django-ninja>=1.3.0",
     "phonenumbers>=8.13.54",
+    "django-pictures>=1.4.0",
 ]
 requires-python = ">=3.12"
 
@@ -41,12 +42,13 @@ dev = [
     "pyopenssl>=25.0.0",
     "django-debug-toolbar>=5.0.1",
     "playwright>=1.49.1",
-    "factory-boy>=3.3.1",
+    "factory-boy==3.3.1", # Pinned to 3.3.1 to fix typing issues
     "faker>=35.0.0",
     "tblib>=3.0.0",
     "django-vite>=3.0.6",
     "pyright>=1.1.393",
-    "django-types>=0.20.0",
+    "django-stubs>=5.1.3",
+    "django-stubs-ext>=5.1.3",
 ]
 
 [tool.ruff.format]

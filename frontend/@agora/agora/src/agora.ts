@@ -1,3 +1,5 @@
+import Identicon, { type IdenticonOptions } from "identicon.js";
+
 declare global {
 	interface Window {
 		pollWithBackoff: typeof pollWithBackoff;
@@ -64,3 +66,26 @@ export const pollWithBackoff = async <T>(
 };
 
 window.pollWithBackoff = pollWithBackoff;
+
+document.addEventListener("DOMContentLoaded", async () => {
+	// Find all elements with the data-identicon attribute
+	const elements = document.querySelectorAll("[data-identicon]");
+	const options: IdenticonOptions = {
+		foreground: [255, 255, 255, 255],
+		background: [0, 0, 0, 255],
+		margin: 0.25,
+		size: 256,
+		format: "svg",
+	};
+	// for each one extract the data value and create an identicon
+	for (const element of elements) {
+		const data = element.getAttribute("data-identicon");
+		if (data) {
+			const identicon = new Identicon(data, options);
+			// insert the identicon as an img
+			const img = document.createElement("img");
+			img.src = `data:image/svg+xml;base64,${identicon.toString()}`;
+			element.appendChild(img);
+		}
+	}
+});

@@ -78,6 +78,7 @@
 		"chdir",
 		"endelement",
 		"endslot",
+		"endwith",
 		"fontsource",
 		"getpid",
 		"itemprop",
@@ -101,5 +102,8 @@
 		{
 			"text": "use the present tense"
 		}
-	]
+	],
+	"python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test_*.py"],
+	"python.testing.pytestEnabled": false,
+	"python.testing.unittestEnabled": true
 }

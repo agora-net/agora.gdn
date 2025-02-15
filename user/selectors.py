@@ -79,23 +79,31 @@ def user_has_verified_identity(*, user: models.AgoraUser) -> bool:
     return models.IdentityVerification.objects.filter(user=user, verified_at__lte=now).exists()
 
 
+def latest_identity_verification(*, user: models.AgoraUser) -> models.IdentityVerification | None:
+    try:
+        return models.IdentityVerification.objects.filter(user=user).latest("modified")
+    except models.IdentityVerification.DoesNotExist:
+        return None
+
+
 def user_identity_verification_status(*, user: models.AgoraUser) -> UserVerificationStatus:
-    user_identity_verification_queryset = models.IdentityVerification.objects.filter(user=user)
+    # todo(kisamoto): Tests
+    # If we have one verified identity verification, we consider the user verified
+    if user_has_verified_identity(user=user):
+        return UserVerificationStatus.VERIFIED
 
-    if not user_identity_verification_queryset.exists():
-        return UserVerificationStatus.MISSING
+    # If we have a verification session that hasn't been verified yet but has no errors and is
+    # less than 48 hours old, we consider it pending.
+    latest_session = latest_identity_verification(user=user)
+    if latest_session is not None:
+        if latest_session.last_error_code:
+            return UserVerificationStatus.REJECTED
 
-    if user_identity_verification_queryset.filter(verified_at__isnull=True).exists():
-        return UserVerificationStatus.PENDING
+        time_threshold = timezone.now() - timezone.timedelta(hours=48)
+        if not latest_session.verified_at and latest_session.created > time_threshold:
+            return UserVerificationStatus.PENDING
 
-    if (
-        user_identity_verification_queryset.filter(last_error_code__isnull=False)
-        .exclude(last_error_code="")
-        .exists()
-    ):
-        return UserVerificationStatus.REJECTED
-
-    return UserVerificationStatus.VERIFIED
+    return UserVerificationStatus.MISSING
 
 
 def user_from_email(*, email: str) -> models.AgoraUser:

@@ -3,9 +3,11 @@ from typing import Any, ClassVar, LiteralString
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
+from pictures.models import PictureField
 
 import utils.models
 from utils.models import SnowflakeIdPrimaryKeyMixin
@@ -56,7 +58,7 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     objects: ClassVar[AgoraUserManager] = AgoraUserManager()  # type: ignore[assignment]
 
     class Meta(AbstractUser.Meta):
-        pass
+        ordering = ["-date_joined"]
 
     def get_full_name(self) -> LiteralString:
         """
@@ -72,15 +74,21 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     def clean(self) -> None:
         return super().clean()
 
+    def __str__(self):
+        return self.get_full_name()
+
+    def get_absolute_url(self):
+        if self.handle:
+            return reverse("user_detail", kwargs={"handle": self.handle})
+        return reverse("user_detail", kwargs={"pk": self.pk})
+
 
 class UserDateOfBirth(models.Model):
     user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE)
-    day = models.PositiveSmallIntegerField(_("day"), blank=True, null=True)
-    month = models.PositiveSmallIntegerField(_("month"), blank=True, null=True)
     year = models.PositiveSmallIntegerField(_("year"), blank=True, null=True)
 
     def __str__(self) -> str:
-        return f"{self.year}/{self.month}/{self.day}"
+        return f"{self.user.pk} - {self.year}"
 
 
 class VerifiableMixin(models.Model):
@@ -178,5 +186,44 @@ class IdentityVerification(TimeStampedModel):
     last_error_code = models.TextField(blank=True, null=True, default=None)
     last_error_message = models.TextField(blank=True, null=True, default=None)
 
+    class Meta:  # type: ignore
+        ordering = ["-modified"]
+
     def __str__(self) -> str:
         return self.stripe_identity_verification_session_id
+
+
+class UserProfile(TimeStampedModel):
+    user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE, related_name="profile")
+    profile_picture = PictureField(
+        # don't know why this is throwing a type error, ignore it
+        aspect_ratios=["3/4"],  # type: ignore
+        upload_to="profile_pics/",
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.user.email}"
+
+
+class UserSettings(TimeStampedModel):
+    class VisibilityStatus(models.TextChoices):
+        UNLISTED = "UN", _("Unlisted - accessible via URL only")
+        PRIVATE = "PRV", _("Private - visible to verified users only")
+        PUBLIC = "PUB", _("Public - visible in directory")
+
+    class Theme(models.TextChoices):
+        LIGHT = "light", _("Light")
+        DARK = "dark", _("Dark")
+
+    user = models.OneToOneField(AgoraUser, on_delete=models.CASCADE, related_name="settings")
+    theme = models.CharField(max_length=10, choices=Theme.choices, default="light")
+    visibility = models.CharField(
+        max_length=3,
+        choices=VisibilityStatus.choices,
+        default=VisibilityStatus.UNLISTED,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.user.email}"
