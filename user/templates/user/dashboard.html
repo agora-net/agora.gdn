@@ -19,7 +19,7 @@
                                 <div class="col-span-1">
                                     <p class="text-sm">{{ config.help_text }}</p>
                                 </div>
-                                <div class="col-span-1 md:col-span-2 xl:col-span-3">
+                                <div class="col-span-1 md:col-span-2 xl:col-span-3 flex flex-col gap-2">
                                     {% for field_name in config.fields %}
                                         {% with field=form|get_form_field:field_name %}{{ field }}{% endwith %}
                                     {% endfor %}
