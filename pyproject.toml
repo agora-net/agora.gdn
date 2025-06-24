@@ -2,53 +2,53 @@
 name = "agora.gdn"
 version = "0.1.0"
 dependencies = [
-    "wagtail",
+    "cuid2",
+    "diskcache>=5.6.3",
+    "django-allauth[mfa]>=65.3.1",
+    "django-countries",
     "django-environ",
     "django-extensions",
     "django-model-utils",
-    "pillow",
-    "nh3",
-    "cuid2",
-    "whitenoise[brotli]",
-    "gunicorn",
-    "readtime",
-    "watchfiles",
-    "django[argon2]>=5.1.0",
-    "django-countries",
-    "django-allauth[mfa]>=65.3.1",
-    "snowflake-id>=1.0.2",
-    "diskcache>=5.6.3",
-    "mintotp>=0.3.0",
-    "django-widget-tweaks>=1.5.0",
-    "stripe>=11.5.0",
     "django-ninja>=1.3.0",
+    "django-widget-tweaks>=1.5.0",
+    "django[argon2]>=5.1.0",
+    "gunicorn",
+    "mintotp>=0.3.0",
+    "nh3",
     "phonenumbers>=8.13.54",
+    "pillow",
+    "readtime",
+    "snowflake-id>=1.0.2",
+    "stripe>=11.5.0",
+    "wagtail",
+    "watchfiles",
+    "whitenoise[brotli]",
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
+
+[dependency-groups]
+dev = [
+    "ansible",
+    "django-debug-toolbar>=5.0.1",
+    "django-types>=0.20.0",
+    "django-vite>=3.0.6",
+    "djlint",
+    "factory-boy>=3.3.1",
+    "faker>=35.0.0",
+    "lefthook>=1.11.14",
+    "playwright>=1.49.1",
+    "pre-commit",
+    "pyopenssl>=25.0.0",
+    "pyright>=1.1.393",
+    "ruff",
+    "tblib>=3.0.0",
+    "werkzeug>=3.1.3",
+]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 extend-exclude = ["*/migrations/*"]
-
-[dependency-groups]
-dev = [
-    "ruff",
-    "pre-commit",
-    "djlint",
-    "ansible",
-    "werkzeug>=3.1.3",
-    "pyopenssl>=25.0.0",
-    "django-debug-toolbar>=5.0.1",
-    "playwright>=1.49.1",
-    "factory-boy>=3.3.1",
-    "faker>=35.0.0",
-    "tblib>=3.0.0",
-    "django-vite>=3.0.6",
-    "pyright>=1.1.393",
-    "django-types>=0.20.0",
-    "lefthook>=1.11.14",
-]
 
 [tool.ruff.format]
 docstring-code-format = true
