@@ -47,6 +47,7 @@ dev = [
     "django-vite>=3.0.6",
     "pyright>=1.1.393",
     "django-types>=0.20.0",
+    "lefthook>=1.11.14",
 ]
 
 [tool.ruff.format]
