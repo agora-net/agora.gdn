@@ -1,7 +1,7 @@
 #!/usr/bin/env just --justfile
 
 # Default recipe to display help information (in order of this file)
-default:
+_default:
     @just --list --unsorted
 
 # Variables
@@ -9,8 +9,17 @@ APP_NAME := "agora"
 DOCKER_IMAGE := "docker.io/kisamoto/tmp.agora.net"
 
 UV_RUN := "uv run"
+PNPM := "pnpm"
 
-PNPM := "pnpm --dir frontend/@agora/agora"
+# Install dev dependencies
+install-dev: install-python-dev install-frontend-dev install-playwright
+    @{{ UV_RUN }} lefthook install
+
+# Generates a self-signed certificate for the development server
+mkcert:
+    @if [ ! -f /tmp/{{ APP_NAME }}.crt ]; then \
+        mkcert -cert-file=/tmp/{{ APP_NAME }}.crt -key-file=/tmp/{{ APP_NAME }}.key localhost 127.0.0.1; \
+    fi
 
 ###############################################
 ## General commands
@@ -21,19 +30,12 @@ uv *ARGS:
     @uv {{ ARGS }}
 
 # Install python dependencies
-install-python *FLAGS:
+install-python-dev *FLAGS:
     @uv sync {{ FLAGS }}
 
 # Install playwright browsers and dependencies
 install-playwright:
     @{{ UV_RUN }} playwright install --with-deps
-
-# Install all dependencies (python, node, and playwright) and pre-commit hooks
-install-dev: install-python install-node install-playwright
-    @{{ UV_RUN }} pre-commit install
-
-# Install dependencies for production
-install: install-python install-node
 
 # Run the linter and formatter
 format:
@@ -54,13 +56,16 @@ stripe-listen:
 manage := UV_RUN + " manage.py"
 
 # Shortcut to run Django management commands
-manage *ARGS:
+manage +ARGS:
     @{{ manage }} {{ ARGS }}
 
-# Run the development server
-runserver:
-    @mkcert -cert-file ./certs/localhost.crt -key-file ./certs/localhost.key localhost 127.0.0.1
-    @{{ manage }} runserver_plus --nostatic --cert ./certs/localhost.crt --key-file ./certs/localhost.key
+# Run the development server with HTTPS
+runserver: mkcert
+    @{{ manage }} runserver_plus --nostatic --cert /tmp/{{ APP_NAME }}.crt --key-file /tmp/{{ APP_NAME }}.key
+
+# Runs the development server without HTTPS
+runserver-no-https:
+    @{{ manage }} runserver --nostatic
 
 # Create Django migrations
 makemigrations:
@@ -96,20 +101,24 @@ test-e2e *FLAGS:
 ###############################################
 
 # Run a pnpm command in the fronted directory
-pnpm *ARGS:
+[working-directory: "frontend/@agora/agora"]
+pnpm +ARGS:
     @{{ PNPM }} {{ ARGS }}
 
-# Install node dependencies
-install-node:
+# Install frontend dependencies
+[working-directory: "frontend/@agora/agora"]
+install-frontend-dev:
     @{{ PNPM }} install
 
-# Compile and watch the static assets
-watch-static:
+# Run the frontend development server
+[working-directory: "frontend/@agora/agora"]
+dev-frontend:
     @{{ PNPM }} run dev
 
 # Compile the static assets
-build-static:
-    @{{ PNPM }} run build
+[working-directory: "frontend/@agora/agora"]
+build-frontend:
+    @{{ PNPM }} build
 
 ###############################################
 ## Docker commands
