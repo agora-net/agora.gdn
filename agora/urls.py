@@ -10,7 +10,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 from home import views as home_views
 from search import views as search_views
 
-from . import api
+from .api_v1 import api as api_v1
 
 urlpatterns = [
     path(
@@ -19,6 +19,7 @@ urlpatterns = [
     ),
     path("", include("user.urls")),
     path("dashboard", home_views.dashboard, name="dashboard"),
+    path("profile/", home_views.dashboard, name="profile"),
     path("accounts/", include("allauth.urls")),
     path("careers/", TemplateView.as_view(template_name="home/careers.html"), name="careers"),
     path(settings.DJANGO_ADMIN_URL, admin.site.urls),
@@ -26,7 +27,7 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     path("join/", home_views.join_waiting_list, name="join_waiting_list"),
-    path("api/v1/", api.api.urls),
+    path("api/v1/", api_v1.urls),
 ]
 
 
@@ -37,8 +38,9 @@ if settings.DEBUG:
     # Serve static and media files from development server
     urlpatterns += staticfiles_urlpatterns()
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    if not settings.TESTING:
-        urlpatterns += debug_toolbar_urls()
+
+if not settings.TESTING:
+    urlpatterns += debug_toolbar_urls()
 
 urlpatterns = urlpatterns + [
     # For anything not caught by a more specific rule above, hand over to
