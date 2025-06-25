@@ -417,6 +417,13 @@ STORAGES = {
     },
 }
 
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": DEBUG,
+        "dev_server_protocol": "https",
+    }
+}
+
 
 vite_regex = re.compile(r"^.+[.-][0-9a-zA-Z_-]{8,12}\..+$")
 
