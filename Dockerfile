@@ -3,18 +3,20 @@
 ###############################################
 # Build the `brand` static assets in a separate image
 FROM node:lts-slim AS static-builder
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
 ENV GENERATE_SOURCEMAP=false \
     NODE_OPTIONS=--max-old-space-size=4096 \
     PATH=$PATH:/home/node/.npm-global/bin
-RUN npm install --prefix /home/node/.npm-global -g rust-just \
-    && ln -s /home/node/.npm-global/bin/rust-just /home/node/.npm-global/bin/just 
+RUN npm install --prefix /home/node/.npm-global -g rust-just
 COPY Justfile .
-COPY brand/package*.json ./brand/
-RUN just install-node && npm cache clean --force
+COPY frontend/@agora/agora/package.json frontend/@agora/agora/pnpm-lock.yaml ./frontend/@agora/agora/
+RUN just install-frontend-prod && pnpm store prune --force
 COPY . .
-RUN just build-static
+RUN just build-frontend
 
 ###############################################
 ## Python alias
@@ -27,6 +29,7 @@ FROM python:3.12-slim-bookworm  AS python
 ###############################################
 # Python build stage
 FROM python AS python-build-stage
+ENV UV_COMPILE_BYTECODE=1
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
 COPY --from=ghcr.io/astral-sh/uv:0.5.24 /uv /uvx /bin/
@@ -36,9 +39,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential
 RUN pip install rust-just
 # Copy the uv dependency and lock files
-COPY Justfile pyproject.toml uv.lock ./
+COPY Justfile pyproject.toml uv.lock* ./
 # Use Just for consistency with the rest of the project.
-RUN just install-python --no-group dev
+RUN just install-python --frozen --no-group dev
 
 ###############################################
 ## Python runner
@@ -66,25 +69,30 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     && mkdir -p /run/gunicorn \
     # Create the directories for the media and database files.
     && mkdir -p /data/media \
-    && mkdir -p /data/db
+    && mkdir -p /data/db \
+    # Create the directory for the static assets
+    && mkdir -p ${APP_HOME}/static
 # Copy the virtual environment from the build stage to the current stage.
 COPY --from=python-build-stage ${APP_HOME}/.venv ${APP_HOME}/.venv
 # Copy the static assets from the static builder stage to the current stage.
-COPY --from=static-builder /app/brand/static /app/brand/static
-ENV PATH=/app/.venv/bin:$PATH
+COPY --from=static-builder ${APP_HOME}/frontend/@agora/agora/dist/ ${APP_HOME}/static/
+ENV PATH=${APP_HOME}/.venv/bin:$PATH
+# Copy the source code of the project into the container.
+COPY . .
+# Make sure the root group has all the same permissions as the user
+RUN chgrp -R 0 ${APP_HOME} /run/gunicorn /data && \
+    chmod -R g=u ${APP_HOME} /run/gunicorn /data && \
+    # Needed for collectstatic to work, clean up after
+    cp .env.dist .env
+# Use user "wagtail" to run the build commands below and the server itself.
+# Collect static files.
+RUN just collectstatic
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
 # uses SQLite, the folder needs to be owned by the user that
 # will be writing to the database file.
-RUN chown -R wagtail:0 ${APP_HOME} /run/gunicorn /data
-# Copy the source code of the project into the container.
-COPY --chown=wagtail:0 . .
-# Make sure the root group has all the same permissions as the user
-RUN chgrp -R 0 ${APP_HOME} /run/gunicorn /data && \
-    chmod -R g=u ${APP_HOME} /run/gunicorn /data
-# Use user "wagtail" to run the build commands below and the server itself.
+RUN chown -R wagtail:0 ${APP_HOME} /run/gunicorn /data && \
+    rm .env
 USER wagtail:root
-# Collect static files.
-RUN just collectstatic
 # Runtime command that executes when "docker run" is called, it does the
 # following:
 #   1. Migrate the database.

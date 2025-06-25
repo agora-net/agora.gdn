@@ -12,7 +12,7 @@ UV_RUN := "uv run"
 PNPM := "pnpm"
 
 # Install dev dependencies
-install-dev: install-python-dev install-frontend-dev install-playwright
+install-dev: install-python install-frontend-dev install-playwright
     @{{ UV_RUN }} lefthook install
 
 # Generates a self-signed certificate for the development server
@@ -29,8 +29,8 @@ mkcert:
 uv *ARGS:
     @uv {{ ARGS }}
 
-# Install python dependencies
-install-python-dev *FLAGS:
+# Install python dependencies for development
+install-python *FLAGS:
     @uv sync {{ FLAGS }}
 
 # Install playwright browsers and dependencies
@@ -105,10 +105,15 @@ test-e2e *FLAGS:
 pnpm +ARGS:
     @{{ PNPM }} {{ ARGS }}
 
-# Install frontend dependencies
+# Install frontend dependencies for development
 [working-directory: "frontend/@agora/agora"]
 install-frontend-dev:
     @{{ PNPM }} install
+
+# Install frontend dependencies for production
+[working-directory: "frontend/@agora/agora"]
+install-frontend-prod:
+    @{{ PNPM }} install --frozen-lockfile
 
 # Run the frontend development server
 [working-directory: "frontend/@agora/agora"]
@@ -117,27 +122,29 @@ dev-frontend:
 
 # Compile the static assets
 [working-directory: "frontend/@agora/agora"]
-build-frontend:
-    @{{ PNPM }} build
+build-frontend *ARGS:
+    @{{ PNPM }} build {{ ARGS }}
 
 ###############################################
 ## Docker commands
 ###############################################
+podman_manifest := "agora-manifest"
 
 # Build the Docker image
-docker-build:
-    @docker buildx build --platform linux/amd64,linux/arm64 -t {{ DOCKER_IMAGE }} .
+build-image:
+    @podman build --tag {{ DOCKER_IMAGE }} --manifest {{ podman_manifest }} --arch linux/amd64 .
+    @podman build --tag {{ DOCKER_IMAGE }} --manifest {{ podman_manifest }} --arch linux/arm64 .
 
 # Push the Docker image to the registry
-docker-push:
-    @docker push {{ DOCKER_IMAGE }}
+push-image:
+    @podman manifest push --all {{ podman_manifest }} {{ DOCKER_IMAGE }}
 
 # Remove the Docker container
-docker-rm:
-    @docker rm -f {{ DOCKER_IMAGE }} || true
+rm-container:
+    @podman rm -f {{ DOCKER_IMAGE }} || true
 
 # Run the Docker container
-docker-run: docker-rm
+run-container: rm-container
     # Note: This still needs a web server to proxy to it
     @docker run \
         --name {{ APP_NAME }} \

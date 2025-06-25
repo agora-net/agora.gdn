@@ -5,13 +5,17 @@ import react from "@vitejs/plugin-react";
 
 import fs from "node:fs";
 
+const isDev = process.env.NODE_ENV === "development";
+
+const https = isDev ? {
+	key: fs.readFileSync("/tmp/agora.key"),
+	cert: fs.readFileSync("/tmp/agora.crt"),
+} : undefined;
+
 export default {
 	base: "/static/",
 	server: {
-		https: {
-			key: fs.readFileSync("/tmp/agora.key"),
-			cert: fs.readFileSync("/tmp/agora.crt"),
-		},
+		https,
 	},
 	build: {
 		manifest: "manifest.json",
