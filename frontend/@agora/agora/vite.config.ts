@@ -9,8 +9,8 @@ export default {
 	base: "/static/",
 	server: {
 		https: {
-			key: fs.readFileSync("../../../certs/localhost.key"),
-			cert: fs.readFileSync("../../../certs/localhost.crt"),
+			key: fs.readFileSync("/tmp/agora.key"),
+			cert: fs.readFileSync("/tmp/agora.crt"),
 		},
 	},
 	build: {
