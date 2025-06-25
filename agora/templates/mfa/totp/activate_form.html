@@ -19,33 +19,33 @@
 {% endblock progress %}
 {% block content %}
     {% element h1 %}
-    {% translate "Activate Authenticator App" %}
-{% endelement %}
-{% element p class="text-base-content" %}
-{% blocktranslate %}All users must enable multi-factor authentication (MFA) to secure their account. Scan the QR below and enter the generated code.{% endblocktranslate %}
-{% endelement %}
-{% url 'mfa_activate_totp' as action_url %}
-{% element form form=form method="post" action=action_url %}
-{% slot body %}
-<div class="bg-white w-fit mx-auto">
-    {% element img src=totp_svg_data_uri alt=form.secret tags="mfa,totp,qr" %}
-{% endelement %}
-</div>
-{% csrf_token %}
-{% element field id="authenticator_secret" type="text" value=form.secret disabled=True %}
-{% slot help_text %}
-{% translate "You can store this secret and use it to reinstall your authenticator app at a later time." %}
-{% endslot %}
-{% endelement %}
-<button type="button"
-        onClick="copyToClipboard(this, 'authenticator_secret')"
-        class="btn">Copy to clipboard</button>
-{% element fields form=form %}
-{% endelement %}
+        {% translate "Activate Authenticator App" %}
+    {% endelement %}
+    {% element p class="text-base-content" %}
+        {% blocktranslate %}All users must enable multi-factor authentication (MFA) to secure their account. Scan the QR below and enter the generated code.{% endblocktranslate %}
+    {% endelement %}
+    {% url 'mfa_activate_totp' as action_url %}
+    {% element form form=form method="post" action=action_url %}
+        {% slot body %}
+        <div class="bg-white w-fit mx-auto">
+            {% element img src=totp_svg_data_uri alt=form.secret tags="mfa,totp,qr" %}
+            {% endelement %}
+        </div>
+        {% csrf_token %}
+        {% element field id="authenticator_secret" type="text" value=form.secret disabled=True %}
+            {% slot help_text %}
+            {% translate "You can store this secret and use it to reinstall your authenticator app at a later time." %}
+        {% endslot %}
+    {% endelement %}
+    <button type="button"
+            onClick="copyToClipboard(this, 'authenticator_secret')"
+            class="btn">Copy to clipboard</button>
+    {% element fields form=form %}
+    {% endelement %}
 {% endslot %}
 {% slot actions %}
 {% element button type="submit" %}
-{% trans "Activate" %}
+    {% trans "Activate" %}
 {% endelement %}
 {% endslot %}
 {% endelement %}
