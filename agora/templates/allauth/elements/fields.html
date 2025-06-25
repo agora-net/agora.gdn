@@ -1,10 +1,10 @@
 {% load widget_tweaks %}
 {% for field in attrs.form %}
     {% if field.name == "remember" %}
-        <div class="form-control md:w-1/2">
-            <label class="label cursor-pointer w-full justify-between">
-                <span class="label-text">{{ field.label }}</span>
+        <div class="form-control">
+            <label class="label cursor-pointer w-full gap-4">
                 {{ field|add_class:"checkbox" }}
+                <span class="label-text">{{ field.label }}</span>
             </label>
         </div>
     {% else %}
