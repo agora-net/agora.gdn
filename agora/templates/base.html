@@ -83,8 +83,29 @@
     </head>
     <body class="{% block body_class %}min-h-screen bg-base-300{% endblock body_class %}">
         {% wagtailuserbar %}
-        {% block base_content %}
-        {% endblock base_content %}
+        {% comment %}
+    Layout follows the UK Gov design system
+    https://design-system.service.gov.uk/styles/page-template/
+        {% endcomment %}
+        {% block body_start %}
+        {% endblock body_start %}
+        {% block skip_link %}
+        {% endblock skip_link %}
+        {% block header %}
+        {% endblock header %}
+        {% block main %}
+            <div class="container">
+                {% block before_content %}
+                {% endblock before_content %}
+                {% block content %}
+                {% endblock content %}
+            </div>
+        {% endblock main %}
+        {% block footer %}
+            {% include "includes/footer.html" %}
+        {% endblock footer %}
+        {% block body_end %}
+        {% endblock body_end %}
         {# Global javascript #}
         {% vite_asset 'src/agora.ts' %}
         {% block extra_js %}{# Override this in templates to add extra javascript #}{% endblock %}
