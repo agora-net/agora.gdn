@@ -37,7 +37,6 @@ dev = [
     "faker>=35.0.0",
     "lefthook>=1.11.14",
     "playwright>=1.49.1",
-    "pre-commit",
     "pyopenssl>=25.0.0",
     "pyright>=1.1.393",
     "ruff",
