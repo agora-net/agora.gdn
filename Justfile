@@ -96,6 +96,11 @@ test *FLAGS:
 test-e2e *FLAGS:
     @{{ manage }} test --shuffle --parallel --tag e2e {{ FLAGS }}
 
+# Create a new Django app in the correct directory
+startapp APP_NAME:
+    @mkdir -p agora/{{ APP_NAME }}
+    @{{ manage }} startapp --template ./app_name {{ APP_NAME }} agora/{{ APP_NAME }}
+
 ###############################################
 ## Node / static assets commands    
 ###############################################
