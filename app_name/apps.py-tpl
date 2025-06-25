@@ -1,0 +1,6 @@
+from django.apps import AppConfig
+
+
+class {{ app_name | title |cut:" " }}AppConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "agora.{{ app_name }}"
