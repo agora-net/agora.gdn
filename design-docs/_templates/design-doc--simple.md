@@ -1,8 +1,10 @@
 # Design Doc: [Feature/Project Name]
 
-Date: 2025-XX-XX
-Author(s): [@your_username]
-Status: [Proposed | In Review | Approved | Deprecated]
+| <!-- -->               |                   <!-- -->                   |
+| ---------------------- | :------------------------------------------: |
+| **Last modified date** |                  2025-XX-XX                  |
+| **Author(s)**          |                  @kisamoto                   |
+| **Status**             | Proposed / In Review / Approved / Deprecated |
 
 ## Decision & Rationale
 
