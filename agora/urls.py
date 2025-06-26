@@ -13,6 +13,11 @@ from search import views as search_views
 
 from .api_v1 import api as api_v1
 
+user_urls = [
+    path("profile/<str:username>/", core_views.ProfileView.as_view(), name="profile"),
+    path("profile/", core_views.ProfileView.as_view(), name="profile"),
+]
+
 urlpatterns = [
     path(
         "robots.txt",
@@ -20,7 +25,7 @@ urlpatterns = [
     ),
     path("", include("user.urls")),
     path("dashboard", home_views.dashboard, name="dashboard"),
-    path("profile/", core_views.ProfileView.as_view(), name="profile"),
+    path("", include((user_urls, "user"))),
     path("accounts/", include("allauth.urls")),
     path("careers/", TemplateView.as_view(template_name="home/careers.html"), name="careers"),
     path(settings.DJANGO_ADMIN_URL, admin.site.urls),

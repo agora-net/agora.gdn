@@ -1,5 +1,31 @@
-{% if user.is_authenticated %}
-    <a href="{% url 'account_logout' %}">Sign out</a>
-{% else %}
-    <a href="{% url 'account_login' %}">Sign in</a>
-{% endif %}
+<div class="navbar bg-white text-black">
+    <div class="container flex items-center">
+        <div class="flex-1">
+            <a href="{% url 'wagtail_serve' '' %}"
+               class="btn btn-ghost normal-case text-xl">agora</a>
+        </div>
+        <div class="flex-none">
+            <ul class="menu menu-horizontal px-1">
+                {% if user.is_authenticated %}
+                    <li>
+                        <details>
+                            <summary>{{ user.username }}</summary>
+                            <ul class="p-2 bg-base-100 rounded-t-none">
+                                <li>
+                                    <a href="{% url 'user:profile' user.username %}">Profile</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'account_logout' %}">Sign out</a>
+                                </li>
+                            </ul>
+                        </details>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'account_login' %}">Sign in</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
