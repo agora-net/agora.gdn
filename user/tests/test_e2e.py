@@ -118,11 +118,14 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
 
         # When they log out they are redirected to the login page
         page.click("a:has-text('Sign out')")
+        page.wait_for_url(self.get_route_by_name("account_logout"))
+
+        page.click("button:has-text('Sign Out')")
         page.wait_for_url(self.get_route_by_name("account_login"))
 
-        # If they're not logged in they can't access the dashboard page
+        # If they're not logged in they can't access the profile page
         # and are redirected to the login page
-        page.goto(self.get_route_by_name("dashboard"))
+        page.goto(self.get_route_by_name("profile"))
         page.wait_for_url(self.get_route_by_name("account_login"))
 
         # They log in and are redirected back to the profile page
