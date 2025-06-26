@@ -369,6 +369,7 @@ USE_I18N = True
 USE_TZ = True
 
 EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")  # type: ignore
+EMAIL_FILE_PATH = BASE_DIR / "e2e" / "mail"
 
 # Vite
 # https://github.com/MrBin99/django-vite?tab=readme-ov-file#configuration-variables
