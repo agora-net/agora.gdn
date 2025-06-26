@@ -134,7 +134,7 @@ install-playwright:
 # Run end-to-end tests with playwright
 [working-directory: "e2e"]
 test-e2e *FLAGS:
-    @pnpm exec playwright test {{ FLAGS }}
+    @pnpm exec playwright test --pass-with-no-tests --fail-on-flaky-tests {{ FLAGS }}
 
 ###############################################
 ## Docker commands
