@@ -3,6 +3,7 @@ from typing import Any, ClassVar, LiteralString
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
@@ -48,6 +49,18 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
     # Email address is the username
     username = None  # type: ignore[assignment]
 
+    class Visibility(models.TextChoices):
+        PUBLIC = "pub", _("Public")
+        HIDDEN = "hid", _("Hidden")
+        PRIVATE = "priv", _("Private")
+
+    visibility = models.CharField(
+        _("visibility"),
+        max_length=4,
+        choices=Visibility.choices,
+        default=Visibility.HIDDEN,
+    )
+
     REQUIRED_FIELDS = []
     USERNAME_FIELD = "email"
 
@@ -69,8 +82,18 @@ class AgoraUser(AbstractUser, SnowflakeIdPrimaryKeyMixin):
         # Apparently there's some issue with Python typing when using string operations
         return full_name.strip()  # type: ignore
 
+    def display_id(self) -> str | int:
+        if self.handle is not None:
+            return self.handle
+        return self.id
+
     def clean(self) -> None:
         return super().clean()
+
+    def get_absolute_url(self) -> str:
+        if self.handle is not None:
+            return reverse("user:profile", kwargs={"handle": self.handle})
+        return reverse("user:profile", kwargs={"id": self.id})
 
 
 class UserDateOfBirth(models.Model):
