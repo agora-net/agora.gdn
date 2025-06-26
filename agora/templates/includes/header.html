@@ -9,10 +9,10 @@
                 {% if user.is_authenticated %}
                     <li>
                         <details>
-                            <summary>{{ user.username }}</summary>
+                            <summary>{{ user.display_id }}</summary>
                             <ul class="p-2 bg-base-100 rounded-t-none">
                                 <li>
-                                    <a href="{% url 'user:profile' user.username %}">Profile</a>
+                                    <a href="{{ user.get_absolute_url }}">Profile</a>
                                 </li>
                                 <li>
                                     <a href="{% url 'account_logout' %}">Sign out</a>
