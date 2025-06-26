@@ -18,20 +18,6 @@
         }
     </style>
 {% endblock extra_css %}
-{% block progress %}
-    <ul class="steps steps-horizontal">
-        <li class="step step-secondary">{% trans "Register" %}</li>
-        <li class="step">
-            <span class="hidden lg:block">{% trans "Enable MFA" %}</span>
-            <span class="lg:hidden">{% trans "Secure" %}</span>
-        </li>
-        <li class="step">{% trans "Subscribe" %}</li>
-        <li class="step">
-            <span class="hidden lg:block">{% trans "Verify Identity" %}</span>
-            <span class="lg:hidden">{% trans "Verify" %}</span>
-        </li>
-    </ul>
-{% endblock progress %}
 {% block content %}
     {% element h1 %}
         {% trans "Sign Up" %}
