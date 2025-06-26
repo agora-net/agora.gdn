@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { faker } from '@faker-js/faker';
 import fs from 'fs/promises';
+import { authenticator } from 'otplib';
 
 const mailDir = "mail";
 
@@ -83,8 +84,26 @@ test('user registration and onboarding', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Code' }).fill(verificationCode);
   await page.click("button:has-text('Confirm')");
 
-  // For the purpose of this test, we'll skip the email verification and go straight to the profile page
   await page.goto('/profile/');
+
+  // They have to re-authenticate to access the MFA page
+  await page.waitForURL(u => u.pathname.startsWith('/accounts/reauthenticate/'));
+  await page.getByRole('textbox', { name: 'Password' }).fill(securePassword);
+  await page.click("button:has-text('Confirm')");
+
+  // They are redirected to the MFA setup page
+  await page.waitForURL(u => u.pathname.startsWith('/accounts/2fa/totp/activate/'));
+  const secret = await page.getByLabel('', { exact: true }).inputValue();
+  let otp = authenticator.generate(secret);
+  // They enter the 2FA code
+  await page.getByRole('textbox', { name: 'Authenticator code' }).fill(otp);
+  await page.click("button:has-text('Activate')");
+
+  // They are shown recovery codes
+  await page.waitForURL(u => u.pathname.startsWith('/accounts/2fa/recovery-codes/'));
+  await page.getByRole('link', { name: 'Continue' }).click();
+
+  // After account setup they are redirected to the profile page
   await expect(page).toHaveTitle('Your profile');
 
   // They refresh the profile page and it works as expected
@@ -103,9 +122,12 @@ test('user registration and onboarding', async ({ page }) => {
   await page.goto('/profile/');
   await page.waitForURL((u) => u.pathname.startsWith('/accounts/login/'));
 
-  // They log in and are redirected back to the profile page
+  // They log in with MFA and are redirected back to the profile page
   await page.getByRole('textbox', { name: 'Email' }).fill(email);
   await page.getByRole('textbox', { name: 'Password Forgot your password?' }).fill(securePassword);
+  await page.click("button:has-text('Sign in')");
+  otp = authenticator.generate(secret);
+  await page.getByRole('textbox', { name: 'Code' }).fill(otp);
   await page.click("button:has-text('Sign in')");
   await page.waitForURL((u) => u.pathname.startsWith('/profile/'));
   await expect(page).toHaveTitle('Your profile');
