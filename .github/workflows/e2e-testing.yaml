@@ -18,9 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
-
       - uses: taiki-e/install-action@2cab843126c0d8cf950bf55f4e9b8413f70f553f
         with:
           tool: just
@@ -35,9 +32,11 @@ jobs:
         with:
           node-version: 22
           cache: 'pnpm'
+          cache-dependency-path: e2e/pnpm-lock.yaml
 
       - name: Install dependencies
-        run: just install-python
+        run: pnpm install
+        working-directory: e2e
 
       - name: Install playwright dependencies
         run: just install-playwright
