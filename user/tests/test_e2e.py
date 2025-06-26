@@ -1,16 +1,12 @@
 import os
 
-import mintotp
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core import mail
 from django.test import tag
 from django.urls import reverse
 from playwright.sync_api import Browser, Playwright, expect, sync_playwright
 
-from user import selectors
-
 from .utils import faker
-from .utils import services as test_services
 
 
 def extract_verification_code(email_body: str) -> str | None:
@@ -112,56 +108,13 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
             page.fill("input[name=password]", secure_password)
             page.click("button:has-text('Confirm')")
 
-        # Next they enter the onboarding flow
-        page.wait_for_url(self.get_route_by_name("mfa_activate_totp"))
+        # Next they are taken to their profile
+        page.wait_for_url(self.get_route_by_name("profile"))
+        self.assertEqual(page.title(), "Your profile")
 
-        # They try to manually get away from the onboarding process but are redirected back
-        page.goto(self.get_route_by_name("dashboard"))
-        page.wait_for_url(self.get_route_by_name("mfa_activate_totp"))
-
-        # They have to set up MFA and choose TOTP (Authenticator app).
-        totp_secret_input = page.locator("input#authenticator_secret")
-        self.assertTrue(totp_secret_input.is_visible())
-        totp_secret = totp_secret_input.input_value()
-        totp_authenticator_code = mintotp.totp(totp_secret)
-        page.fill("input[name=code]", totp_authenticator_code)
-        page.click("button:has-text('Activate')")
-
-        # They get shown their recovery codes
-        page.wait_for_url(self.get_route_by_name("mfa_view_recovery_codes"))
-        recovery_codes = page.locator("textarea#recovery_codes").input_value().split("\n")
-        self.assertEqual(len(recovery_codes), 12)
-
-        # After successful setup they progress to the next step
-        page.goto(self.get_route_by_name("onboarding_billing"))
-        page.wait_for_url(self.get_route_by_name("onboarding_billing"))
-
-        # They try again to get away from the onboarding process but are redirected back
-        page.goto(self.get_route_by_name("dashboard"))
-        page.wait_for_url(self.get_route_by_name("onboarding_billing"))
-
-        # They pay for their annual subscription and progress to the next step
-        # Just update the database to say they have a valid subscription and go to next step
-        user_obj = selectors.user_from_email(email=user_email)
-        test_services.create_valid_subscription(user=user_obj)
-        page.reload()  # Refresh the page to get the updated subscription status
-        page.wait_for_url(self.get_route_by_name("onboarding_identity"))
-
-        # Once again they try to get away from the onboarding process but are redirected back
-        page.goto(self.get_route_by_name("dashboard"))
-        page.wait_for_url(self.get_route_by_name("onboarding_identity"))
-
-        # They verify their identity
-        # For now we'll manually set it verified in the database.
-        test_services.create_verified_identity(user=user_obj)
-        page.reload()  # Refresh the page to get the updated identity status
-        # Now they are fully onboarded and can access their dashboard
-        page.wait_for_url(self.get_route_by_name("dashboard"))
-        self.assertEqual(page.title(), "Your dashboard")
-
-        # They refresh the dashboard page and it works as expected
+        # They refresh the profile page and it works as expected
         page.reload()
-        self.assertEqual(page.title(), "Your dashboard")
+        self.assertEqual(page.title(), "Your profile")
 
         # When they log out they are redirected to the login page
         page.click("a:has-text('Sign out')")
@@ -172,10 +125,10 @@ class UserRegistrationTestCase(StaticLiveServerTestCase):
         page.goto(self.get_route_by_name("dashboard"))
         page.wait_for_url(self.get_route_by_name("account_login"))
 
-        # They log in and are redirected back to the dashboard page
+        # They log in and are redirected back to the profile page
         page.goto(self.get_route_by_name("account_login"))
         page.fill("input[name=email]", user_email)
         page.fill("input[name=password]", secure_password)
         page.click("button:has-text('Sign in')")
-        page.wait_for_url(self.get_route_by_name("dashboard"))
-        self.assertEqual(page.title(), "Your dashboard")
+        page.wait_for_url(self.get_route_by_name("profile"))
+        self.assertEqual(page.title(), "Your profile")
