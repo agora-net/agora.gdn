@@ -33,10 +33,6 @@ uv *ARGS:
 install-python *FLAGS:
     @uv sync {{ FLAGS }}
 
-# Install playwright browsers and dependencies
-install-playwright:
-    @{{ UV_RUN }} playwright install --with-deps
-
 # Run the linter and formatter
 format:
     @{{ UV_RUN }} ruff check --fix
@@ -92,11 +88,6 @@ createsuperuser *FLAGS:
 test *FLAGS:
     @{{ manage }} test --parallel --shuffle --exclude-tag e2e {{ FLAGS }}
 
-# Run end-to-end tests with playwright
-[working-directory: "e2e"]
-test-e2e *FLAGS:
-    @pnpm exec playwright test {{ FLAGS }}
-
 # Create a new Django app in the correct directory
 startapp APP_NAME:
     @mkdir -p agora/{{ APP_NAME }}
@@ -130,6 +121,20 @@ dev-frontend:
 [working-directory: "frontend/@agora/agora"]
 build-frontend *ARGS:
     @{{ PNPM }} build {{ ARGS }}
+
+###############################################
+## E2E commands
+###############################################
+
+# Install playwright browsers and dependencies
+[working-directory: "e2e"]
+install-playwright:
+    @pnpm exec playwright install --with-deps
+
+# Run end-to-end tests with playwright
+[working-directory: "e2e"]
+test-e2e *FLAGS:
+    @pnpm exec playwright test {{ FLAGS }}
 
 ###############################################
 ## Docker commands
