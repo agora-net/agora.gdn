@@ -7,6 +7,7 @@ from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
+from agora.core import views as core_views
 from home import views as home_views
 from search import views as search_views
 
@@ -19,7 +20,7 @@ urlpatterns = [
     ),
     path("", include("user.urls")),
     path("dashboard", home_views.dashboard, name="dashboard"),
-    path("profile/", home_views.dashboard, name="profile"),
+    path("profile/", core_views.ProfileView.as_view(), name="profile"),
     path("accounts/", include("allauth.urls")),
     path("careers/", TemplateView.as_view(template_name="home/careers.html"), name="careers"),
     path(settings.DJANGO_ADMIN_URL, admin.site.urls),

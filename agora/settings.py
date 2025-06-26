@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "django_vite",
     "widget_tweaks",
     "user",  # Custom user model
+    "agora.core",
 ]
 
 if DEBUG and not TESTING:
@@ -335,8 +336,6 @@ LOGOUT_REDIRECT_URL = "/"
 
 # All Auth
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_CHANGE_EMAIL = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = True
@@ -346,10 +345,11 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_LOGIN_TIMEOUT = 60 * 15  # 15 minutes
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "user_name_required"
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
 # All Auth MFA
 # https://docs.allauth.org/en/latest/mfa/configuration.html
