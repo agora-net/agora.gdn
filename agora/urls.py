@@ -14,8 +14,11 @@ from search import views as search_views
 from .api_v1 import api as api_v1
 
 user_urls = [
-    path("profile/<str:username>/", core_views.ProfileView.as_view(), name="profile"),
-    path("profile/", core_views.ProfileView.as_view(), name="profile"),
+    # Cover both the handle and the ID
+    path("profile/<int:id>/", core_views.ProfileView.as_view(), name="profile"),
+    path("profile/<str:handle>/", core_views.ProfileView.as_view(), name="profile"),
+    # Redirect to the profile page of the current user
+    path("profile/", core_views.ProfileRedirectView.as_view(), name="profile"),
 ]
 
 urlpatterns = [
