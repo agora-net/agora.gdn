@@ -16,12 +16,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
 
-      - uses: taiki-e/install-action@v2
+      - name: Install just
+      - uses: taiki-e/install-action@2cab843126c0d8cf950bf55f4e9b8413f70f553f
         with:
           tool: just
 
@@ -29,7 +30,7 @@ jobs:
         run: just install-python
 
       - name: Copy .env file
-        run: cp .env.template .env
+        run: cp .env.dist .env
 
       - name: Typecheck
         run: just typecheck
