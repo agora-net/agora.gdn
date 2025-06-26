@@ -93,8 +93,9 @@ test *FLAGS:
     @{{ manage }} test --parallel --shuffle --exclude-tag e2e {{ FLAGS }}
 
 # Run end-to-end tests with playwright
+[working-directory: "e2e"]
 test-e2e *FLAGS:
-    @{{ manage }} test --shuffle --parallel --tag e2e {{ FLAGS }}
+    @pnpm exec playwright test {{ FLAGS }}
 
 # Create a new Django app in the correct directory
 startapp APP_NAME:
