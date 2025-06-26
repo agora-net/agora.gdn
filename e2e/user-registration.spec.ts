@@ -1,7 +1,10 @@
 
 import { test, expect } from '@playwright/test';
+import { faker } from '@faker-js/faker';
 
 test('user registration and onboarding', async ({ page }) => {
+  const email = faker.internet.email({ provider: 'example.com' });
+
   // First of all they visit the login page
   await page.goto('/accounts/login/');
   await expect(page).toHaveTitle('Sign In');
@@ -13,7 +16,7 @@ test('user registration and onboarding', async ({ page }) => {
 
   // They enter their email address and password and submit the form
   const insecurePassword = 'password';
-  await page.fill('input[name=email]', 'test@example.com');
+  await page.fill('input[name=email]', email);
   await page.fill('input[name=password1]', insecurePassword);
   await page.fill('input[name=password2]', insecurePassword);
   await page.click("button:has-text('Sign up')");
@@ -56,7 +59,7 @@ test('user registration and onboarding', async ({ page }) => {
 
   // They log in and are redirected back to the profile page
   await page.goto('/accounts/login/');
-  await page.fill('input[name=email]', 'test@example.com');
+  await page.fill('input[name=email]', email);
   await page.fill('input[name=password]', securePassword);
   await page.click("button:has-text('Sign in')");
   await page.waitForURL('/profile/');
