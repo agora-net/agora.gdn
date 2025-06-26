@@ -329,7 +329,7 @@ CSRF_COOKIE_SECURE = True
 
 LOGIN_URL = "account_login"
 LOGIN_REDIRECT_URL = "profile"
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "account_login"
 
 # All Auth
 # https://docs.allauth.org/en/latest/account/configuration.html
@@ -488,7 +488,6 @@ stripe.api_key = STRIPE_SECRET_KEY
 # ------------------------------------
 
 DJANGO_ADMIN_URL = env.str("DJANGO_ADMIN_URL", default="django-admin/")  # pyright: ignore
-
 
 
 for db in DATABASES.values():
