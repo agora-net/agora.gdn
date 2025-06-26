@@ -101,6 +101,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "user.middleware.AllUserRequire2FAMiddleware",
 ]
 
 if DEBUG and not TESTING:
