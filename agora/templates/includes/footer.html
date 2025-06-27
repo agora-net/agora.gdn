@@ -14,17 +14,19 @@
             <a class="link link-hover">Privacy policy</a>
             <a class="link link-hover">Cookie policy</a>
         </nav>
-        <form>
-            <h6 class="footer-title">Newsletter</h6>
-            <fieldset class="w-80">
-                <label>Enter your email address</label>
-                <div class="join">
-                    <input type="text"
-                           placeholder="name@example.com"
-                           class="input input-bordered join-item" />
-                    <button class="btn btn-primary join-item">Subscribe</button>
-                </div>
-            </fieldset>
-        </form>
+        {% if not user.is_authenticated or True %}
+            <form class="w-full">
+                <h6 class="footer-title">Newsletter</h6>
+                <fieldset class="w-full lg:w-80">
+                    <label>Enter your email address</label>
+                    <div class="join w-full">
+                        <input type="text"
+                               placeholder="name@example.com"
+                               class="input input-bordered join-item" />
+                        <button class="btn btn-primary join-item">Subscribe</button>
+                    </div>
+                </fieldset>
+            </form>
+        {% endif %}
     </footer>
 </div>
