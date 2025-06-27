@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
-     class="h-24 l:h-32 w-fit fill-secondary"
+     class="{% if class %}{{ class }}{% else %}h-24 l:h-32 w-fit fill-secondary{% endif %}"
      zoomAndPan="magnify"
      viewBox="0 0 255 103.5"
      preserveAspectRatio="xMidYMid meet"
+     height="96"
+     width="236"
      version="1.0">
     <defs>
     <g />
