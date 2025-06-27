@@ -29,7 +29,7 @@
         {% block extra_head %}
         {% endblock extra_head %}
     </head>
-    <body class="{% block body_class %}min-h-screen bg-base-300{% endblock body_class %}">
+    <body class="{% block body_class %}min-h-screen bg-base-300 flex flex-col{% endblock body_class %}">
         {% wagtailuserbar %}
         {% comment %}
     Layout follows the UK Gov design system
@@ -43,7 +43,7 @@
             {% include "includes/header.html" %}
         {% endblock header %}
         {% block main %}
-            <div class="container">
+            <div class="container flex-1">
                 {% block before_content %}
                 {% endblock before_content %}
                 {% block content %}
@@ -51,6 +51,7 @@
             </div>
         {% endblock main %}
         {% block footer %}
+            {% include "includes/footer.html" %}
         {% endblock footer %}
         {% block body_end %}
         {% endblock body_end %}
