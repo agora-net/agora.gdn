@@ -1,8 +1,7 @@
 <div class="navbar bg-white text-black">
     <div class="container flex items-center">
         <div class="flex-1">
-            <a href="{% url 'wagtail_serve' '' %}"
-               class="btn btn-ghost normal-case text-xl">agora</a>
+            <a href="{% url 'wagtail_serve' '' %}">{% include "logo/agora.svg" with class="h-10 w-fit fill-secondary" %}</a>
         </div>
         <div class="flex-none">
             <ul class="menu menu-horizontal px-1">
