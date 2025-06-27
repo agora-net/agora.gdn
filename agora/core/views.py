@@ -35,7 +35,10 @@ class ProfileView(LoginRequiredMixin, DetailView):
         assert profile is not None
 
         # Check permissions
-        if (
+        if profile.id == self.request.user.id:
+            # User can view their own profile
+            pass
+        elif (
             profile.visibility == AgoraUser.Visibility.HIDDEN
             and not self.request.user.has_perm("user.view_hidden_profile", profile)
         ) or (

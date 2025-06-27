@@ -329,7 +329,7 @@ AUTHENTICATION_BACKENDS = [
 CSRF_COOKIE_SECURE = True
 
 LOGIN_URL = "account_login"
-LOGIN_REDIRECT_URL = "profile"
+LOGIN_REDIRECT_URL = "user:profile"
 LOGOUT_REDIRECT_URL = "account_login"
 
 # All Auth
