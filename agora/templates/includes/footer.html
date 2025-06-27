@@ -15,7 +15,9 @@
             <a class="link link-hover">Privacy policy</a>
             <a class="link link-hover">Cookie policy</a>
         </nav>
-        {% if not user.is_authenticated or True %}<div data-form-location="footer" id="newsletter-form-root"></div>{% endif %}
+        {% if not user.is_authenticated and not request.COOKIES.newsletter_signup %}
+            <div data-form-location="footer" id="newsletter-form-root"></div>
+        {% endif %}
     </footer>
 </div>
 {% block extra_js %}
