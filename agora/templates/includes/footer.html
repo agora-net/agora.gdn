@@ -1,3 +1,4 @@
+{% load django_vite %}
 <div class=" bg-base-200 text-base-content py-10">
     <footer class="container footer sm:footer-horizontal">
         <a href="{% url 'wagtail_serve' '' %}">{% include "logo/agora.svg" with class="h-10 w-fit fill-current" %}</a>
@@ -14,19 +15,9 @@
             <a class="link link-hover">Privacy policy</a>
             <a class="link link-hover">Cookie policy</a>
         </nav>
-        {% if not user.is_authenticated or True %}
-            <form class="w-full">
-                <h6 class="footer-title">Newsletter</h6>
-                <fieldset class="w-full lg:w-80">
-                    <label>Enter your email address</label>
-                    <div class="join w-full">
-                        <input type="text"
-                               placeholder="name@example.com"
-                               class="input input-bordered join-item" />
-                        <button class="btn btn-primary join-item">Subscribe</button>
-                    </div>
-                </fieldset>
-            </form>
-        {% endif %}
+        {% if not user.is_authenticated or True %}<div data-form-location="footer" id="newsletter-form-root"></div>{% endif %}
     </footer>
 </div>
+{% block extra_js %}
+    {% vite_asset "src/newsletter.tsx" %}
+{% endblock extra_js %}

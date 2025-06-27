@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "user",  # Custom user model
     "agora.core",
+    "agora.newsletter",
 ]
 
 if DEBUG and not TESTING:

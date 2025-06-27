@@ -25,6 +25,7 @@ export default {
 				copyToClipboard: "src/clipboard.ts",
 				tailwind: "src/tailwind.css",
 				agora: "src/agora.ts",
+				newsletter: "src/newsletter.tsx",
 			},
 		},
 		modulePreload: {
